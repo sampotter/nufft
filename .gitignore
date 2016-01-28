@@ -1,0 +1,13 @@
+build
+.juliahistory
+*.mat
+*.pdf
+*.log
+*.eps
+*.aux
+*.bbl
+*.blg
+*.out
+*.nav
+*.snm
+*.toc

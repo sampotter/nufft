@@ -1,0 +1,228 @@
+\section{Cauchy Kernel Translation Operators}
+
+Our algorithm makes use of the multilevel fast multipole method
+(MLFMM) in its implementation. The MLFMM is developed in particular
+for our kernel $\Phi$. In this section, we derive the corresponding
+$\SSmat$, $\SRmat$, and $\RRmat$ translation operators. We also derive
+two simple but useful results. The first shows that translation of a
+truncated $R$ or $S$ factorization corresponds to multiplying the
+truncated expansion coefficients by the matrix obtained by considering
+the upper left block of the infinite matrix representation of the
+translation operator. The second result extends this slightly to
+consider translations of linear combinations of truncated
+factorizations. The second result is very useful for implementing the
+upward and downward passes of the MLFMM.\@
+
+\subsection{$\SSmat$ Translation Operator}
+
+For the $\SSmat$
+operator, we fix $m \in \nats$
+and $x_*, x_*' \in \mathbb{R}$,
+defining $\delta$ as before. Then, considering $S_m$, we can write:
+\begin{align*}
+  S_m(y - x_*) = \parens{y - x_*' + \delta}^{-m-1} = \parens{y - x_*'}^{-m-1} \parens{1 + {\delta \over y - x_*'}}^{-m-1}.
+\end{align*}
+We have, for $|x| < 1$,
+that the Taylor series expansion of $\parens{1 + x}^{-m-1}$
+is given by:
+\begin{align*}
+  \parens{1 + x}^{-m-1} = \sum_{n=0}^\infty {-m-1 \choose n} x^n,
+\end{align*}
+where we treat ${-m-1 \choose n}$
+as \emph{generalized} binomial coefficients. These are given by:
+\begin{align*}
+  {-m-1 \choose n} = \prod_{k=1}^n {-m-1-k+1 \over k} = \parens{-1}^n {(m+n)! \over m!n!}.
+\end{align*}
+Applying this form for $\parens{1 + x}^{-m-1}$
+to our expression for $S_m$, we can write:
+\begin{align*}
+  S_m(y - x_*)
+  &= \parens{y - x_*'}^{-m-1} \sum_{n=0}^\infty \parens{-1}^n {\parens{m + n}! \over m! n!} \parens{\delta \over y - x_*'}^n \\
+  &= \sum_{n = 0}^\infty \parens{-1}^n {\parens{m + n}! \delta^n \over m! n!} S_{m+n}(y - x_*') \\
+  &= \sum_{n = m}^\infty \parens{-1}^{n-m} {n! \delta^{n-m} \over \parens{n - m}! m!} S_n(y-x_*') & \mbox{(mapping $n \mapsto n - m$)}.
+\end{align*}
+Where, again, we require that $\abs{\delta} < \abs{y - x_*'}$,
+from having made use of the Taylor series expansion for
+$\parens{1 + x}^{-m-1}$.
+
+If we consider $\SSmat$
+to be an infinite matrix with the $(n,m)$th
+entry given by the $n$th
+coefficient of the preceding series expansion for $S_m$,
+we can define:
+\begin{align*}
+  \parens{\SSmat}_{n,m} \equiv \parens{-1}^{n - m} {n! \delta^{n-m} \over \parens{n - m}! m!},
+\end{align*}
+which then allows us to write:
+\begin{align*}
+  S_m(y - x_*) = \sum_{n=0}^\infty \parens{\SSmat}_{n,m} S_n(y - x_*').
+\end{align*}
+Schematically, the matrix $\SSmat$
+can be written as follows (bearing in mind that $m \geq 0$
+and $n \geq m$, with entries equal to zero for $n < m$):
+\begin{align*}
+  \SSmat = \begin{bmatrix} 
+    1 & 0 & 0 & 0 & 0 & \cdots \\
+    -\delta & 1 & 0 & 0 & 0 & \cdots \\
+    \delta^2 & -2\delta & 1 & 0 & 0 & \cdots \\
+    -\delta^3 & 3\delta^2 & -3\delta & 1 & 0 & \cdots \\
+    \delta^4 & -4\delta^3 & 6 \delta^2 & -4 \delta & 1 & \cdots \\
+    \vdots & \vdots & \vdots & \vdots & \vdots & \ddots \\
+  \end{bmatrix}
+\end{align*}
+
+\subsection{$\SRmat$ Translation Operator}
+
+To determine the $\SRmat$
+operator, we start by directly considering the Taylor series of $S_m$
+expanded at $\delta$. We have:
+\begin{align*}
+  S_m(x) = \sum_{n=0}^\infty {S_m^{(n)}(\delta) \over n!} \parens{x - \delta},
+\end{align*}
+where the $n$th
+derivative of $S_m$ evaluated at $\delta$ is computed to be:
+\begin{align*}
+  S_m^{(n)}(\delta) = \left. {d^n S_m \over dx^n} \right|_{x = \delta} = \parens{-1}^n \parens{m+1} \parens{m+2} \cdots \parens{m+n} \delta^{-m-n-1} = \parens{-1}^n {\parens{m + n}! \over m! \delta^{m+n+1}}.
+\end{align*}
+Then, substituting this expression into our Taylor series expansion for
+$S_m$ and evaluating at $y - x_*$ gives us:
+\begin{align*}
+  S_m(y - x_*) = \sum_{n=0}^\infty {\parens{-1}^n \parens{m + n}! \over m! n! \delta^{m + n + 1}} \parens{y - x_* - \delta}^n = \sum_{n=0}^\infty {\parens{-1}^n \parens{m + n}! \over m! n! \delta^{m + n + 1}} R_n(y - x_*'),
+\end{align*}
+since $y - x_* - \delta = y - x_*'$.
+
+Again, having expressed $S_m(y - x_*)$
+as a series in $R_n(y - x_*')$,
+we have a means of defining $\SRmat$
+by reading off the coefficients of these series for each $m$.
+This gives us:
+\begin{align*}
+  \parens{\SRmat}_{n,m} \equiv {\parens{-1}^n \parens{m + n}! \over m! n! \delta^{m+n+1}}.
+\end{align*}
+As before, we can use these coefficients to express $S_m$
+as a series in $R_n$
+by writing:
+\begin{align*}
+  S_m(y - x_*) = \sum_{n=0}^\infty \parens{\SRmat}_{n,m} R_n(y - x_*').
+\end{align*}
+The resultant infinite matrix $\SRmat$ can be depicted as follows:
+\begin{align*}
+  \SRmat = \begin{bmatrix}
+    \delta^{-1} & \delta^{-2} & \delta^{-3} & \delta^{-4} & \cdots \\
+    -\delta^{-2} & -2\delta^{-3} & -3\delta^{-4} & -4\delta^{-5} & \cdots \\
+    \delta^{-3} & 3\delta^{-4} & 6 \delta^{-5} & 10 \delta^{-6} & \cdots \\
+    -\delta^{-4} & -4 \delta^{-5} & -10 \delta^{-6} & -20 \delta^{-7} & \cdots \\
+    \vdots & \vdots & \vdots & \vdots & \ddots
+  \end{bmatrix}
+\end{align*}
+By considering this matrix, we can see that the antidiagonals are
+constant in their power for $\delta$
+and are multiplied by the binomial coefficients with alternating sign.
+
+\subsection{$\RRmat$ Translation Operator}
+
+The $\RRmat$
+translation operator is a bit simpler. If we consider $R_m(y - x_*)$,
+we can write:
+\begin{align*}
+  R_m(y - x_*) = (y - x_*)^m = (y - x_*' + x_* - x_*)^m = (y - x_*' + \delta)^m.
+\end{align*}
+Then, applying the binomial formula, we find that:
+\begin{align*}
+  R_m(y - x_*) = \sum_{n=0}^m {m \choose n} \delta^{m - n} \parens{y - x_*'}^n = \sum_{n=0}^m {m! \delta^{m - n} \over (m - n)! n!} R_n(y - x_*').
+\end{align*}
+Then, reading off the coefficients of this expansion, we can define
+the entries of $\RRmat$ by:
+\begin{align*}
+  \parens{\RRmat}_{n,m} = \left\{ \begin{tabular}{cl}
+                                    ${m! \delta^{m - n} \over (m - n)! n!}$ & if $n \leq m$, \\
+                                    $0$ & otherwise.
+                                  \end{tabular} \right.
+\end{align*}
+This allows us to write our reexpansion compactly:
+\begin{align*}
+  R_m(y - x_*) = \sum_{n=0}^\infty \parens{\RRmat}_{n,m} R_n(y - x_*').
+\end{align*}
+Writing out $\RRmat$ explicitly gives us:
+\begin{align*}
+  \RRmat = \begin{bmatrix}
+    1 & \delta & \delta^2 & \delta^3 & \delta^4 & \cdots \\
+    0 & 1 & 2\delta & 3 \delta^2 & 4\delta^3 & \cdots \\
+    0 & 0 & 1 & 3 \delta & 6\delta^2 & \cdots \\
+    0 & 0 & 0 & 1 & 4 \delta & \cdots \\
+    0 & 0 & 0 & 0 & 1 & \cdots \\
+    \vdots & \vdots & \vdots & \vdots & \vdots & \ddots
+  \end{bmatrix}
+\end{align*} 
+
+\emph{Note: this is the translation operator that differs from what
+  was derived in lecture.}
+
+\subsection{Application of the Translation Operators}
+
+Focusing on the $\SSmat$
+translation operator, we can consider the application of it to the
+kernel $\Phi$
+to reexpand $\Phi$
+about a new expansion center $x_*'$.
+Considering a singular expansion about $x_*$,
+our kernel $\Phi$ can be written:
+\begin{align*}
+  \Phi(y, x) = \sum_{m=0}^\infty b_m(x, x_*) S_m(y - x_*).
+\end{align*}
+And, as before, the $\SSmat$
+translation operator lets us expand each $S_m(y - x_*)$ as:
+\begin{align*}
+  S_m(y - x_*) = \sum_{n=0}^\infty \parens{\SSmat}_{n,m} S_n(y - x_*').
+\end{align*}
+So, if we substitute our reexpansion of $S_m$
+into our expression for $\Phi$, we can compute:
+\begin{align*}
+  \Phi(y, x)
+  &= \sum_{m=0}^\infty b_m(x, x_*) \sum_{n=0}^\infty \parens{\SSmat}_{n,m} S_n(y - x_*') \\
+  &= \sum_{n=0}^\infty \parens{\sum_{m=0}^\infty \parens{\SSmat}_{n,m} b_m(x, x_*)} S_n(y - x_*').
+\end{align*}
+
+From this expression, can see that reexpansion of the kernel $\Phi$
+about $x_*'$ is tantamount to multiplication of the coefficients $b_m$
+by the infinite matrix $\SSmat$, with the sequence of coefficients
+treated as an infinite column vector. Of course, the same sort of
+result holds for the $\SRmat$ and $\RRmat$ translation operators.
+
+\subsection{Translations of Linear Combinations}
+
+A small result that will be useful in the construction of the
+multilevel fast multipole method algorithm which we will make use of
+is the following. Consider a set of source points $\set{x_k}$
+and a set of weights $\set{u_k}$,
+both of size $N$,
+and a kernel $\Phi$
+which is a linear combination of $N$ other kernels, defined by:
+\begin{align*}
+  \Phi(y) = \sum_{k=1}^N u_k \Phi(y, x_k).
+\end{align*}
+As usual, we let $x_*$
+denote our original expansion center and $x_*'$
+our new expansion center. Without loss of generality, we will consider
+$S$
+expansions of the kernels $\Phi(y, x_k)$
+and the $\SSmat$
+translation operator. Then, for a general argument $y$,
+we can reexpress $\Phi(y)$ itself by writing:
+\begin{align*}
+  \Phi(y)
+  &= \sum_{k=1}^N u_k \Phi(y, x_k) \\
+  &= \sum_{k=1}^N u_k \sum_{m=0}^\infty b_m(x_k, x_*) S_m(y - x_*) \\
+  &= \sum_{k=1}^N u_k \sum_{n=0}^\infty \parens{\sum_{m=0}^\infty \parens{\SSmat}_{n,m} b_m(x_k, x_*)} S_n(y - x_*') \\
+  &= \sum_{n=0}^\infty \parens{\sum_{k=1}^N u_k \sum_{m=0}^\infty \parens{\SSmat}_{n,m} b_m(x_k, x_*)} S_n(y - x_*').
+\end{align*}
+From this final expression, we can see that translating linear
+combinations of kernels that are expanded about the same expansion
+center can be achieved by computing a new sequence of coefficients by
+evaluating the same linear combination of the $\SSmat$-translated
+coefficients. 
+
+Extending this formulation slightly, separate original expansion
+centers can also be handled straightforwardly. This will be useful,
+for example, in aggregating multipole expansions in the ``upward
+pass'' phase of the multilevel fast multipole method.

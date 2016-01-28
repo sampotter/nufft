@@ -1,0 +1,553 @@
+\documentclass{beamer}
+
+\usepackage{
+  amsmath,
+  amssymb,
+  amsthm,
+  tikz,
+  xcolor
+}
+
+\newcommand{\abs}[1]{\card{#1}}
+\newcommand{\asconv}{\overset{\operatorname{as}}{\longrightarrow}}
+\newcommand{\bern}[1]{\operatorname{Bernoulli} \parens{#1}}
+\newcommand{\bigcdot}{\boldsymbol{\cdot}}
+\newcommand{\boldup}[1]{\textbf{\textup{#1}}}
+\newcommand{\card}[1]{\left|#1\right|}
+\newcommand{\comp}[1]{{#1}^{c}}
+\newcommand{\condexpected}[2]{E \left[ #1 \;\middle\vert\; #2 \right]}
+\newcommand{\condprob}[2]{P \left[ #1 \;\middle\vert\; #2 \right]}
+\newcommand{\cov}[2]{\operatorname{cov} \parens{#1, #2}}
+\newcommand{\curlyb}[1]{\left\{#1\right\}}
+\newcommand{\distconv}{\overset{\operatorname{d}}{\longrightarrow}}
+\newcommand{\expected}[1]{E \squareb{#1}}
+\newcommand{\exponential}[1]{\operatorname{Exp} \parens{#1}}
+\newcommand{\geom}[1]{\operatorname{Geometric} \parens{#1}}
+\newcommand{\icoms}{\longleftrightarrow}
+\newcommand{\io}{\mbox{i.o.}}
+\newcommand{\nats}{\mathbb{N}}
+\newcommand{\probarc}[1]{\stackrel{#1}{\longrightarrow}}
+\newcommand{\parens}[1]{\left(#1\right)}
+\newcommand{\poisson}[1]{\mbox{Poisson} \parens{#1}}
+\newcommand{\powerset}[1]{2^{#1}}
+\newcommand{\probconv}[1]{\overset{#1}{\longrightarrow}}
+\newcommand{\prob}[1]{P \squareb{#1}}
+\newcommand{\qmconv}{\overset{\operatorname{qm}}{\longrightarrow}}
+\newcommand{\range}{\operatorname{range}}
+\newcommand{\reaches}{\longrightarrow}
+\newcommand{\set}[1]{\left\{#1\right\}}
+\newcommand{\squareb}[1]{\left[#1\right]}
+\newcommand{\uniform}[2]{\operatorname{Uniform}\left(#1, #2\right)}
+\newcommand{\var}[1]{\operatorname{var} \parens{#1}}
+
+% commands for this paper
+
+\newcommand{\phinear}{\phi_{\operatorname{near}}}
+\newcommand{\phifar}{\phi_{\operatorname{far}}}
+\newcommand{\SSmat}{\bold{S}|\bold{S}}
+\newcommand{\SRmat}{\bold{S}|\bold{R}}
+\newcommand{\RRmat}{\bold{R}|\bold{R}}
+
+% title etc
+
+\title{FMM-based Bandlimited Interpolation}
+\author{Sam Potter}
+
+\begin{document}
+
+\setbeamertemplate{itemize items}[triangle]
+
+\frame{\titlepage}
+
+\begin{frame}
+  \frametitle{Motivation}
+  \begin{itemize}
+  \item The FFT and IFFT are a pair of algorithms that convert in
+    $O(N \log N)$ time between:
+    \begin{align*}
+      \set{f(x_k)} \underset{\operatorname{FFT}}{\overset{\operatorname{IFFT}}{\leftrightarrows}} \set{c_n},
+    \end{align*}
+    where $x_k = 2\pi k/N$ and:
+    \begin{align*}
+      c_n = {1 \over N} \sum_{k=0}^{N-1} f(x_k) e^{-inx_k}.
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Motivation}
+  \begin{itemize}
+  \item The input and output of the FFT are thought of as equispaced
+    grids of point in space or time and frequency, respectively. What
+    if we don't have equispaced input or don't want equispaced output?
+    \pause
+  \item We need to interpolate.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item There are six possible algorithms:
+    \begin{align*}
+      \begin{tabular}{ccc}
+        space/time domain & & frequency domain \\
+        equispaced & $\leftrightarrows$ & nonequispaced \\
+        nonequispaced & $\leftrightarrows$ & equispaced \\
+        nonequispaced & $\leftrightarrows$ & nonequispaced
+      \end{tabular}
+    \end{align*}
+  \item This project focuses on this case:
+    \begin{align*}
+      \begin{tabular}{ccc}
+        \textbf{nonequispaced} & $\boldsymbol{\leftarrow}$ & \textbf{equispaced}
+      \end{tabular}      
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item Assume that $f$ is \emph{bandlimited} so that:
+    \begin{align*}
+      f(x) = \sum_{n=-(N-1)}^{N-1} c_n e^{jnx}
+    \end{align*}
+  \item The function $f$ is $2\pi$-periodic.
+  \item Let there be $M$ points $y_j$ distributed in $[0, 2\pi)$.
+  \item And let $g_j = f(y_j)$.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item A little algebra and the fact that $f$ is bandlimited gives us:
+    \begin{align*}
+      g_j = f(y_j) = \sum_{k=0}^{N-1} f(x_k) \parens{{1 \over N} \sum_{n=-(N-1)}^{N-1} e^{-inx_k} e^{iny_j}}
+    \end{align*}
+    \pause
+  \item \ldots suggesting that we define a matrix $\bold{K}$ by:
+    \begin{align*}
+      K_{jk} = {1 \over N} \sum_{n=-(N-1)}^{N-1} e^{-inx_k} e^{iny_j}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item Stacking the $f(x_k) = f_k$'s
+    and $g_j$'s into the vectors $\bold{f}$ and $\bold{g}$ lets us write:
+    \begin{align*}
+      \bold{g} = \bold{K} \bold{f}
+    \end{align*}
+  \item Solving our interpolation problem is the same as solving for
+    $\bold{g}$.
+    \pause
+  \item \textbf{Bad:} naive matrix multiplication has complexity $O(N^2)$.
+    \pause
+  \item \textbf{Worse:} our resulting IFFT algorithm is $O(N^2)$.
+    \begin{align*}
+      \underbrace{\set{f(x_k)} \; \overset{O(N^2)}{\longleftarrow} \; \set{g_j} \overset{O(N \log N)}{\longleftarrow} \set{c_n}}_{O(N^2)}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item We can rewrite the entries of $\bold{K}$ as:
+    \begin{align*}
+      K_{jk} = {1 \over N} \parens{-1 + {e^{iNy_j} - 1 \over e^{i(y_j - x_k)} - 1} + {e^{-iNy_j} - 1 \over e^{i(x_k - y_j)} - 1}}
+    \end{align*}
+    \pause
+  \item From this expression, we define:
+    \begin{align*}
+      F_j^+ = {e^{iNy_j} - 1 \over N} \hspace{1cm} F_j^- = {e^{-iNy_j} - 1 \over N}
+    \end{align*}
+    \begin{align*}
+      G(t) = {1 \over e^{it} - 1}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item For $G(t) = (e^{it} - 1)^{-1}$, we have:
+    \begin{align*}
+      G(t) = {1 + i \cot(t/2) \over 2}
+    \end{align*}
+  \item We also have:
+    \begin{align*}
+      \cot(t) = \sum_{k=-\infty}^\infty {1 \over t - \pi k}
+    \end{align*}
+    \pause
+  \item Combining these yields:
+    \begin{align*}
+      G(t) = {1 \over 2} + i \sum_{k=-\infty}^\infty {1 \over t - 2\pi k}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{Setup}
+  \begin{itemize}
+  \item Altogether, for the components of $\bold{g}$, we can write:
+    \begin{align*}
+      g_j = &\parens{{F_j^+ + F_j^- \over 2} - N^{-1}} \sum_{k=0}^{N-1} f_k \; + \\ &i \parens{F_j^+ - F_j^-} \sum_{l=-\infty}^\infty \sum_{k=0}^{N-1} {f_k \over y_j - x_k - 2\pi l}
+    \end{align*}
+    \pause
+  \item \textbf{Goal}: combine this equation with the fast multipole
+    method to compute $\bold{g} = \bold{K} \bold{f}$
+    in $O(N \log N)$ time or better.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Brief Detour}
+  \begin{itemize}
+  \item Notice that the highlighted term is an \emph{infinite,
+      $2\pi$-periodic summation of simple kernels that we've seen in class}:
+    \begin{align*}
+      g_j = & \parens{{F_j^+ + F_j^- \over 2} - N^{-1}} \sum_{k=0}^{N-1} f_k \; + \\ & i \parens{F_j^+ - F_j^-} \textcolor{red}{\sum_{l=-\infty}^\infty \sum_{k=0}^{N-1} {f_k \over y_j - x_k - 2\pi l}}
+    \end{align*}
+  \item We'll summarize the relevant factorizations and translation operators.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Brief Detour}{Kernel Factorization}
+  \begin{itemize}
+  \item We define the kernel $\Phi$ by:
+    \begin{align*}
+      \Phi(y, x) = {1 \over y - x}.
+    \end{align*}
+    \pause
+  \item Its regular factorization is given by:
+    \begin{align*}
+      \Phi(y, x) = {1 \over x - x_*} \sum_{m=0}^\infty \parens{y - x_* \over x - x_*}^m = \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*).
+    \end{align*}
+    \pause
+  \item And its singular factorization by:
+    \begin{align*}
+      \Phi(y, x) = {1 \over y - x_*} \sum_{m=0}^\infty \parens{x - x_* \over y - x_*}^m = \sum_{m=0}^\infty b_m(x, x_*) S_m(y - x_*)
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Brief Detour}{$\bold{S}|\bold{S}$ Translation Operator}
+  \begin{itemize}
+  \item The $\bold{S}|\bold{S}$ operator is given by:
+    \begin{align*}
+      \bold{S}|\bold{S} = \begin{bmatrix}
+        1 & 0 & 0 & 0 & 0 & \cdots \\
+        -\delta & 1 & 0 & 0 & 0 & \cdots \\
+        \delta^2 & -2\delta & 1 & 0 & 0 & \cdots \\
+        -\delta^3 & 3\delta^2 & -3\delta & 1 & 0 & \cdots \\
+        \delta^4 & -4\delta^3 & 6 \delta^2 & -4 \delta & 1 & \cdots \\
+        \vdots & \vdots & \vdots & \vdots & \vdots & \ddots
+      \end{bmatrix}
+    \end{align*}
+    \pause
+  \item Great structure\----lower triangular, alternating signs, ascending powers of $\delta$, binomial coefficients\ldots
+  \item Should be possible to write a very efficient algorithm to compute this operator.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Brief Detour}{$\bold{S}|\bold{R}$ Translation Operator}
+  \begin{itemize}
+  \item Likewise, the $\bold{S}|\bold{R}$ matrix is written:
+    \begin{align*}
+      \bold{S}|\bold{R} = \begin{bmatrix}
+        \delta^{-1} & \delta^{-2} & \delta^{-3} & \delta^{-4} & \cdots \\
+        -\delta^{-2} & -2\delta^{-3} & -3\delta^{-4} & -4\delta^{-5} & \cdots \\
+        \delta^{-3} & 3\delta^{-4} & 6 \delta^{-5} & 10 \delta^{-6} & \cdots \\
+        -\delta^{-4} & -4 \delta^{-5} & -10 \delta^{-6} & -20 \delta^{-7} & \cdots \\
+        \vdots & \vdots & \vdots & \vdots & \ddots
+      \end{bmatrix}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{A Brief Detour}{$\bold{R}|\bold{R}$ Translation Operator}
+  \begin{itemize}
+  \item And the $\bold{R}|\bold{R}$ matrix is written:
+    \begin{align*}
+      \bold{R}|\bold{R} = \begin{bmatrix}
+        1 & \delta & \delta^2 & \delta^3 & \delta^4 & \cdots \\
+        0 & 1 & 2\delta & 3 \delta^2 & 4\delta^3 & \cdots \\
+        0 & 0 & 1 & 3 \delta & 6\delta^2 & \cdots \\
+        0 & 0 & 0 & 1 & 4 \delta & \cdots \\
+        0 & 0 & 0 & 0 & 1 & \cdots \\
+        \vdots & \vdots & \vdots & \vdots & \vdots & \ddots
+      \end{bmatrix}
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}
+  \begin{align*}
+    \phi(y) = \sum_{l=-\infty}^\infty \sum_{k=0}^{N-1} {f_k \over y - x_k + 2 \pi l}
+  \end{align*}
+  \begin{itemize}
+  \item We can compute this summation using a method presented in a
+    paper by Professors Gumerov and Duraiswami (\emph{A method to
+      compute periodic sums}, 2014, Journal of Computational Physics).
+    \pause
+  \item We will present an adaption of their algorithm which applies to
+    our particular summation.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Dividing the Domain}
+  \begin{figure}[h]
+    \centering
+    \begin{tikzpicture}
+      \draw[-] (-0.6,0) -- (2.6, 0);
+      \draw[-] (0, 0.1) -- (0, -0.1) node[below] {$0$};
+      \fill[black] (1, 0) circle (1pt);
+      \draw[dashed] (1, 0) -- (1, -1) node[below] {$x_* = \pi$};
+      \draw[-] (2, 0.1) -- (2, -0.1) node[below] {$2\pi$};
+      
+      \fill[black] (-0.85, 0) circle (0.5pt);
+      \fill[black] (-1.0, 0) circle (0.5pt);
+      \fill[black] (-1.15, 0) circle (0.5pt);
+
+      \fill[black] (2.85, 0) circle (0.5pt);
+      \fill[black] (3.0, 0) circle (0.5pt);
+      \fill[black] (3.15, 0) circle (0.5pt);
+
+      \draw[->] (-1.4, 0) -- (-2.25, 0);
+      \draw[-] (-2, 0.1) -- (-2, -0.1) node[below] {$-2\pi n$};
+
+      \draw[->] (3.4, 0) -- (4.25, 0);
+      \draw[-] (4, 0.1) -- (4, -0.1) node[below] {$2\pi (n + 1)$};
+
+      \draw[dashed] (1, 1) -- (3.7, 1);
+      \draw[-] (1, 1.1) -- (1, 0.9);
+      \draw[-] (2.7, 1.3) node[above] {$r + \pi$} -- (2.7, 0.9);
+      \draw[-] (3.32, 1.1) -- (3.32, 0.7) node[below] {$R + \pi$};
+    \end{tikzpicture}
+  \end{figure}
+  \begin{itemize}
+  \item Choose $n \geq 1$.
+  \item Pick $r$ and $R$ so that:
+    \begin{align*}
+      \pi < r < R < 2\pi(n + 1)
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Near and Far Components}
+  \begin{itemize}
+  \item Define $\mathcal{N} = \set{-n, -n+1, \hdots, n} \subset \mathbb{Z}$.
+    \pause
+  \item Decompose $\phi$ by defining $\phinear$ and $\phifar$ by:
+    \begin{align*}
+      \phinear(y) &= \sum_{l \in \mathcal{N}} \sum_{k=0}^{N-1} {f_k \Phi(y, x_k - 2\pi l)} \\
+      \phifar(y) &= \sum_{l \notin \mathcal{N}} \sum_{k=0}^{N-1} {f_k \Phi(y, x_k - 2\pi l)}
+    \end{align*}
+    (i.e. $\phi(y) = \phinear(y) + \phifar(y)$)
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Reworking $\phifar$}
+  \begin{itemize}
+  \item Substituting a $p$-truncated regular factorization of $\Phi$
+    and doing some algebra gives us:
+    \begin{align*}
+      \phifar(y) = \varepsilon_p(y) + \sum_{m=0}^{p-1} c_m R_m(y - x_*)
+    \end{align*}
+    with $c_m$ given by:
+    \begin{align*}
+      c_m = \sum_{l \notin \mathcal{N}} \sum_{k=0}^{N-1} f_k a_m(x_k + 2\pi l, x_*)
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Least Squares Collocation}
+  \begin{itemize}
+  \item We have $\phi = \phinear + \phifar$.
+    \pause
+  \item For an integer $l$, we also have $\phi(y) = \phi(y + 2\pi l)$.
+    \pause
+  \item This implies:
+    \begin{align*}
+      \phifar(y + 2\pi l) - \phifar(y) = \phinear(y) - \phinear(y + 2\pi l)
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Least Squares Collocation}
+  \begin{itemize}
+  \item Substituting our expression for $\phifar$
+    in terms of $c_m$'s, we get:
+    \begin{align*}
+      \phifar(y + 2\pi l) \;-\; &\phifar(y) = \varepsilon_p(y + 2\pi l) - \varepsilon_p(y) \; + \\
+      &\sum_{m=0}^{p-1} c_m \parens{R_m(y + 2\pi l - x_*) - R_m(y - x_*)}
+    \end{align*}
+  % \item We can clean this up a little using the $2\pi l$-forward difference operator $\Delta_{2\pi l}[f](y) = f(y + 2\pi l) - f(y)$:
+  %   \begin{align*}
+  %     -\Delta_{2\pi l}[\phinear](y) = \Delta_{2\pi l}[\varepsilon_p](y) + \sum_{m=0}^{p-1} c_m \Delta_{2\pi l}[R_m](y - x_*)
+  %   \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Least Squares Collocation}
+  \begin{itemize}
+  \item Consider a set of \textbf{check points} $Z = \set{z_l}$ so that:
+    \begin{align*}
+      \pi < |z_l - x_*| < r
+    \end{align*}
+  \item For each of these points, we can pick a $k$
+    so that $z_l + 2\pi k$ satisfies:
+    \begin{align*}
+      |z_l + 2\pi k - x_*| < \pi
+    \end{align*}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{Least Squares Collocation}
+  \begin{itemize}
+  \item If we consider $L > p$
+    of these points, we can form $L$
+    \textbf{collocation equations} using the preceding equation.
+    \pause
+  \item If we stack these equations, we get:
+    \begin{align*}
+      -\bold{R} \bold{c} = \boldsymbol{\phi}_{\operatorname{near}} + \boldsymbol{\varepsilon}_p
+    \end{align*}
+    \pause
+  \item We can solve for $\bold{c}$ using least squares methods.
+  \item Choose $L \gg p$ to reduce the error.
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Computing the Periodic Summation}{The Algorithm}
+  \begin{itemize}
+  \item Schematically, the periodic summation algorithm is as follows:
+    \begin{enumerate}
+    \item Pick parameters $r, R, n,$ and $p$.
+    \item Choose a set of check points and find their periodic offsets.
+    \item Extend $x_k$'s to periodically tile $[-2\pi n, 2\pi(n+1))$.
+    \item Use the FMM to evaluate $\phinear$
+      at the $y_j$'s and the checkpoint pairs.
+    \item Solve the collocation equations for $\bold{c}$.
+    \item Compute $\phifar$ at the $y_j$'s using $\bold{c}$.
+    \item Evaluate $\phi = \phinear + \phifar$ at the $y_j$'s.
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Check Points}
+  \begin{itemize}
+  \item The check points can be chosen in different ways, how can we choose good ones?
+    \pause
+  \item Heuristically, for now... Some distributions to try:
+    \begin{enumerate}
+    \item Linearly spaced.
+    \item Uniformly distributed.
+    \item Gaussian quadrature abscissae.
+    \item Kumaraswamy and/or beta distribution.
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Complex Check Points}
+  \begin{itemize}
+  \item Professor Gumerov suggested solving the problem in the
+    complex domain with complex check points.
+    \begin{figure}[h]
+      \centering
+      \vspace{0.75cm}
+      \begin{tikzpicture}
+        \draw[<-] (-3, 0) -- (-1.1, 0);
+
+        \fill[black] (-0.7, 0) circle (0.5pt);
+        \fill[black] (-0.8, 0) circle (0.5pt);
+        \fill[black] (-0.9, 0) circle (0.5pt);
+
+        \draw[-] (-0.5, 0) -- (2.5, 0);
+        \fill[black] (1, 0) circle (1pt);
+        \draw[-] (1, 0.1) -- (1, -0.1) node[below] {$x_\star$};
+        
+        \fill[black] (2.7, 0) circle (0.5pt);
+        \fill[black] (2.8, 0) circle (0.5pt);
+        \fill[black] (2.9, 0) circle (0.5pt);
+
+        \draw[->] (3.1, 0) -- (5, 0);
+
+        \draw[-] (0, 0.1) -- (0, -0.1) node[below] {$0$};
+        \draw[-] (2, 0.1) -- (2, -0.1) node[below] {$2\pi$};
+
+        \draw[-] (-2, 0.1) -- (-2, -0.1) node[below] {$\pi - r$};
+        \draw[-] (4, 0.1) -- (4, -0.1) node[below] {$\pi + r$};
+
+        \draw[dashed] (1, 0) circle (2.25);
+        \draw[dashed] (1, 0) circle (1);
+
+        \fill[black] (2.125, 1.9485571585149868) circle (1pt);
+        \fill[black] (0.125, 0.05144284148501321) circle (1pt);
+        \draw[->] (2.125, 1.9485571585149868) -- (0.125, 0.05144284148501321);
+
+        \fill[black] (1.1624359867364369, 2.244128906772728) circle (1pt);
+        \fill[black] (1.1624359867364369, 0.244128906772728) circle (1pt);
+        \draw[->] (1.1624359867364369, 2.244128906772728) -- (1.1624359867364369, 0.244128906772728);
+
+        \fill[black] (-0.5909902576697323, -1.590990257669732) circle (1pt);
+        \fill[black] (0.40900974233026766, -0.5909902576697319) circle (1pt);
+        \draw[->] (-0.5909902576697323, -1.590990257669732) -- (0.40900974233026766, -0.5909902576697319);
+
+      \end{tikzpicture}
+    \end{figure}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Progress}
+  \begin{itemize}
+  \item I've implemented a 1D MLFMM for this kernel in Julia.
+    \pause
+  \item I've implemented the periodic summation as described and am debugging it...
+    \pause
+  \item \textbf{Todo} (in order of priority):
+    \begin{enumerate}
+    \item Vet check point distributions numerically.
+      \pause
+    \item Numerically compare the final nonequispaced IFFT algorithm with
+      current fastest implementation.
+      \pause
+    \item Complexity analysis.
+      \pause
+    \item Profile and optimize overall algorithm (1D MLFMM and
+      periodic summation).
+    \end{enumerate}
+  \end{itemize}
+\end{frame}
+
+\begin{frame}{Future Work}
+  \begin{itemize}
+  \item \textbf{Forward interpolation algorithm!}
+    \pause
+    \begin{enumerate}
+    \item Try and fit the corresponding interpolation equations into this framework.
+    \item Implement the necessary 1D MLFMM.
+    \end{enumerate}
+    \pause
+  \item Analysis of check points.
+    \pause
+  \item Implement complex version of ``1D'' MLFMM (should be easy).
+    \pause
+    \begin{enumerate}
+    \item Could be used for the algorithm in 2D?
+    \item Try complex check points.
+    \end{enumerate}
+    \pause
+  \item Thoroughly optimize algorithm (parallelization on CPU and GPU, adaptive FMM?) in Julia.
+    \pause
+  \item Rewrite kernel of algorithm in C, expose to Julia and other languages?
+    \pause
+  \item Look at this algorithm in dimensions 3 and greater...
+  \end{itemize}
+\end{frame}
+
+\end{document}

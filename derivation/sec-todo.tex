@@ -1,0 +1,30 @@
+\section{Todo}
+
+\begin{enumerate}
+\item Simplify the summation
+  $\sum_{l \in \mathbb{Z} \backslash \set{-n, \hdots, n}}
+  \sum_{k=0}^{N-1}$ by defining a suitable set to sum over (what about
+  convergence?).
+\item Replace $\epsilon^{(p)}$ with $\varepsilon_p$.
+\item Spruce up \texttt{itemize}s with numbered equations and labels
+  and references.
+\item Reference these equations appropriately throughout the text.
+\item Make appropriate references to source papers where needed.
+\item Define macros for commonly used notation to make it easier to
+  change the notation later.
+\item Make slightly better choices for variables for some indices that
+  we're using, e.g.\ there's a clash between two different $l$'s
+  right now.
+\item Can we actually do anything using the finite difference operator
+  stuff?
+\item Figure out complexity.
+\item Implement periodic summation algorithm.
+\item Figure out choice of $x_*$
+  so that it doesn't need to be passed in as a parameter to
+  anything\ldots
+\item \st{Consider $N - 1 \longrightarrow N$
+  to avoid $\sum_{n=-(N-1)}^{N-1}$ (replace with $\sum_{n=-N}^N$).}
+\item \st{Switch to bin sort.} \emph{Maybe discuss why this didn't work out.}
+\item Is $\epsilon^{(p)}(y,x) = \epsilon^{(p)}(y, x + 2\pi)$?
+\item Make a table out of definitions to make them easier to read.
+\end{enumerate}

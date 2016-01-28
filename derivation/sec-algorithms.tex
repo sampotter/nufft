@@ -1,0 +1,56 @@
+\section{Algorithms}
+
+\subsection{MLFMM}
+
+The periodic summation method makes use of a ``black box fast
+summation algorithm''\----this could, for instance, be the usual
+matrix product. In our case, as well as in the original paper, the
+fast multipole method is used. There are many variations on the fast
+multipole method~\cite{book:fmm-helmholtz}. Our own implementation is
+not particularly refined, and is a nonadaptive MLFMM that takes both
+the truncation number and the depth of the MLFMM to be computed as
+parameters. More refined choices for each of these could be made; in
+particular, making use of the adaptive MLFMM is likely a good
+choice. As for the truncation number, were the adaptive MLFMM to be
+adopted, this could be considered once that change were made.
+
+\subsubsection*{FMM Input/Output Scaling}
+
+A brief observation about the FMM: assume that $X$ and $Y$ are your
+input sources and targets to a run of the FMM, and that they are
+sorted but not necessarily normalized to lie in the interval $[0, 1]$.
+It looks like it's necessary to scale in the following
+fashion.
+\begin{enumerate}
+\item Compute $a \equiv \min(\min X, \min Y) $
+  and $b \equiv \max(\max X, \max Y)$.
+\item Set $\alpha \equiv b - a$ and $\delta \equiv -a$.
+\item Compute $X'$ and $Y'$ from:
+  \begin{align*}
+    X' \equiv \set{(x + \delta)\alpha^{-1} : x \in X}, \hspace{1cm} Y' \equiv \set{(y + \delta) \alpha^{-1} : y \in Y}.
+  \end{align*}
+\item Evaluate the FMM with $X'$
+  and $Y'$
+    in place of $X$
+    and $Y$ as arguments and multiply the results by $\alpha$.
+\end{enumerate}
+In a test case, this seemed to provide the necessary results.
+
+\subsection*{Inverse Interpolation}
+
+In our case, compared to the algorithm presented in the periodic
+method summation paper, our algorithm is a bit simplified. The
+corresponding algorithm for the inverse interpolation step to be computed during the inverse NUFFT is straightforward. \\
+
+\begin{enumerate}
+\item Choose $r, R, n,$ and $p$.
+\item Determine the set of check points $Y$ with $|Y| = L > p$.
+\item Compute $\boldsymbol{\phi}_{\operatorname{near}}$ using the ``scaled'' MLFMM.
+\item Approximately compute $\bold{c}$ from $- \bold{R} \bold{c} =
+  \boldsymbol{\phi}_{\operatorname{near}} + \boldsymbol{\epsilon}^{(p)}$.
+\item For each source point $y_j$,
+  evaluate $\phi(y_j) = \phinear(y_j) + \phifar(y_j)$.
+\item Compute each interpolation point $g_j$ from
+  Equation~\ref{eqn:gj-per-sum-form}.
+\end{enumerate}
+

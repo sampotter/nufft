@@ -1,0 +1,197 @@
+\section{Periodic Summation}
+
+This section contains a formulation of the periodic summation method
+as applied to our problem. The original presentation focused on a
+periodic summation in a space of arbitrary dimension (and, for their
+particular application, $\mathbb{R}^3$).  The algorithm presented in
+this paper only requires the method to operate in $\mathbb{R}$. In the
+original paper, a rectangular honeycomb containing a set of
+periodically repeating points is considered, where the sum is to be
+evaluated over one cell in the honeycomb. For the evaluation, a
+neighborhood of cells is selected, as well as a pair of concentric
+spheres. The inner sphere contains the computational domain, and the
+outer sphere is chosen so that it has nontrivial intersection with
+each cell in the selected neighborhood.
+
+In the single-dimensional case, the corresponding domains are
+simplified. Instead of a honeycomb, we work with the intervals
+$[2\pi n, 2\pi (n + 1))$, for $n \in \mathbb{Z}$. We think of these
+intervals as ``boxes''. Since the function to be evaluated is
+$2\pi$-periodic, we can make the following definitions:
+\begin{itemize}
+\item A number $n \in \nats$, corresponding to the number of boxes
+  extending radially from the central box.
+\item An index set
+  $\mathcal{N} = \set{-n, \hdots, n} \subseteq \nats$.
+\item Radii $r, R \in \mathbb{R}$ satisfying
+  $\pi < r < R < (2n + 1)\pi$ \emph{(analogs of the concentric
+    spheres)}.
+\end{itemize}
+These definitions are illustrated in Figure~\ref{fig:per-sum-alg}.
+
+The periodic summation method requires a kernel that can be factorized
+in a manner appropriate for the FMM. The kernel $\Phi$ factorizes as:
+\begin{align*}
+  \Phi(y, x) = {1 \over y - x} = \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*) = \epsilon^{(p)}(y,x) + \sum_{m=0}^{p-1} a_m(x, x_*) R_m(y - x_*).
+\end{align*}
+We will denote the $2\pi$-periodic
+part of our interpolation formula by $\phi(y)$,
+written (ignoring the constant factor):
+\begin{align*}
+  \phi(y) \equiv \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} {f_k \over y - x_k - 2\pi l} = \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} f_k \Phi(y, x_k + 2\pi l).
+\end{align*}
+This is the exact form required for application of the periodic
+summation method.
+
+\begin{figure}[h]
+  \centering
+  \caption{an illustration depicting the domain of the periodic
+    summation algorithm as well as relevant parameters.}
+  \begin{tikzpicture}
+    \draw[-] (-0.6,0) -- (2.6, 0);
+    \draw[-] (0, 0.1) -- (0, -0.1) node[below] {$0$};
+    \fill[black] (1, 0) circle (1pt);
+    \draw[dashed] (1, 0) -- (1, -1) node[below] {$x_* = \pi$};
+    \draw[-] (2, 0.1) -- (2, -0.1) node[below] {$2\pi$};
+    
+    \fill[black] (-0.85, 0) circle (0.5pt);
+    \fill[black] (-1.0, 0) circle (0.5pt);
+    \fill[black] (-1.15, 0) circle (0.5pt);
+
+    \fill[black] (2.85, 0) circle (0.5pt);
+    \fill[black] (3.0, 0) circle (0.5pt);
+    \fill[black] (3.15, 0) circle (0.5pt);
+
+    \draw[->] (-1.4, 0) -- (-2.25, 0);
+    \draw[-] (-2, 0.1) -- (-2, -0.1) node[below] {$-2\pi n$};
+
+    \draw[->] (3.4, 0) -- (4.25, 0);
+    \draw[-] (4, 0.1) -- (4, -0.1) node[below] {$2\pi (n + 1)$};
+
+    \draw[dashed] (1, 1) -- (3.7, 1);
+    \draw[-] (1, 1.1) -- (1, 0.9);
+    \draw[-] (2.7, 1.3) node[above] {$r + \pi$} -- (2.7, 0.9);
+    \draw[-] (3.32, 1.1) -- (3.32, 0.7) node[below] {$R + \pi$};
+  \end{tikzpicture}
+  \label{fig:per-sum-alg}
+\end{figure}
+
+Given our choice of $n$, we can decompose $\phi$ into a near component
+and far component. We define $\phinear$ and $\phifar$ by:
+\begin{align*}
+  \phinear(y) &\equiv \sum_{l \in \mathcal{N}} \sum_{k=0}^{2K-1} f_k \Phi(y, x_k + 2\pi l), \\
+  \phifar(y) &\equiv \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k \Phi(y, x_k + 2\pi l).
+\end{align*}
+Making use of this decomposition, we would like to build towards
+formulating the least squares collocation step of the periodic
+summation algorithm. The first step in this direction is reexpressing
+$\phifar$ in the correct form. We have that:
+\begin{align*}
+  \phifar(y)
+  &= \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k \Phi(y, x_k + 2\pi l) \\
+  &= \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k \parens{\epsilon^{(p)}(y, x_k + 2\pi l) + \sum_{m=0}^{p-1} a_m(x_k + 2\pi l, x_*) R_m(y - x_*)} \\
+  &= \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k \epsilon^{(p)}(y, x_k + 2\pi l) + \sum_{m=0}^{p-1} \parens{ \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k a_m(x_k + 2\pi l, x_*)} R_m(y - x_*).
+\end{align*}
+This suggests that we define:
+\begin{itemize}
+\item $\epsilon^{(p)}(y) \equiv \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k \epsilon^{(p)}(y, x_k + 2\pi l)$,
+\item $c_m \equiv \sum_{l \notin \mathcal{N}} \sum_{k=0}^{2K-1} f_k a_m(x_k + 2\pi l, x_*)$.
+\end{itemize}
+Making use of these definitions, then, we can simplify $\phifar$ by writing:
+\begin{align*}
+  \phifar(y) = \epsilon^{(p)}(y) + \sum_{m=0}^{p-1} c_m R_m(y - x_*).
+\end{align*}
+
+Since $y$ is $2\pi$-periodic, for each $y \in \mathbb{R}$ and
+$l \in \mathbb{Z}$, we have that $\phi(y) = \phi(y + 2\pi l)$.
+Recalling that $\phi = \phinear + \phifar$, this further implies that
+(\emph{N.B.:} this is the negative of the corresponding equation in
+the periodic sums paper):
+% \begin{align*}
+%   \phifar(y) - \phifar(y + 2\pi l) = \phinear(y + 2\pi l) - \phinear(y).
+% \end{align*}
+\begin{align*}
+  \phifar(y + 2\pi l) - \phifar(y) = \phinear(y) - \phinear(y + 2\pi l).
+\end{align*}
+Then, focusing on $\phifar$, we can write:
+\begin{align*}
+  \phifar(y + 2\pi l) - \phifar(y) &= \epsilon^{(p)}(y + 2\pi l) - \epsilon^{(p)}(y) + \sum_{m=0}^{p-1} c_m \parens{R_m(y + 2\pi l - x_*) - R_m(y - x_*)} \\
+  &= \Delta_{2\pi l}[\epsilon^{(p)}](y) + \sum_{m=0}^{p-1} c_m \Delta_{2\pi l}[R_m](y - x_*),
+\end{align*}
+where $\Delta_{2\pi l}[\;\cdot\;]$
+denotes the $2\pi l$
+forward difference operator. Likewise,
+$\phinear(y) - \phinear(y + 2\pi l)$ can be written:
+\begin{align*}
+  \phinear(y) - \phinear(y + 2\pi l) = - \Delta_{2\pi l}[\phinear](y).
+\end{align*}
+
+For the collocation step, we assume that we have chosen a set of $L$
+\textbf{check points} $Y = \set{y_1, \hdots, y_L}$
+that satisfies $\pi < \abs{y_i - \pi} < r$
+for each $i = 1, \hdots, L$.
+The choice of such a set is nontrivial and is considered in another
+section.  Now, if we consider the equation derived in the preceding
+paragraph in turn for each of our check points $y_i \in Y$,
+we end up with $L$
+equations in $p$
+unknowns and can correspondingly define
+$\bold{R} \in \mathbb{C}^{L \times p}$,
+$\bold{c} \in \mathbb{C}^{p \times 1}$,
+$\boldsymbol{\phi}_{\operatorname{near}} \in \mathbb{C}^{L \times 1}$,
+and $\boldsymbol{\epsilon}^{(p)} \in \mathbb{C}^{L \times 1}$ by:
+\begin{itemize}
+\item $\parens{\bold{R}}_{i,m} \equiv \Delta_{2 \pi l}[R_m](y_i - x_*)$,
+\item $\parens{\bold{c}}_m \equiv c_m$,
+\item $\parens{\boldsymbol{\phi}_{\operatorname{near}}}_i \equiv \Delta_{2\pi l}[\phinear](y_i)$,
+\item $\parens{\boldsymbol{\epsilon}^{(p)}}_i \equiv \Delta_{2\pi l}[\epsilon^{(p)}](y_i)$.
+\end{itemize}
+These definitions allow us to write our equations as a matrix equality
+as follows:
+\begin{align*}
+  -\bold{R} \bold{c} = \boldsymbol{\phi}_{\operatorname{near}} + \boldsymbol{\epsilon}^{(p)}.
+\end{align*}
+Then, the collocation step of the periodic summation algorithm is
+tantamount to solving the preceding equation for $\bold{c}$.
+We could, for instance, directly use the Moore-Penrose pseudoinverse,
+evaluating:
+\begin{align*}
+  \bold{c} \approx -\bold{R}^\dagger \parens{\boldsymbol{\phi}_{\operatorname{near}} + \boldsymbol{\epsilon}^{(p)}}.
+\end{align*}
+Of course, there are other least squares methods which can compute
+$\bold{c}$ which may also be used.
+
+\subsection*{Check Points}
+
+The original paper describing the periodic summation method makes the
+point that the choice of check points used in the algorithm is
+nontrivial. The authors explore several different distributions:
+\begin{itemize}
+\item Points uniformly distributed on a sphere.
+\item The zeros of a certain Legendre polynomial.
+\item Points which are the solution to the Thomas problem (the
+  equilibrium position of electrons contrained to lie on a sphere).
+\end{itemize}
+The commonality is that each distribution chooses points that lie on a
+sphere. In the 1D version of the algorithm, this corresponds to a pair
+of points, which allows for a maximum of two check points\----clearly
+problematic.
+
+Our goal was to explore the use of distributions that lie in the
+region $\pi < |\pi - y| < r$. Several check points distributions were
+implemented:
+\begin{itemize}
+\item Uniformly distributed points.
+\item Linearly spaced points.
+\item Logarithmically spaced points.
+\item Points drawn from a Beta distribution with parameter
+  $\alpha = 1$, and $\beta$ to be determined.
+\end{itemize}
+In the future, we would also like to look into the abscissae of the
+Legendre polynomials, along the same lines as in the original
+paper. In our experiments, we primarily made use of points drawn from
+the Beta distribution, as they had varying density and were simple to
+generate. There was not enough time to go into depth with
+experimenting with the trade-offs associated with check point
+distributions, but this is one of the first things that will be looked
+into in future work.

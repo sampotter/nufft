@@ -1,0 +1,165 @@
+\documentclass{article}
+
+\usepackage{
+  amsmath,
+  amssymb,
+  cite,
+  fullpage
+}
+
+\begin{document}
+
+\noindent Sam Potter \\
+\noindent AMSC808D \\
+\noindent Project Proposal \\
+
+\begin{center}
+  \huge{Applying the Periodized FMM to the NFFT}
+\end{center}
+
+% \section*{Outline}
+
+% Throughout all this, try and maintain a consistent style of notation.
+
+% \begin{enumerate}
+% \item Describe the DFT and explain what problem the FFT solves (citing
+%   my Oppenheim \& Schafer book).
+% \item Describe the NDFT and what might necessitate its use (citing the
+%   Daniel Potts NFFT tutorial?).
+% \item Reference the prior art (i.e.\ the Daniel Potts NFFT). Indicate
+%   asymptotic complexity of their algorithm clearly.
+% \item Explain the FMM.\@
+% \item Explain the periodic sum method (citing the periodic sum paper).
+% \item Explain our formulation (citing attendant references).
+% \item Go over what we will do in the project.
+%   \begin{enumerate}
+%   \item Come up with a method of generating check points and get some
+%     error bounds.
+%   \item Implement Julia (or Matlab) package for 1D periodized FMM.\@
+%   \item Apply Julia (or Matlab) package to NDFT computation.
+%   \item Compare performance with NFFT.\@
+%   \end{enumerate}
+% \end{enumerate}
+
+% \section*{Draft}
+
+The discrete Fourier transform (DFT) is an orthogonal linear
+transformation that serves as a discrete analog of the Fourier
+transform. Many problems in science and engineering yield to the
+methods of Fourier analysis, so much so that when the fast Fourier
+transform (FFT) algorithm of Cooley and Tukey was disclosed in 1965,
+much of the focus of research in the field of signal processing
+shifted from research in analog signal processing to digital signal
+processing, owing to the newfound feasibility of previously
+speculative numerical methods~\cite{book:dsp75}. Of course, this
+algorithm has gone on to enable the efficient solution of a myriad of
+problems since.
+
+A limitation of the $N$-point
+FFT is that its domain consists of vectors in $\mathbb{C}^N$
+whose components are typically assumed to correspond to equally spaced
+samples of some underlying continuous signal; likewise, the range is
+comprised of coefficients of equally spaced frequency components. In
+the cases where our input signal is sampled unevenly or where we would
+like to determine the strength of frequency components which are
+unequally spaced, the usual FFT is of no use without interpolating
+before or after the transform. A variety of methods have been
+introduced to formalize an approach to computing a ``nonequispaced''
+discrete Fourier transform making use of
+interpolation~\cite{Dutt95fastfourierII,Keiner06nfft3.0}.
+
+In this project, our goal is to explore the practicality of a new
+approach to computing the nonuniform IDFT (INDFT) efficiently. Like
+these other methods, the approach relies on interpolation, and this
+project will specifically consider a fast INDFT (INFFT).
+
+To outline the focus of this project, we consider a function
+$f : \mathbb{R} \to \mathbb{C}$
+which is $2\pi$-periodic
+and band-limited. Then, we define the following sets of points:
+\begin{enumerate}
+\item $x_k = 2\pi k/N$ for $k = 0, \hdots, N-1$ (\emph{equispaced points}).
+\item $f_k = f(x_k)$ (\emph{samples at equispaced points}).
+\item $y_j \in [0, 2\pi)$ for $j = 0, \hdots, M - 1$ (\emph{nonequispaced points}).
+\item $g_j = f(y_j)$ (\emph{samples at nonequispaced points}).
+\item $c_n = {1 \over N} \sum_{k=0}^{N-1} f_k e^{-inx_k}$ (\emph{DFT coefficients of $f_k$'s}).
+\end{enumerate}
+Schematically, we can consider the following relations:
+\begin{align}
+  \left\{g_j\right\} \longleftrightarrow \left\{f_k\right\} \longleftrightarrow \left\{c_n\right\}
+\end{align}
+The first arrow represents an invertible interpolation method and the
+second represents a method that computes the DFT and IDFT.\@ Then, a
+fast interpolation method combined with the FFT and IFFT could
+efficiently compute an answer to the problem of finding the integer
+frequency components of the unequally spaced samples.
+
+This project focuses on a method to quickly interpolate the points
+$\left\{g_j\right\}$
+from $\left\{f_k\right\}$,
+resulting in the ``inverse interpolation'' required by the INFFT.\@
+That is, our method corresponds to the arrow:
+\begin{align*}
+  \left\{g_j\right\} \longleftarrow \left\{f_k\right\}.
+\end{align*}
+In~\cite{Dutt95fastfourierII}, an interpolation method was developed
+that makes use of an expansion of the sraightforward formulation in
+terms of the following kernel:
+\begin{align}
+  G(y_j - x_k) = - {1 + i \cot((y_j - x_k)/2) \over 2}.
+\end{align}
+This method makes the interpolation problem amenable to solution by
+the fast multipole method when the kernel is suitably expanded.
+
+In \cite{Gumerov13amethod}, a method for the fast computation of
+periodic sums is developed. This method is presented in terms of a
+black-box fast summation algorithm, but is ideally matched to the fast
+multipole method. As the preceding kernel can be expanded as a
+$2\pi$-periodic
+sum of Cauchy kernels~\cite{fmmfiltering}, this method for computing
+periodic sums can be applied to the interpolation problem under
+discussion. A caveat of this method is that it requires a set of
+``check points'' which must be distributed carefully in order to
+ensure good error bounds. The reference paper develops this in terms
+of 3-dimensional periodic sums, but not 1-dimensional periodic sums,
+so this would need to be investigated.
+
+Overall, then, and including the distribution of the check points for
+the periodic summation, the project will involve working out the
+following pieces (not necessarily in this order):
+\begin{enumerate}
+\item Rederiving the separate interpolation results so that they can
+  be placed into a coherent framework.
+\item Determination of a method to distribute the check points
+  involved in the periodic summation method (and derivation of error
+  bounds associated with this distribution).
+\item Implementation of the periodic summation method in Julia (or Matlab).
+\item Implementation of the 1-dimensional FMM in Julia (or Matlab).
+\item Derivation of the asymptotic complexity of this method of
+  interpolation and the complexity of the resulting INFFT.\@
+\item Numerical comparison of the performance of this method of
+  computing the INFFT with existing methods.
+\end{enumerate}
+Since it is possible that this method might be amenable to being sped
+up through parallelization, we are interested in implementing this
+project using Julia not only for its general speed when compared to
+Matlab but also for how readily code written in it can be
+parallelized. Also, Julia has a package manager for fast dissemination
+of software and is supposed to have really nice looking plots.
+
+This project addresses the fast computation of the inverse nonuniform
+DFT, where the points in the domain are nonuniformly sampled and the
+frequency coefficients are computed for uniformly spaced
+frequencies. If this work is successful, then it will provide a
+starting point for exploring the other combinations of
+uniformly/nonuniformly sampled points, as well as the forward
+nonuniform DFT. In particular, we note that an expansion exists for
+the NFFT such that the periodic summation method could be applied with
+the FFM. However, this expansion is more complicated; and the
+``forward interpolation'' step itself is also more involved than the
+computation of a single matrix-vector product.
+
+\bibliography{proposal}{}
+\bibliographystyle{plain}
+
+\end{document}

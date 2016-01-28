@@ -1,0 +1,54 @@
+* Project Todo
+  - [ ] Get Gadfly's plotting working.
+	- [ ] eps
+	- [ ] TikZ
+  - [ ] Numerical tests for check points.
+  - [ ] Numerical tests for interpolation.
+  - [ ] Analysis for check points.
+  - [ ] Forward interpolation derivation.
+  - [ ] Complexity analysis.
+  - [ ] Adaptive FMM.
+  - [ ] Comparison with Potts's library.
+  - [ ] Get cluster access.
+  - [ ] Compare final performance with results from Dott & Rokhlin II.
+  - [ ] Find some applications...
+  - [ ] Figure out what the deal with computing Bernoulli numbers is...
+
+* Applications
+
+** Audio
+   - Probably nothing interesting in terms of nonuniform nodes in
+     space, but as far as nonuniform frequency nodes go, maybe there
+     are some audio applications? Could compute the FFT at dyadic
+     frequencies... How would this compare to the wavelet transform?
+     Are there compression applications? (e.g. signals which only have
+     power at known frequencies... sort of along the same lines as the
+     dyadic thing...)
+
+* Things to Read
+  - [ ] [[https://en.wikipedia.org/wiki/Dirichlet_kernel][Wikipedia - Dirichlet kernel]]
+  - [ ] "Multipole Expansions and Pseudospectral Cardinal Functions"
+
+* Links
+
+** References
+   - [[http://fastmultipole.org/Main/T-NuFFT][site containing links and references to NuFFT implementations]]
+
+** NUFFT Implementations
+   - [[http://cs.nyu.edu/cs/faculty/berger/nufft/nufft.html][CMCL (Courant)]]
+   - [[https://www-user.tu-chemnitz.de/~potts/nfft/download.php][Potts (TU Chemnitz)]]
+   - [[http://www.mathworks.com/matlabcentral/fileexchange/25135-nufft--nfft--usfft][Matthew Ferrara (Air Force Research Laboratory)]]
+   - [[http://web.eecs.umich.edu/~fessler/code/index.html][Image reconstruction toolbox]]
+
+** OEIS
+   - http://oeis.org/A046990
+	 - numerators of Taylor series of log(cos(x))
+   - http://oeis.org/A046991
+	 - denominators of Taylor series of log(cos(x))
+* C++ Implementation
+  - [ ] Try out using Boost.Optional for the bookmarks instead of
+    using a pair of -1's to indicate no bookmark.
+  - [ ] Alternative bookmark data structures to try:
+	- [ ] Heap-based
+	- [ ] Linear probing (i.e. no buckets) implementation
+  - [ ] Play around with the ~inline~ keyword for optimization.

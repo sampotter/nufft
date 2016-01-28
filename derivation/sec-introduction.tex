@@ -1,0 +1,52 @@
+\section{Introduction}
+
+The discrete Fourier transform (DFT) is an orthogonal linear
+transformation that serves as a discrete analog of the Fourier
+transform. Many problems in science and engineering yield to the
+methods of Fourier analysis, so much so that when the fast Fourier
+transform (FFT) algorithm of Cooley and Tukey was disclosed in 1965,
+much of the focus of research in the field of signal processing
+shifted from research in analog signal processing to digital signal
+processing, owing to the newfound feasibility of previously
+speculative numerical methods~\cite{book:dsp75}. Of course, this
+algorithm has gone on to enable the efficient solution of a myriad of
+problems since.
+
+A limitation of the $N$-point
+FFT is that its domain consists of vectors in $\mathbb{C}^N$
+whose components are typically assumed to correspond to equally spaced
+samples of some underlying continuous signal; likewise, the range is
+comprised of coefficients of equally spaced frequency components. In
+the cases where our input signal is sampled unevenly or where we would
+like to determine the strength of frequency components which are
+unequally spaced, the usual FFT is of no use without interpolating
+before or after the transform. A variety of methods have been
+introduced to formalize an approach to computing a ``nonequispaced''
+discrete Fourier transform making use of
+interpolation~\cite{Dutt95fastfourierII,Keiner06nfft3.0}.
+
+In this project, our goal is to explore the practicality of a new
+approach to computing the nonuniform IDFT (INDFT) efficiently. Like
+these other methods, the approach relies on interpolation, and this
+project will specifically consider a fast INDFT (INFFT).
+
+This paper is structured as follows:
+\begin{enumerate}
+\item We outline basic facts related to the sampling theorem that
+  will serve as an important step in the derivation of our algorithm.
+\item We pose the interpolation problem as a matrix product and
+  factorize this product into a form amenable to solution by a method
+  for computing periodic sums~\cite{Gumerov13amethod}, which makes use
+  of the fast multipole method (FMM).
+\item We derive the corresponding $S$ and $R$ factorizations of the
+  relevant kernel for use in the FMM.
+\item Likewise, we compute the $\SSmat$, $\SRmat$, and $\RRmat$ translation
+  operators for this kernel.
+\item We derive the periodic summation algorithm.
+\item The inverse interpolation algorithm is presented.
+\item The test series used in the project are considered.
+\item We discuss our numerical experiments.
+\item We look into future work to be conducted, and treat in more
+  depth the optimizations that could be made to our implementation of
+  the FMM.
+\end{enumerate}

@@ -1,0 +1,136 @@
+\section{Cauchy Kernel Interpolation}
+
+This section starts by considering the problem of bandlimited
+interpolation, casting the problem as a matrix-vector product. The
+entries of the matrix involved in this product are simplified and
+recast, ultimately, in terms of the cotangent function. Then,
+cotangent is shown to be expressible as an infinite summation of
+periodic translations of the function $(y - x)^{-1}$. The derivation
+presented in this section is based on ideas presented
+in~\cite{fmmfiltering}.
+
+We make use of the following definitions throughout the derivation:
+\begin{enumerate}
+\item $n_0 \in \nats$ (our bandlimit).
+\item $K \in \nats$ such that $K > n_0$.
+\item $f(x) \equiv \sum_{n=-(K-1)}^{K-1} c_n e^{inx}$ (a
+  bandlimited function\----i.e. a function with a finite
+  Fourier series).
+\item $x_k \equiv \pi k / K$, for $k = 0, \hdots, 2K - 1$ (a grid of
+  points in the time/space domain).
+\item $c_n \equiv {1 \over 2K} \sum_{k=0}^{2K-1} f_k e^{-inx_k}$, for
+  $n = -(K - 1), \hdots, K - 1$ (the DFT coefficients of $f$\----which
+  equal the Fourier series coefficients of $f$ by our choice of $K$).
+\item $f_k \equiv f(x_k)$, for $k = 0, \hdots 2K - 1$.
+\item $J \in \nats$ (the number of points to interpolate at).
+\item $\set{y_1, \hdots, y_J} \subseteq [0, 2\pi)$ (the interpolation points).
+\item $g_j \equiv f(y_j)$, for $j = 0, \hdots, J - 1$ (our
+  interpolants).
+\end{enumerate}
+
+The first step in deriving our interpolation formula is to
+start by expressing the vector of $g_j$'s in terms of a matrix product
+involving the $f_k$'s. So, for $j = 0, \hdots, J - 1$, we can write:
+\begin{align*}
+  g_j = f(y_j) &= \sum_{n=-(K-1)}^{K-1} c_n e^{iny_j} \\
+  &= \sum_{n=-(K-1)}^{K-1} \parens{{1 \over 2K} \sum_{k=0}^{2K-1} f_k e^{-inx_k}} e^{iny_j} & \mbox{(from the definition of $c_n$)} \\
+  &= {1 \over 2K} \sum_{k=0}^{2K-1} f_k \parens{\sum_{n=-(K-1)}^{K-1} e^{in(y_j - x_k)}}
+\end{align*}
+Making use of this expression, we define $\bold{K} \in \mathbb{C}^{J \times K}$ by:
+\begin{align*}
+  \bold{K}_{jk} &= \sum_{n=-(K-1)}^{K-1} e^{in(y_j - x_k)} \\
+  &= -1 + \sum_{n=0}^{K-1} e^{in(y_j - x_k)} + \sum_{n=0}^{K-1} e^{-in(y_j - x_k)} \\
+  &= -1 + {1 - e^{iK(y_j - x_k)} \over 1 - e^{i(y_j - x_k)}} + {1 - e^{-iK(y_j - x_k)} \over 1 - e^{-i(y_j - x_k)}} & \mbox{(geometric summation)} \\
+  &= -1 + {1 - (-1)^ke^{iKy_j} \over 1 - e^{i(y_j - x_k)}} + {1 - (-1)^ke^{-iKy_j} \over 1 - e^{-i(y_j - x_k)}} & \mbox{($e^{-i\pi k} = (-1)^k$)} \\
+\end{align*}
+We further define the function $G$ by $G(t) \equiv (1 -
+e^{it})^{-1}$. This allows us to write the entries of $\bold{K}$ as:
+\begin{align} \label{eqn:Kjk-in-terms-of-G-first-form}
+  \bold{K}_{jk} = -1 + \parens{1 - (-1)^ke^{iKy_j}} G(y_j - x_k) + \parens{1 - (-1)^ke^{-iKy_j}} G(x_k - y_j).
+\end{align}
+
+We'll derive a new form for $G$ in this paragraph and
+the next. We have from 4.3.91 in Abramowitz and Stegun~\cite{abramowitz-and-stegun} that:
+\begin{align*}
+  \cot(t) = {1 \over t} + 2t \sum_{k=1}^\infty {1 \over t^2 - \pi^2 k^2}.
+\end{align*}
+This can be rewritten so that:
+\begin{align*}
+  \cot(t) = {t \over t^2 - \pi^2 \cdot 0^2} + t \sum_{k=1}^\infty {1 \over t^2 - \pi^2 k^2} + t \sum_{k=-1}^\infty {1 \over t^2 - \pi^2 k^2} = t \sum_{k=-\infty}^\infty {1 \over t^2 - \pi^2 k^2}.
+\end{align*}
+The summands of the last expression admit the following partial
+fraction decomposition:
+\begin{align*}
+  {1 \over t^2 - \pi^2 k^2} = {1 \over 2t} \parens{{1 \over t - k \pi} + {1 \over t + \pi k}}.
+\end{align*}
+Substituting this into our previous form for the cotangent function
+allows us to write:
+\begin{align*}
+  \cot(t)
+  &= t \sum_{k=-\infty}^\infty {1 \over 2t} \parens{{1 \over t - \pi k} + {1 \over t + \pi k}} \\
+  &= {1 \over 2} \parens{\sum_{k = -\infty}^\infty {1 \over t - \pi k} + \sum_{k=-\infty}^\infty {1 \over t + \pi k}} \\
+  &= \sum_{k=-\infty}^\infty {1 \over t - \pi k}. & \mbox{(applying $k \mapsto -k$ to the second summation)}
+\end{align*}
+
+We observe that the following equation holds:
+\begin{align*}
+  {1 + i \cot(t) \over 2} = {1 \over 1 - e^{2it}}.
+\end{align*}
+To prove this, we write:
+\begin{align*}
+  {1 + i \cot(t) \over 2} &= {1 \over 2} \parens{1 - {e^{it} + e^{-it} \over e^{it} - e^{-it}}} & \mbox{($\cot$ in terms of $\exp$)} \\
+  &= {1 \over 2} \parens{e^{it} - e^{it} - e^{it} - e^{-it} \over e^{it} - e^{-it}} \\
+  &= {1 \over 2} \parens{-2e^{-it} \over e^{it - e^{-it}}} \\
+  &= {e^{-it} \over e^{-it} - e^{it}} \cdot {e^{it} \over e^{it}} = {1 \over 1 - e^{2it}}.
+\end{align*}
+Reexpressing $G$ in terms of this equation and making use of our
+previous expression for $\cot(t)$ gives us:
+\begin{align} \label{eqn:G-in-cot-and-G-per-sum}
+  G(t) = {1 + i\cot(t/2) \over 2} = {1 \over 2} + i \sum_{k=-\infty}^\infty {1 \over t - 2 \pi k}.
+\end{align}
+This form for $G$ will allow us to continue to simplify the entries of
+$\bold{K}$.
+
+Consider again Equation~\ref{eqn:Kjk-in-terms-of-G-first-form}. Making
+use of our expression for $G$ in terms of the cotangent function in
+Equation~\ref{eqn:G-in-cot-and-G-per-sum}, we can write:
+\begin{align*}
+  \bold{K}_{jk} = -1 + \parens{1 - (-1)^ke^{iKy_j}} \parens{{1 \over 2} + {i \over 2}\cot\parens{y_j - x_k \over 2}} + \parens{1 - (-1)^ke^{-iKy_j}} \parens{{1 \over 2} - {i \over 2} \cot \parens{y_j - x_k \over 2}}
+\end{align*}
+since the cotangent function is odd. Then, regrouping terms gives us:
+\begin{align} \label{eqn:K-regrouped}
+  \bold{K}_{jk} &= -1 + {1 \over 2} \parens{2 - (-1)^ke^{iKy_j} - (-1)^ke^{-iKy_j}} + {i \over 2} \parens{(-1)^ke^{-iKy_j} - (-1)^ke^{-iKy_j}} \cot \parens{y_j - x_k \over 2}
+\end{align}
+If we consider the second term of Equation~\ref{eqn:K-regrouped}, we
+can rewrite it so that:
+\begin{align} \label{eqn:K-cosine-term}
+  {1 \over 2} \parens{2 - (-1)^ke^{iKy_j} - (-1)^ke^{-iKy_j}} = 1 - {(-1)^k \over 2} \cdot 2 \cos(Ky_j) = 1 - (-1)^k \cos(Ky_j).
+\end{align}
+Likewise, considering the third term, we can write:
+\begin{align} \label{eqn:K-sine-term}
+  {i \over 2} \parens{(-1)^ke^{-iKy_j} - (-1)^ke^{-iKy_j}}
+  &= (-1)^k {i \over 2} \cdot -2i \sin(Ky_j) = (-1)^k \sin(Ky_j).
+\end{align}
+Then, making use of Equations~\ref{eqn:K-cosine-term} and
+\ref{eqn:K-sine-term}, we can rewrite the entries of $\bold{K}$ so
+that:
+\begin{align} \label{eqn:K-entries-final}
+  \bold{K}_{jk} = (-1)^k \parens{\sin(Ky_j) \cot \parens{y_j - x_k \over 2} - \cos(Ky_j)}.
+\end{align}
+
+Our next goal is express each $g_j$ in terms of the infinite series
+$\sum_{k=-\infty}^\infty \parens{t - 2 \pi k}^{-1}$, which we have
+encountered in our previous derivations. Appealing to
+Equations~\ref{eqn:K-entries-final} and
+\ref{eqn:G-in-cot-and-G-per-sum} we have that:
+\begin{align}
+  2K g_j &= \sum_{k=0}^{2K-1} f_k \cdot (-1)^k \cdot \parens{-\cos(Ky_j) + \sin(Ky_j) \sum_{l=-\infty}^\infty {1 \over y_j - x_k - 2\pi l}} \notag \\
+  &= - \cos(Ky_j) \sum_{k=0}^{2K-1} (-1)^k f_k + 2 \sin(Ky_j) \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} \parens{(-1)^k f_k \over y_j - x_k - 2\pi l}. \label{eqn:gj-per-sum-form}
+\end{align}
+
+In the next section, we will define a kernel function $\Phi$ from the
+infinite series in Equation~\ref{eqn:gj-per-sum-form} and derive
+useful properties of this kernel that pertain to the fast multipole
+method. Later, we will use Equation~\ref{eqn:gj-per-sum-form} in
+conjunction with the fast multipole method and the periodic
+summation method to compute each $g_j$.

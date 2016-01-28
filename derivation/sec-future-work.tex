@@ -1,0 +1,159 @@
+\section{Future Work}
+
+Important steps that will be taken next in continuing with this
+project are:
+\begin{itemize}
+\item Conduct further numerical experiments involving the check points
+  and comparing performance with Potts's library.
+\item Optimization of the algorithm (see next section).
+\item Derivation of the asymptotic complexity of the interpolation
+  algorithm.
+\end{itemize}
+Other steps that are a bit longer term in nature, and could be
+explored independently of one another:
+\begin{itemize}
+\item Start researching the forward interpolation algorithm.
+\item Implement a complex MLFMM (i.e. extend the existing algorithm to
+  use a quad-tree).
+\item A complex MLFMM could potentially be used for the 1D problem if
+  the 1D problem were thought of as residing in $\mathbb{C}$. In this
+  case, complex check points could be used\----see
+  Figure~\ref{fig:complex-check-points}.
+\item Experiment with more speculative optimizations of the algorithm.
+\item Investigate other approaches to the interpolation algorithm.
+\item Consider the interpolation problem in dimensions 3 and greater.
+\end{itemize}
+
+\begin{figure}[h]
+  \centering
+  \caption{an illustration of periodic translations of complex check
+    points distributed on a circle with radius greater than $\pi$ and
+    less than $r$.}
+  \vspace{1cm}
+  \begin{tikzpicture}
+    \draw[<-] (-3, 0) -- (-1.1, 0);
+
+    \fill[black] (-0.7, 0) circle (0.5pt);
+    \fill[black] (-0.8, 0) circle (0.5pt);
+    \fill[black] (-0.9, 0) circle (0.5pt);
+
+    \draw[-] (-0.5, 0) -- (2.5, 0);
+    \fill[black] (1, 0) circle (1pt);
+    \draw[-] (1, 0.1) -- (1, -0.1) node[below] {$x_\star$};
+    
+    \fill[black] (2.7, 0) circle (0.5pt);
+    \fill[black] (2.8, 0) circle (0.5pt);
+    \fill[black] (2.9, 0) circle (0.5pt);
+
+    \draw[->] (3.1, 0) -- (5, 0);
+
+    \draw[-] (0, 0.1) -- (0, -0.1) node[below] {$0$};
+    \draw[-] (2, 0.1) -- (2, -0.1) node[below] {$2\pi$};
+
+    \draw[-] (-2, 0.1) -- (-2, -0.1) node[below] {$\pi - r$};
+    \draw[-] (4, 0.1) -- (4, -0.1) node[below] {$\pi + r$};
+
+    \draw[dashed] (1, 0) circle (2.25);
+    \draw[dashed] (1, 0) circle (1);
+
+    \fill[black] (2.125, 1.9485571585149868) circle (1pt);
+    \fill[black] (0.125, 0.05144284148501321) circle (1pt);
+    \draw[->] (2.125, 1.9485571585149868) -- (0.125, 0.05144284148501321);
+
+    \fill[black] (1.1624359867364369, 2.244128906772728) circle (1pt);
+    \fill[black] (1.1624359867364369, 0.244128906772728) circle (1pt);
+    \draw[->] (1.1624359867364369, 2.244128906772728) -- (1.1624359867364369, 0.244128906772728);
+
+    \fill[black] (-0.5909902576697323, -1.590990257669732) circle (1pt);
+    \fill[black] (0.40900974233026766, -0.5909902576697319) circle (1pt);
+    \draw[->] (-0.5909902576697323, -1.590990257669732) -- (0.40900974233026766, -0.5909902576697319);
+  \end{tikzpicture}
+  \label{fig:complex-check-points}
+\end{figure}
+
+\section{MLFMM Optimization}
+
+The MLFMM written for this project was written partly so that the
+author could learn how to use the Julia programming
+language~\cite{arxiv:julia}. Julia claims the following
+advantages over other traditional choices of the scientific computing
+(e.g. MATLAB, the Python/SciPy/NumPy combination, R, or some
+combination of these languages and C or C++):
+\begin{enumerate}
+\item A JIT compiler with good performance (makes use of LLVM and
+  appears to make further optimizations beyond what LLVM does?).
+\item A strong, but dynamic, type system combined with type inference.
+\item Generic functions (``methods'') in the style of the Common Lisp
+  object system (CLOS).
+\item Lisp-like macros.
+\item Easy to embed in C and has a simple C FFI.
+\item Compact memory layout of user-defined types (cache coherency).
+\item Interoperability with Python.
+\item Good support for parallel and distributed programming.
+\item Functions that call out to ``best of breed'' libraries for the
+  kernels of common algorithms.
+\item A package manager with a growing ecosystem of native packages
+  written in Julia and wrappers around frequently used libraries.
+\end{enumerate}
+At the same time, the language is clearly designed for users of
+MATLAB, but with a syntax that is modern and coherent.
+
+The ``essence of Julia'' is something like: \emph{allowing rapid
+  prototyping of numerical algorithms while simultaneously offering a
+  gradation of options for improving performance so that progressively
+  more involved modications can be made to gain speed}. Evaluating
+whether or not these claims are true and whether or not Julia lives up
+to its purported goal is difficult and requires extensive testing,
+something clearly beyond the scope of this project. However, this
+project was implemented in a straightforward and naive fashion in
+Julia, and achieved decent performance. Few of the options for
+optimization were fully researched and taken advantage
+of\----exploring some of the available options would be a way to vet
+this language for future use.
+
+Here is a list of some optimizations which could be made to speed up
+the MLFMM:
+\begin{itemize}
+\item Unrelated to Julia, a better choice of algorithm could be made
+  by using the adaptive MLFMM.
+\item Likewise, the optimal truncation number was not explored at all
+  in the implementation.
+\item None of Julia's facilities for parallelism or distributed
+  programming were taken advantage of.
+\item Libraries for OpenCL and CUDA (and support libraries) are
+  available from Julia's package manager, so making use of the GPU is
+  feasible without having to go through the FFI (although the FFI
+  seems simple enough).
+\item Very little was done to optimize the various translations
+  involved in the MLFMM\----algorithmic improvements as well as any
+  combination of the previously mentioned approaches could likely be
+  made use of.
+\item The bookmarking scheme/binary tree used for main data structure
+  was implemented primarily for algorithmic speed ups. Questions of
+  cache coherency and memory allocations have not been
+  investigated. It may be possible to make some performance gains by
+  taking advantage of Julia's type system (i.e. by reducing the number
+  of pointers in play and the number of memory allocations made).
+\item Different parts of the algorithm could be rewritten in C and
+  called using the FFI, which is supposed to have little or no
+  overhead. This is doable but may not be ideal, since it breaks
+  somewhat with one of Julia's stated goals of providing an efficient
+  native language for numerical computation, avoiding the hassle of
+  having to step through ABIs and multiple languages when debugging an
+  algorithm.
+\item Julia makes use of LLVM and can use LLVM to compile on the fly
+  (as a JIT) bits of LLVM IR. An interesting experiment might be to
+  dynamically compile fragments of LLVM IR for different parts of the
+  algorithm: e.g., for direct computation of differently sized
+  translations. Julia can also disassemble functions into LLVM IR,
+  which could facilitate this process.
+\end{itemize}
+
+Along the same lines, the efficiency of the interpolation algorithm
+proper (i.e. the combination of the periodic summation method
+implemented using our MLFMM with Equation~\ref{eqn:gj-per-sum-form})
+could be investigated, although most of the time in the algorithm is
+spent in the MLFMM. One thing we noticed, however, was that the term
+in Equation~\ref{eqn:gj-per-sum-form} involving $\cos(Ky_j)$ was
+always zero for our test series. This should be looked into but is
+unlikely to be true in general.

@@ -1,0 +1,70 @@
+\section{Bandlimiting, the Fourier Series, and the DFT}
+
+The point of this section is to make the meaning of ``let $f$ be
+bandlimited'' a bit more precise in terms of the sampling theorem. We
+let $f : \mathbb{R} \to \mathbb{C}$ be a $2\pi$-periodic function. The
+Fourier series of $f$ has two equivalent formulations. The first is as
+a trigonometric series of the following form:
+\begin{align} \label{eqn-fourier-series-sinusoid-rep}
+  f(x) = {a_0 \over 2} + \sum_{n=1}^\infty a_n \cos(n x) + \sum_{n=1}^\infty b_n \sin(n x)
+\end{align}
+where the coefficients are given by:
+\begin{enumerate}
+\item $a_0 = {1 \over \pi} \int_0^{2\pi} f(x) dx$.
+\item $a_n = {1 \over \pi} \int_0^{2\pi} f(x) \cos(nx) dx$.
+\item $b_n = {1 \over \pi} \int_0^{2\pi} f(x) \sin(nx) dx$.
+\end{enumerate}
+The second formulation is in terms of a series of weighted complex
+exponentials:
+\begin{align*}
+  f(x) = \sum_{n = -\infty}^\infty c_n e^{inx}
+\end{align*}
+where the coefficients $c_n$ are given by:
+\begin{align*}
+  c_n = {1 \over 2} \left\{ \begin{tabular}{cl}
+                              $a_n + ib_n$ & if $n < 0$, \\
+                              $a_0$ & if $n = 0$, \\
+                              $a_n - ib_n$ & if $n > 0$. \\
+                            \end{tabular} \right.
+\end{align*}
+We are interested in the complex exponential form, in particular; but
+we note that toy problems are easier to conceive of in terms of
+sinusoids. So, we simply observe that the preceding formulae for the
+different sequences of coefficients can be used to translate between
+the two representations easily.
+
+Now, assume that our function $f : \mathbb{R} \to \mathbb{C}$
+is \emph{bandlimited}. We take this to mean that $f$'s
+Fourier series is finite. That is, there exists some set
+$\mathcal{N} \subseteq \mathbb{Z}$
+with $|\mathcal{N}| < \infty$ such that:
+\begin{align*}
+  f(x) = \sum_{n \in \mathcal{N}} c_n e^{inx}.
+\end{align*}
+Of course, if we want, this condition can be reexpressed in terms of
+Equation \ref{eqn-fourier-series-sinusoid-rep}.  We let
+$n_0 = \max \set{\abs n : n \in \mathcal{N}}$. Then, if $K > n_0$, we
+have that:
+\begin{align} \label{eqn:zero-padded-fourier-series-of-f}
+  \sum_{n \in \mathcal{N}} c_n e^{inx} = \sum_{n=-(K-1)}^{K-1} c_ne^{inx}.
+\end{align}
+The sampling theorem says that if we want to sample the function
+defined by the right hand side of
+Equation~\ref{eqn:zero-padded-fourier-series-of-f}, we must sample at
+a rate at least twice that of the highest frequency. With the signal
+unknown, although this step appears formal, it is imperative that we
+choose a rate that is at least $2K$. So, assuming a sampling rate of
+$2K$, we define $x_k$ by:
+\begin{align*}
+  x_k \equiv 2\pi k /(2K) = \pi k / K.
+\end{align*}
+Then, the sampling theorem implies that the coefficients of the
+$2K$-point discrete fourier transform (DFT) agree with the
+corresponding Fourier series coefficients. This lets us write:
+\begin{align} \label{eqn:2K-point-dft-of-f}
+  c_n = {1 \over 2K} \sum_{k=0}^{2K-1} f(x_k) e^{-inx_k}.
+\end{align}
+Substituting Equation~\ref{eqn:2K-point-dft-of-f} into the right hand
+side of Equation~\ref{eqn:zero-padded-fourier-series-of-f} forms the
+basis of the derivation of our algorithm. This substitution will be
+carried out in the next section in detail.

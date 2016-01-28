@@ -1,0 +1,49 @@
+\section{Test Series}
+
+A leading statistician, David Donoho, in an audaciously titled but
+basically pragmatic online article discusses how to be a highly cited
+researcher in the mathematical
+sciences~\cite{online:how-to-be-highly-cited}. The article references
+a collection of papers that he and several of his collaborators
+published on wavelets. Donoho points out that the inclusion of
+synthetic test cases with reproducible computational research can go a
+long way towards generating further research. In his case, papers were
+published which involved, e.g., tuning the parameters of previously
+published algorithms in order to improve the performance of the
+algorithms on test cases published with them. Donoho questions the
+value of this research, but the point is made.
+
+\begin{figure}[h]
+  \centering
+  \includegraphics{semicircle.eps} \includegraphics{triangle.eps} \\
+  \includegraphics{sawtooth.eps} \includegraphics{square.eps} \\
+  \caption{plots of the first several truncated Fourier series of our
+    test functions. The domain of each plot is $x \in [0, 2\pi]$.}
+  \label{fig:test-series}
+\end{figure}
+
+At the onset of this project, we followed this advice and selected
+four test series to test our algorithm on, as well as to verify the
+validity of ground truth methods and intermediate steps in deriving
+the final algorithm. This was exceedingly helpful and led to the
+discovery of several errors. Our view is that the utility of such test
+cases is two-fold: on the one hand, they may provide an intuitive
+ground truth that can be used to verify the correctness of the
+algorithm. More importantly, they might be able to shed light on the
+sorts of qualitative behavior the algorithm might exhibit. For
+instance, Fourier series exhibit slow convergence at discontinuities,
+owing to the Gibbs phenomenon. We selected test cases that intended to
+highlight this effect.
+
+We made use of four test cases while developing our algorithm: the
+square wave~\cite{online:mathworld-fourier-series-square}, the saw
+wave~\cite{online:mathworld-fourier-series-sawtooth}, the triangle
+wave~\cite{online:mathworld-fourier-series-triangle}, and the
+$2\pi$-periodic
+semicircle~\cite{online:mathworld-fourier-series-semicircle}. Plots of
+the first few truncated Fourier series of each are included (see
+Figure~\ref{fig:test-series}). We were not able to get so far with
+this project that we were able to suss out the qualititative
+differences in the behavior of the algorithm across our different test
+functions\----but it will be pursued in the future, for the reasons
+outlined earlier.

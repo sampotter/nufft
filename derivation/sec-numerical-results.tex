@@ -1,0 +1,56 @@
+\section{Numerical Results}
+
+\emph{Because of finals week, I wasn't able to conduct quite as many
+  tests as I would have liked. I verified that my implementation of
+  the MLFMM exhibited the expected asymptotic behavior by comparing it
+  with direct evaluation $\phi$ (see
+  Figure~\ref{fig:direct-vs-mlfmm}). I also compared to speed of
+  computing the inverse interpolation using the matrix product
+  directly with computing it using the periodic summation method.}
+
+\emph{The MLFMM exhibited the expected speedup. The speedup wasn't
+  nearly as good as I would have liked, but the implementation was
+  relatively straightforward and unoptimized. There is a lot of
+  low-hanging fruit waiting\----see the section on optimizing the
+  MLFMM.}
+
+\emph{The periodic summation method performed much better than
+  directly using the matrix product, but a word of warning: the
+  timings for the matrix product include both the matrix
+  multiplication and the computation of the matrix. The computation of
+  the matrix accounted for almost the entirety of the running time,
+  and is maybe not a fair comparison. The ``ground truth'' method
+  could be appropriately sped up if it were itself
+  optimized\----what's more, other forms of the product could be
+  explored. For instance, consider any step of the derivation of the
+  interpolation formula. In some sense, this plot was included mostly
+  as a stand-in for a better comparison, ideally to be made against,
+  e.g., Potts's NFFT library. In any case, the fact that the
+  asymptotically complex computation of the interpolation matrix is
+  avoided by this algorithm is a good thing, and is on display here.}
+
+\begin{figure} 
+  \centering
+  \caption{direct computation of $\phi$ versus evaluation with our
+    MLFMM implemented in Julia.}
+  \includegraphics{fmm_speed.eps}
+  \label{fig:direct-vs-mlfmm}
+\end{figure}
+
+\begin{figure}
+    \centering
+    \caption{interpolation using the ground truth matrix product and
+      using the periodic summation method and
+      Equation~\ref{eqn:gj-per-sum-form}.}
+    \includegraphics{interp_speed.eps}
+\end{figure}
+
+The next things that will be examined by way of numerical
+experimentation are:
+\begin{itemize}
+\item The effect of the check point distribution on the error.
+\item The relative of error of interpolation of different bandlimited
+  functions (our different test Fourier series).
+\item How our method compares to the Potts NFFT (and to any other
+  NUFFT implementations?).
+\end{itemize}

@@ -8,10 +8,12 @@ set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
 
 find_package (Boost)
 
+add_executable (bookmarks.test bookmarks.test.cpp bookmarks.cpp)
 add_executable (util.test util.test.cpp)
 add_executable (index_manip.test index_manip.test.cpp index_manip.cpp)
 
 enable_testing ()
 
+add_test (bookmarks bookmarks.test)
 add_test (util util.test)
 add_test (index_manip index_manip.test)

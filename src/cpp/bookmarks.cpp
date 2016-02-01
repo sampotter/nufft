@@ -1,24 +1,29 @@
 #include "bookmarks.hpp"
 #include "util.hpp"
 
-int64_t const NO_BOOKMARK = -1;
-
-nufft::bookmarks::bookmarks(vector_type const & sources, size_type max_level):
-	bookmarks_(make_bookmarks(sources, max_level))
+nufft::bookmarks::bookmarks(vector_type<domain_elt_type> const & sources,
+							size_type max_level):
+	bookmark_hash_(make_bookmark_hash(sources, max_level))
 {}
 
-nufft::bookmarks::bookmark_map_type
-nufft::bookmarks::make_bookmark_map(vector_type const & sources,
-									size_type max_level) const
-{
-	auto const num_sources {std::size(sources)};
-	auto const num_boxes {std::pow(2, max_level)};
-	auto const bounds = util::linspace(0, 1, num_boxes);
-	auto const bookmarks = get_empty_bookmarks(max_level);
+#include <iostream>
 
-	int64_t box_index {0};
-	int64_t scan_index {-1};
-	int64_t prev_scan_index {scan_index};
+nufft::bookmarks::bookmark_hash_type
+nufft::bookmarks::make_bookmark_hash(
+	vector_type<domain_elt_type> const & sources,
+	size_type max_level) const
+{
+#ifdef NUFFT_DEBUG
+	assert(std::size(sources) <= std::numeric_limits<index_type>::max());
+#endif
+	index_type const num_sources = std::size(sources);
+	auto const num_boxes = std::pow(2, max_level) + 1;
+	auto const bounds = util::linspace(0.0, 1.0, num_boxes);
+	vector_type<boost::optional<bookmark_type>> bookmarks = get_empty_bookmarks(max_level);
+
+	index_type box_index {0};
+	index_type scan_index {-1};
+	index_type prev_scan_index {scan_index};
 
 	while (box_index < num_boxes && scan_index < num_sources) {
 		auto const right_bound = bounds[box_index + 1];
@@ -29,80 +34,96 @@ nufft::bookmarks::make_bookmark_map(vector_type const & sources,
 		}
 
 		if (prev_scan_index != scan_index) {
-			bookmarks[2 * box_index - 1] = prev_scan_index + 1;
-			bookmarks[2 * box_index] = scan_index;
+			bookmarks[box_index] = std::make_pair(prev_scan_index + 1,
+												  scan_index);
 		}
 
 		prev_scan_index = scan_index;
 		++box_index;
 	}
 
-	auto const get_bookmark_at_level = [] (int64_t level, int64_t index) {
-#if DEBUG
-		assert(0 <= level <= max_level);
-		assert(0 <= index < std::pow(2, level));
+	auto const get_bookmark_at_level = [&] (size_type level, index_type index) {
+#ifdef NUFFT_DEBUG
+		assert(level >= 0);
+		assert(level <= max_level);
+		assert(index >= 0);
+		{
+			index_type const max_index =
+				static_cast<index_type>(std::pow(2, level)); 
+			assert(index < max_index);;
+		}
 #endif
 		
-		auto const level_diff {max_level - level};
-		auto const left_extent {level_diff * (index - 1) + 1};
-		auto const right_extent {level_diff * index};
-		auto left_index {left_extent};
-		auto right_index {right_extent};
+		auto const level_diff = max_level - level;
+		auto const scale = std::pow(2, level_diff);
+		auto const left_extent = scale * index;
+#ifdef NUFFT_DEBUG
+		assert(scale * (index + 1) > 0);
+#endif
+		auto const right_extent = scale * (index + 1) - 1;
 
-		bookmark_type bookmark;
-		{
-			auto first = bookmarks[2 * left_index - 1];
-			while (left_index++ < right_extent && first == 0) {
-				first = bookmarks[2 * left_index - 1];
-			}
-			bookmark.first = left_index > right_extent ? NO_BOOKMARK : first;
-		}
-		{
-			auto second = bookmarks[2 * right_index];
-			while (right_index-- >= left_extent && second == 0) {
-				second = bookmarks[2 * right_index];
-			}
-			bookmark.second = right_index < left_index ? NO_BOOKMARK : second;
+		auto left_index = left_extent;
+		auto right_index = right_extent;
+
+		while (left_index <= right_extent && !bookmarks[left_index]) {
+			++left_index;
 		}
 
-#if DEBUG
-		assert((bookmark.first == NO_BOOKMARK &&
-				bookmark.second == NO_BOOKMARK) ||
-			   (bookmark.first != NO_BOOKMARK &&
-				bookmark.second != NO_BOOKMARK));
-		assert(0 <= bookmark.first && bookmark.second < num_sources);
+		while (right_index >= left_extent && !bookmarks[right_index]) {
+			--right_index;
+		}
+		
+		boost::optional<bookmark_type> opt_bookmark;
+
+		auto const past_left = right_index < left_extent;
+		auto const past_right = left_index > right_extent;
+#ifdef NUFFT_DEBUG
+		assert(past_left && past_right || !(past_left || past_right));
 #endif
 
-		return bookmark;
-	}
+		if (!(past_left || past_right)) {
+			auto const first = bookmarks[left_index]->first;
+			auto const second = bookmarks[right_index]->second;
+			opt_bookmark = std::make_pair(first, second);
+		}
 
-	bookmark_map_type bookmark_map;
+#ifdef NUFFT_DEBUG
+		if (opt_bookmark) {
+			auto const first = opt_bookmark->first;
+			auto const second = opt_bookmark->second;
+			assert(0 <= first);
+			assert(first <= second);
+			assert(second < num_sources);
+		}
+#endif
+		return opt_bookmark;
+	};
+
+	bookmark_hash_type bookmark_hash;
 	
 	for (decltype(max_level) level {0}; level <= max_level; ++level) {
-		bookmark_map[level] = get_empty_bookmarks(level);
-		index_type max_index {std::pow(2, level)};
+		bookmark_hash[level] = get_empty_bookmarks(level);
+		auto const max_index = static_cast<index_type>(std::pow(2, level));
 		for (index_type index {0}; index < max_index; ++index) {
-			auto const bookmark = get_bookmark_at_level(level, index);
-			bookmark_map[level][2 * index_type] = bookmark.first;
-			bookmark_map[level][2 * index_type + 1] = bookmark.second;
+			auto opt_bookmark = get_bookmark_at_level(level, index);
+			if (opt_bookmark) {
+				bookmark_hash[level][index] = opt_bookmark;
+			}
 		}
 	}
 
-	return bookmark_map;
+	return bookmark_hash;
 }
 
-nufft::bookmarks::vector_type
-nufft::bookmarks::get_empty_bookmarks(size_type max_level) const
+nufft::bookmarks::vector_type<boost::optional<nufft::bookmarks::bookmark_type>>
+nufft::bookmarks::get_empty_bookmarks(size_type level) const
 {
-	auto const size = std::pow(2, max_level + 1);
-	vector_type bookmarks(size);
-	bookmarks.reserve(size);
-	std::fill(std::begin(bookmarks), std::end(bookmarks), NO_BOOKMARK);
-	return bookmarks;
+	auto const size = std::pow(2, level);
+	return vector_type<boost::optional<bookmark_type>>(size, boost::none);
 }
 
-nufft::bookmarks::bookmark_type
+boost::optional<nufft::bookmarks::bookmark_type>
 nufft::bookmarks::operator()(size_type level, size_type index) const
 {
-	return bookmark_map_[level][index];
+	return bookmark_hash_.at(level)[index];
 }

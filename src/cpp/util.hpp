@@ -4,7 +4,7 @@
 #include <cinttypes>
 #include <vector>
 
-namespace fmm1d { namespace util {
+namespace nufft { namespace util {
 	template <typename elt_type>
 	std::vector<elt_type> linspace(elt_type min,
 								   elt_type max,

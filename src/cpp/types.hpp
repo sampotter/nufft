@@ -1,6 +1,7 @@
 #ifndef __NUFFT_TYPES_HPP__
 #define __NUFFT_TYPES_HPP__
 
+#include <boost/numeric/ublas/matrix.hpp>
 #include <cinttypes>
 #include <cstddef>
 #include <vector>

@@ -1,3 +1,5 @@
+#include "cauchy.hpp"
+
 #include <cassert>
 #include <cmath>
 

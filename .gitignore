@@ -11,3 +11,6 @@ build
 *.nav
 *.snm
 *.toc
+GPATH
+GRTAGS
+GTAGS

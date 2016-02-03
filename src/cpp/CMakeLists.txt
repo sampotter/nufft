@@ -21,3 +21,7 @@ add_test (util util.test)
 add_test (index_manip index_manip.test)
 add_test (cauchy cauchy.test)
 add_test (fmm1d fmm1d.test)
+
+# Local Variables:
+# indent-tabs-mode: nil
+# End:

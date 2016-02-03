@@ -12,6 +12,7 @@ add_executable (bookmarks.test bookmarks.test.cpp bookmarks.cpp)
 add_executable (util.test util.test.cpp)
 add_executable (index_manip.test index_manip.test.cpp index_manip.cpp)
 add_executable (cauchy.test cauchy.test.cpp cauchy.cpp)
+add_executable (fmm1d.test fmm1d.test.cpp cauchy.cpp)
 
 enable_testing ()
 
@@ -19,3 +20,4 @@ add_test (bookmarks bookmarks.test)
 add_test (util util.test)
 add_test (index_manip index_manip.test)
 add_test (cauchy cauchy.test)
+add_test (fmm1d fmm1d.test)

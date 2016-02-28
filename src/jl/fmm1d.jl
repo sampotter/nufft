@@ -361,7 +361,7 @@ function fmm{T<:Number}(Y::Array{Float64, 1}, # normalized and sorted targets
     for i = 1:M
         V[Y_sortperm[i]] = V_sorted[i]
     end
-    V
+    V, source_coefs, target_coefs
 end
 
 end # module Cauchy
@@ -452,6 +452,7 @@ that effectively serve as the algorithm's main data structure.
 """
 function get_box_finder(X::AbstractArray, # normalized and sorted reals
                         L::Integer)       # maximum level
+    assert(issorted(X))
     N = length(X)
     K = 2^L                     # the number of boxes
 

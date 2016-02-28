@@ -1,0 +1,23 @@
+\documentclass[class=minimal,border=0pt]{standalone}
+
+\usepackage{color, scalefnt, tikz}
+\usepackage{arev}
+\usepackage[T1]{fontenc}
+
+\begin{document}
+
+\definecolor{navy-blue}{RGB}{20, 27, 114}
+\definecolor{teal}{RGB}{127, 246, 177}
+\definecolor{cyan}{RGB}{0, 220, 195}
+\definecolor{dull-cyan}{RGB}{0, 191, 200}
+
+{
+  \scalefont{2.3}
+  \begin{tikzpicture}
+    \draw (0.1, 0.5) node [left] {\color{navy-blue} \emph{PIRL}};
+    \draw [draw=none, fill=teal] (0.0, 0.9) -- (2.0, 0.9) -- (2.0, 0.7) -- (0.0, 0.7) -- cycle;
+    \draw [draw=none, fill=cyan] (0.0, 0.6) -- (2.0, 0.6) -- (2.0, 0.4) -- (0.0, 0.4) -- cycle;
+    \draw [draw=none, fill=dull-cyan] (0.0, 0.3) -- (2.0, 0.3) -- (2.0, 0.1) -- (0.0, 0.1) -- cycle;
+  \end{tikzpicture}
+}
+\end{document}

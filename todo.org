@@ -46,9 +46,36 @@
    - http://oeis.org/A046991
 	 - denominators of Taylor series of log(cos(x))
 * C++ Implementation
+  - [ ] Replace ~std::vector~ with ~boost::numeric::ublas::vector~?
+  - [ ] Figure out how to deal with domain and range types -- if this
+    is even necessary...
   - [ ] Try out using Boost.Optional for the bookmarks instead of
     using a pair of -1's to indicate no bookmark.
   - [ ] Alternative bookmark data structures to try:
 	- [ ] Heap-based
 	- [ ] Linear probing (i.e. no buckets) implementation
   - [ ] Play around with the ~inline~ keyword for optimization.
+  - [ ] Factor out Kahan summation for reuse...
+  - [ ] Kahan product?
+  - [ ] Make ~p~ a template parameter to enable use of arrays on the stack...
+  - [ ] Look into Shewchuk summation...
+* Optimization
+** General
+   - [ ] Put EVERYTHING on the stack/or preallocate all memory used
+   - [ ] Remove dependance on boost (for compilation speed)
+   - [ ] Diagram algorithm to try and figure out best way to move memory around
+   - [ ] Sum directly into coefficient vectors instead of using an intermediate workspace
+   - [ ] Don't use maps -- or at least don't use STL maps?
+   - [ ] don't unnecessarily propagate coefficients that aren't there...
+   - [ ] SSE/SIMD?
+   - [ ] use a heap for the index finder?
+** Eventually
+   - [ ] parallelize
+	 - OpenMP?
+	 - C++11 threads?
+	 - TBB?
+** Things to try autotuning
+   - [ ] Whether or not functions are inline
+   - [ ] Duff's device for loop unrolling (maybe this can be done using TMP?)
+   - [ ] Loop tiling
+   - [ ] Index types

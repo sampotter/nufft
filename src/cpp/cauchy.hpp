@@ -5,6 +5,10 @@
 
 namespace nufft {
     struct cauchy {
+        static inline range_elt_type phi(domain_elt_type y, domain_elt_type x) {
+            return 1.0/(y - x);
+        }
+                
         static range_elt_type R(integer_type m, domain_elt_type x);
         static range_elt_type S(integer_type m, domain_elt_type x);
         static range_elt_type a(integer_type m, domain_elt_type x);
@@ -18,6 +22,24 @@ namespace nufft {
 
         static matrix_type<domain_elt_type>
         get_RR_matrix(domain_elt_type delta, integer_type p);
+
+        static void
+        apply_SS_translation(vector_type<range_elt_type> const & input,
+                             vector_type<range_elt_type> & output,
+                             domain_elt_type delta,
+                             integer_type p);
+
+        static void
+        apply_SR_translation(vector_type<range_elt_type> const & input,
+                             vector_type<range_elt_type> & output,
+                             domain_elt_type delta,
+                             integer_type p);
+
+        static void
+        apply_RR_translation(vector_type<range_elt_type> const & input,
+                             vector_type<range_elt_type> & output,
+                             domain_elt_type delta,
+                             integer_type p);
     private:
         cauchy();
     };

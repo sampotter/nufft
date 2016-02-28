@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 3.4)
 
 set (CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++1z")
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -DNUFFT_DEBUG")
-set (CMAKE_CXX_FLAGS_RELEASE "-O4")
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O2 -g")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g")
 
 find_package (Boost)
 
@@ -12,7 +12,9 @@ add_executable (bookmarks.test bookmarks.test.cpp bookmarks.cpp)
 add_executable (util.test util.test.cpp)
 add_executable (index_manip.test index_manip.test.cpp index_manip.cpp)
 add_executable (cauchy.test cauchy.test.cpp cauchy.cpp)
-add_executable (fmm1d.test fmm1d.test.cpp cauchy.cpp)
+add_executable (fmm1d.test fmm1d.test.cpp cauchy.cpp index_manip.cpp bookmarks.cpp)
+
+add_executable (fmm1d.perf fmm1d.perf.cpp cauchy.cpp index_manip.cpp bookmarks.cpp)
 
 enable_testing ()
 

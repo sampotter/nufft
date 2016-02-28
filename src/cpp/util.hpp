@@ -2,6 +2,7 @@
 #define __NUFFT_UTIL_HPP__
 
 #include <cinttypes>
+#include <unordered_map>
 #include <vector>
 
 namespace nufft { namespace util {

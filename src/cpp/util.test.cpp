@@ -19,7 +19,8 @@ BOOST_AUTO_TEST_CASE (linspace_works_with_negative_delta) {
 }
 
 BOOST_AUTO_TEST_CASE (linspace_kahan_summation_works) {
-    BOOST_TEST(false);
+	auto const elts = nufft::util::linspace<double>(0.0, 1.0, 11);
+	BOOST_TEST(elts[10] == 1.0);
 }
 
 // Local Variables:

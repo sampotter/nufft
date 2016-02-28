@@ -14,15 +14,6 @@ namespace nufft {
         static range_elt_type a(integer_type m, domain_elt_type x);
         static range_elt_type b(integer_type m, domain_elt_type x);
 
-        static matrix_type<domain_elt_type>
-        get_SS_matrix(domain_elt_type delta, integer_type p);
-
-        static matrix_type<domain_elt_type>
-        get_SR_matrix(domain_elt_type delta, integer_type p);
-
-        static matrix_type<domain_elt_type>
-        get_RR_matrix(domain_elt_type delta, integer_type p);
-
         static void
         apply_SS_translation(vector_type<range_elt_type> const & input,
                              vector_type<range_elt_type> & output,

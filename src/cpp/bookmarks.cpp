@@ -17,8 +17,8 @@ nufft::bookmarks::make_bookmark_hash(
     assert(std::size(sources) <= std::numeric_limits<index_type>::max());
 #endif
     index_type const num_sources = std::size(sources);
-    auto const num_boxes = std::pow(2, max_level) + 1;
-    auto const bounds = util::linspace(0.0, 1.0, num_boxes);
+    auto const num_boxes = std::pow(2, max_level);
+    auto const bounds = util::linspace(0.0, 1.0, num_boxes + 1);
     vector_type<boost::optional<bookmark_type>> bookmarks = get_empty_bookmarks(max_level);
 
     index_type box_index {0};

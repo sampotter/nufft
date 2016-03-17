@@ -8,10 +8,10 @@ $x_* \in \mathbb{R}$
 and two general arguments $x, y \in \mathbb{R}$\----the source point and evaluation point, respectively.  Then, for
 the regular expansion, we can write:
 \begin{align*}
-  \Phi(y, x) = {1 \over y - x} = {1 \over x - x_* - (y - x_*)} = {1 \over x - x_*} \sum_{m=0}^\infty \parens{y - x_* \over x - x_*}^m,
+  \Phi(y, x) = {1 \over y - x} = -{1 \over x - x_* - (y - x_*)} = -{1 \over x - x_*} \sum_{m=0}^\infty \parens{y - x_* \over x - x_*}^m,
 \end{align*}
 requiring $\abs{y - x_*} < \abs{x - x_*}$.
-This suggests that we define $R_m(y - x_*) = \parens{y - x_*}^m$ and $a_m(x, x_*) = \parens{x - x_*}^{-m-1}$ so that:
+This suggests that we define $R_m(y - x_*) = \parens{y - x_*}^m$ and $a_m(x, x_*) = -\parens{x - x_*}^{-m-1}$ so that:
 \begin{align*}
   \Phi(y, x) = \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*).
 \end{align*}

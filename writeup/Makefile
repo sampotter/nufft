@@ -15,6 +15,7 @@ clean:
 	rm -rf *.out
 	rm -rf *.pdf
 	rm -rf *.pdf_tex
+	rm -rf *.toc
 
 writeup: plots writeup.pdf
 

@@ -1,0 +1,137 @@
+\section{Error Analysis}
+
+\subsection{$R$ Factorization}
+
+The $R$ factorization used in our algorithm is derived using the
+geometric series:
+\begin{align*}
+  \Phi(y, x) = -\frac{1}{1 - x_*} \sum_{m=0}^\infty \parens{\frac{y - x_*}{x - x_*}}^m,
+\end{align*}
+for $|y - x_*| < |x - x_*|$. If we truncate this expansion after $p$
+terms, we have:
+\begin{align*}
+  \Phi(y, x) = -\frac{1}{1 - x_*} \parens{R_{p-1} + \sum_{m=0}^{p-1} \parens{\frac{y - x_*}{x - x_*}}^m},
+\end{align*}
+where the remainder $R_{p-1}$ is given by:
+\begin{align*}
+  R_{p-1} = \frac{\parens{\frac{y - x_*}{x - x_*}}^p}{1 - \frac{y - x_*}{x - x_*}} = \frac{x - x_*}{x - y} \parens{\frac{y - x_*}{x - x_*}}^p
+\end{align*}
+This lets us write:
+\begin{align*}
+  \Phi(y, x) &= -\frac{1}{x - y} \parens{\frac{y - x_*}{x - x_*}}^p + \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*) \\
+  &\equiv \epsilon_p + \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*).
+\end{align*}
+We let $r$ and $R$ be radii that satisfy $R > r > x_*$ and:
+\begin{align*}
+  |y - x_*| < r - x_* < R - x_* < |x - x_*|.
+\end{align*}
+Then, we note that $|x - y| > R - r$ since
+$|x - y| = |x - x_* - (y - x_*)| > |\beta - \alpha| = |R - r|$ we can
+bound $\epsilon_p$ as follows:
+\begin{align*}
+  |\epsilon_p| = |x-y|^{-1} \left|\frac{y-x_*}{x-x_*}\right|^p < \frac{1}{R - r} \parens{\frac{r - x_*}{R - x_*}}^p.
+\end{align*}
+
+\subsection{$S$ Factorization}
+
+Since the $S$ factorization is derived along the same lines as the $R$
+factorization using the geometric series, we have that the error bound
+for the $R$ factorization goes through almost without change. In this
+case, we note that $|x - x_*| < |y - x_*|$ is required. So, instead,
+for radii $R > r > x_*$, we assume that:
+\begin{align*}
+  |x - x_*| < r - x_* < R - x_* < |y - x_*|.
+\end{align*}
+Then, since $\epsilon_p$ is defined in this case by:
+\begin{align*}
+  \epsilon_p \equiv \frac{1}{y - x} \parens{\frac{x - x_*}{y - x_*}}^p,
+\end{align*}
+we have that our error bound is once again:
+\begin{align*}
+  |\epsilon_p| < \frac{1}{R - r} \parens{\frac{r - x_*}{R - x_*}}^p.
+\end{align*}
+
+\subsection{$\SSmat$ Translation}
+
+To determine the error due to reexpansion of $\Phi$ under an $\SSmat$
+translation, we consider that in the implementation of the FMM, we
+approximate the $\SSmat$ translation operator by applying only the
+upper $p \times p$ block of the operator. With this in mind, we write:
+\begin{align*}
+  \Phi(y, x) = \tilde{\Phi}(y, x) + \epsilon_p,
+\end{align*}
+where $\tilde{\Phi}(y, x)$ represents the result of the approximate
+translation of $\Phi$, and $\epsilon_p$ is the resultant error.
+
+To determine the error, we compute:
+\begin{align*}
+  \epsilon_p
+  &= \sum_{n=p}^\infty \parens{\sum_{m=0}^n (\SSmat)_{n,m} b_m(x, x_*)} S_n(y - x_*') \\
+  &= \sum_{n=p}^\infty (-1)^n \delta^n \parens{\sum_{m=0}^n {n \choose m} (-1)^m \parens{\frac{x - x_*}{\delta}}^m} S_n(y - x_*') \\
+  &= \sum_{n=p}^\infty (-1)^n \delta^n \parens{1 - \frac{x - x_*}{\delta}}^n S_n(y - x_*') \\
+  &= \sum_{n=p}^\infty (-1)^n \delta^n \parens{\frac{x_*' - x}{\delta}}^n S_n(y - x_*') \\
+  &= \sum_{n=p}^\infty b_n(x, x_*') S_n(y - x_*').
+\end{align*}
+This is just the same as the error of truncating an $S$ factorization
+centered at $x_*'$ after $p$ terms. So, no additional error is
+accumulated by approximating the $\SSmat$ with the upper left
+$p \times p$ block.
+
+\subsection{$\SRmat$ Translation}
+
+% For $\SRmat$ translation, we start by noting that under $\SRmat$
+% translation, $\Phi$ is written:
+% \begin{align*}
+%   \Phi(y, x) = \sum_{n=0}^\infty \parens{\sum_{m=0}^\infty (\SRmat)_{n, m} b_m(x, x_*)} R_n(y - x_*')
+% \end{align*}
+
+\subsection{$\RRmat$ Translation}
+
+To evaluate the error due to $\RRmat$ translation, we start by
+recalling the formula for the coefficients of the translation
+operator:
+\begin{align*}
+  (\RRmat)_{n,m} = \left\{ \begin{tabular}{cl}
+                             $\frac{(-1)^n m! \delta^{m-n}}{(m-n)! n!}$ & if $n \leq m$, \\
+                             0 & otherwise.
+                           \end{tabular} \right.
+\end{align*}
+From this, we can see that $\epsilon_p$ can be evaluated by writing:
+\begin{align*}
+  \epsilon_p
+  &= \sum_{m=p}^\infty \sum_{n=0}^m (\RRmat)_{n, m} a_m(x, x_*) R_n(y - x_*') \\
+  &= -\sum_{m=p}^\infty \sum_{n=0}^m {m \choose n} (-1)^n \delta^{m-n} \frac{(y - x_*')^n}{(x-x_*)^{m+1}} \\
+  &= -\sum_{m=p}^\infty \frac{\delta^m}{(x-x_*)^{m+1}} \sum_{n=0}^m {m \choose n} (-1)^n \parens{\frac{y - x_*'}{\delta}}^n \\
+  &= -\sum_{m=p}^\infty \frac{\delta^m}{(x-x_*)^{m+1}} \parens{1 - \frac{y - x_*'}{\delta}}^m \\
+  &= -\sum_{m=p}^\infty \frac{\delta^m}{(x-x_*)^{m+1}} \parens{\frac{\delta - y + x_*'}{\delta}}^m \\
+  &= -\frac{1}{x-x_*} \parens{\frac{\delta - y + x_*'}{x-x_*}}^p \parens{1 - \frac{\delta - y + x_*'}{x - x_*}}^{-1} & \mbox{($|\delta - y + x_*'| < |x - x_*|$)} \\
+  &= \frac{1}{2x_*' - x - y} \parens{\frac{2x_*' - x_* - y}{x - x_*}}^p.
+\end{align*}
+
+Next, we let $l$ be the level to which $x_*$ nominally belongs, and
+let $l' = l + 1$ be the level corresponding to $x_*'$. To bound
+$\epsilon_p$, we will make the following assumptions (\textbf{TODO}: \emph{figure out
+  if these are correct or if we can do better}):
+\begin{enumerate}
+\item There exists some $R > 0$ such that $|x - x_*| > R$.
+\item There exists $R' > 0$ so that $|x - x_*'| > R'$.
+\item The translation distance $\delta$ satisfies $|\delta| = 2^{-l'-1}$.
+\item Every evaluation point $y$ satisfies $|y - x_*'| < 2^{-l'-1}$.
+\item The radius $R'$ satisfies $R' > 2^{-l'-1}$.
+\end{enumerate}
+Making use of these inequalities, we bound $\epsilon_p$ as follows:
+\begin{align*}
+  |\epsilon_p|
+  &= |(x_*' - x) - (y - x_*')|^{-1} \left|\frac{\delta - (y - x_*')}{x - x_*}\right|^p \\
+  &\leq \left|\left|x - x_*'\right| - \left|y - x_*'\right|\right|^{-1} \left|\frac{\delta - (y - x_*')}{x - x_*}\right|^p & \mbox{(reverse triangle inequality)} \\
+  &\leq \left|\left|x - x_*'\right| - \left|y - x_*'\right|\right|^{-1} \frac{\parens{|\delta| + |y - x_*'|}^p}{|x - x_*|^p} & \mbox{(triangle inequality)} \\
+  &\leq \left|\left|x - x_*'\right| - 2^{-l'-1}\right|^{-1} \frac{\parens{|\delta| + 2^{-l'-1}}^p}{|x - x_*|^p} & \mbox{(assumption 4)} \\
+  &\leq \left|R' - 2^{-l'-1}\right|^{-1} \parens{\frac{2^{-l'-1} + 2^{-l'-1}}{R}}^p & \mbox{(assumptions 2 and 3)} \\
+  &= \frac{1}{R' - 2^{-l'-1}} \parens{\frac{2^{-l'}}{R}}^p. & \mbox{(assumption 5)}
+\end{align*}
+\textbf{TODO}: \emph{now, do we need to consider the absolute difference between this and the error we would have expected to already have from expanding $\Phi$ at $x_*'$?}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

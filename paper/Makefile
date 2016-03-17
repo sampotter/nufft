@@ -18,6 +18,7 @@ TEX_FILES = \
 	paper.tex \
 	abstract.tex \
 	appendix.tex \
+	checkpoint-distribution.tex \
 	complexity.tex \
 	error-analysis.tex \
 	fmm.tex \

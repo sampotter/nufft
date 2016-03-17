@@ -18,13 +18,13 @@ nufft::cauchy::R(integer_type m, domain_elt_type x)
 nufft::range_elt_type
 nufft::cauchy::S(integer_type m, domain_elt_type x)
 {
-    return std::pow(x, -(m + 1));
+    return x == 0 ? 0 : std::pow(x, -(m + 1));
 }
 
 nufft::range_elt_type
 nufft::cauchy::a(integer_type m, domain_elt_type x)
 {
-    return std::pow(-x, -(m + 1));
+    return x == 0 ? 0 : std::pow(-x, -(m + 1));
 }
 
 nufft::range_elt_type

@@ -361,7 +361,7 @@ function fmm{T<:Number}(Y::Array{Float64, 1}, # normalized and sorted targets
     for i = 1:M
         V[Y_sortperm[i]] = V_sorted[i]
     end
-    V, source_coefs, target_coefs
+    V
 end
 
 end # module Cauchy

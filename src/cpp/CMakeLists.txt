@@ -14,6 +14,8 @@ add_executable (index_manip.test index_manip.test.cpp index_manip.cpp)
 add_executable (cauchy.test cauchy.test.cpp cauchy.cpp)
 add_executable (fmm1d.test fmm1d.test.cpp cauchy.cpp index_manip.cpp bookmarks.cpp)
 
+add_library (fmm SHARED fmm.cpp cauchy.cpp index_manip.cpp bookmarks.cpp)
+
 add_executable (fmm1d.perf fmm1d.perf.cpp cauchy.cpp index_manip.cpp bookmarks.cpp)
 
 enable_testing ()

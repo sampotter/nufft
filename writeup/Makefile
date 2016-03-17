@@ -1,9 +1,9 @@
 # TODO: add targets for generating eps files
-# TODO: add target for generating paper
+# TODO: add target for generating writeup
 
 M_FILE_DIR = ../src/m
 
-all: paper
+all: writeup
 
 clean:
 	rm -rf auto
@@ -16,14 +16,14 @@ clean:
 	rm -rf *.pdf
 	rm -rf *.pdf_tex
 
-paper: plots paper.pdf
+writeup: plots writeup.pdf
 
 plots:
 	$(MAKE) -C $(M_FILE_DIR)
 	cp $(M_FILE_DIR)/*.eps .
 
-paper.pdf: paper.tex
-	pdflatex paper.tex
-	bibtex paper
-	pdflatex paper.tex
-	pdflatex paper.tex
+writeup.pdf: writeup.tex
+	pdflatex writeup.tex
+	bibtex writeup
+	pdflatex writeup.tex
+	pdflatex writeup.tex

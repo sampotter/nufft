@@ -175,7 +175,7 @@ if __name__ == '__main__':
 
     G_fmm = compute_G_fmm()
     G_persum = compute_G_persum()
-    G_gt = compute_G_gt()
+    G_gt = compute_G_gt().real
     
     plt.figure()
     plt.plot(Y, G_fmm)

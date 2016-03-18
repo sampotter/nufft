@@ -36,7 +36,7 @@ involving the $f_k$'s. So, for $j = 0, \hdots, J - 1$, we can write:
   &= \sum_{n=-(K-1)}^{K-1} \parens{{1 \over 2K} \sum_{k=0}^{2K-1} f_k e^{-inx_k}} e^{iny_j} & \mbox{(from the definition of $c_n$)} \\
   &= {1 \over 2K} \sum_{k=0}^{2K-1} f_k \parens{\sum_{n=-(K-1)}^{K-1} e^{in(y_j - x_k)}}
 \end{align*}
-Making use of this expression, we define $\bold{K} \in \mathbb{C}^{J \times K}$ by:
+Making use of this expression, we define $\bold{K} \in \mathbb{C}^{J \times 2K}$ by:
 \begin{align*}
   \bold{K}_{jk} &= \sum_{n=-(K-1)}^{K-1} e^{in(y_j - x_k)} \\
   &= -1 + \sum_{n=0}^{K-1} e^{in(y_j - x_k)} + \sum_{n=0}^{K-1} e^{-in(y_j - x_k)} \\

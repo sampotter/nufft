@@ -125,6 +125,19 @@ if __name__ == '__main__':
     # Y = np.array(sorted(np.random.uniform(0, 2*np.pi, J)))
     Y = np.linspace(0, twopi, J, endpoint=False)
     K = 10
+    XY_index_ratio = J/(2*K)
+
+    def test(y):
+        '''
+        This test is necessary to check if we've passed a point that we
+        essentially already know the value of (i.e. an evaluation
+        point that's nearly equal to a source point). We could
+        probably handle this correctly in the FMM itself, but for now,
+        a test like this should give us approximately what we
+        want... That is, no interpolates that are NaN, +/-Inf, or
+        incorrectly equal to zero.
+        '''
+        return np.abs(np.mod(y*(J/twopi), XY_index_ratio)) < 1e-13
 
     def compute_G_fmm():
         X = np.linspace(0, twopi, 2*K, endpoint=False)
@@ -132,7 +145,12 @@ if __name__ == '__main__':
         L = 4
         p = 4
         q = 4
-        return approx_interp_fmm(F, K, Y, L, p, q)
+        G = approx_interp_fmm(F, K, Y, L, p, q)
+        for i, y in enumerate(Y):
+            if test(y):
+                j = int(i/XY_index_ratio)
+                G[i] = F[j]
+        return G
         
     def compute_G_persum():
         X = np.linspace(0, twopi, 2*K, endpoint=False)
@@ -141,7 +159,12 @@ if __name__ == '__main__':
         p = 4
         q = 4
         num_cps = 10
-        return approx_interp_persum(F, K, Y, L, p, q, num_cps)
+        G = approx_interp_persum(F, K, Y, L, p, q, num_cps)
+        for i, y in enumerate(Y):
+            if test(y):
+                j = int(i/XY_index_ratio)
+                G[i] = F[j]
+        return G
         
     def compute_G_gt():
         N = 30

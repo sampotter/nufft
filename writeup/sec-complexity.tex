@@ -1,0 +1,123 @@
+\section{Complexity}
+
+\subsection{FMM}
+
+In this section, we come up with a rough estimate of the cost of the
+MLFMM and an asymptotic estimate of its cost. The FMM used in our
+implementation consists of several different parts, which can be
+considered independently:
+\begin{itemize}
+\item The $\SSmat$, $\SRmat$, and $\RRmat$ translations.
+\item The construction of $S$ factorizations for the finest boxes.
+\item Direct evaluation.
+\item Indirect evaluation.
+\end{itemize}
+We consider each of these items in turn. First, we define the
+parameters of the algorithm:
+\begin{align*}
+L &\equiv \mbox{ the maximum level,} \\
+M &\equiv \mbox{ the number of evaluation points,} \\
+N &\equiv \mbox{ the number of source points,} \\
+p &\equiv \mbox{ the truncation number.}
+\end{align*}
+We also note that in our estimate of the complexity, we assume that
+the source and evaluation points are distributed uniformly.
+
+We let $L$ be the maximum level of the FMM. Then, the hierarchies of
+$\SSmat$ and $\RRmat$ translations each correspond to a set of four
+perfect binary trees, each of height $L - 1$ (i.e., each tree's root
+is a box in the second, or coarsest, level). The number of branches in
+a perfect binary tree of height $L - 1$ is $2^{L-1} - 1$. So, the
+number of either $\SSmat$ or $\RRmat$ translations is
+$4(2^{L-1} - 2)$.
+
+To estimate the number of $\SRmat$ translations, we first recall that
+$\RRmat$ translations occur between each box and the boxes in the E4
+neighborhood of that box. For the 1D FMM, there are (except at the
+boundaries), three such neighbors. Since there are $2^{L-1} - 1$ nodes
+in a perfect binary tree of height $L-1$, and since the hierarchy of
+boxes consists of four such trees, there are $4(2^{L-1} - 1)$
+boxes. Therefore, approximately $12(2^{L-1} - 1)$ $\RRmat$
+translations occur.
+
+The $\SSmat$, $\SRmat$, and $\RRmat$ translations are each $O(p^2)$
+complexity, where $p$ is the truncation number. Combining this
+complexity with our estimates of the number of translations that
+occur, we have that the cost due to all translations is:
+\begin{align*}
+  \underbrace{4(2^{L-1} - 2) O(p^2)}_{\SSmat} + \underbrace{4(2^{L-1} - 2) O(p^2)}_{\SRmat} + \underbrace{12(2^{L-1} - 1) O(p^2)}_{\RRmat} = O(2^Lp^2)
+\end{align*}
+
+Next, we consider the construction of $S$-factorizations for the
+sources in the finest boxes. Constructing an $S$-factorization has
+complexity $O(p)$, and there are $N$ sources, so the overall
+complexity is $O(Np)$.
+
+For the direct evaluations, we have that direct evaluation occurs
+between every target point and each of the source points in its
+neighborhood at level $L$. Since we have assumed that the points are
+distributed uniformly, there are approximately
+$3 \times 2^{-L} N$ sources in the finest neighborhood of an
+evaluation point. Then, since there are $M$ evaluation points, the
+complexity of direct evaluation is $O(2^{-L}MN)$. 
+
+As for indirect evaluation, we note that indirect evaluation involves
+evaluating an $R$-expansion at each of the target points. Since the
+cost of evaluating an $R$-expansion is $O(p)$, the complexity is
+$O(Mp)$.
+
+Combining each of these individual parts gives us the following table
+of costs:
+\begin{center}
+  \begin{tabular}{|c|c|}
+    \hline
+    Translations & $O(2^Lp^2)$ \\
+    Forming $S$-Factorizations & $O(Np)$ \\
+    Direct Evaluation & $O(2^{-L}MN)$ \\
+    Indirect Evaluation & $O(Mp)$ \\
+    \hline
+    Total & $O(2^{-L}MN + (M + N)p + 2^Lp^2)$ \\
+    \hline
+  \end{tabular}
+\end{center}
+
+\subsection{NUFFT}
+
+The nonuniform (I)FFT algorithm which is studied in this paper
+consists primarily of computing the IFFT, followed by an application
+of the FMM and the solution of a linear least squares problem (i.e.,
+the periodic summation). We detail the required parameters:
+\begin{align*}
+  K &\equiv \mbox{ the number of grid points,} \\
+  J &\equiv \mbox{ the number of interpolation points,} \\
+  L &\equiv \mbox{ the maximum level of the FMM,} \\
+  p &\equiv \mbox{ the truncation number for the FMM,} \\
+  q &\equiv \mbox{ the number of check points ($q \gg p$),} \\
+  n &\equiv \mbox{ the radius for the periodic summation.}
+\end{align*}
+We compute the complexity of the FMM followed by the total cost of the
+algorithm.
+
+When the FMM is run as a step of the NUFFT, its source points are the
+periodic extension of the grid points, which lie in $[0, 2\pi)$, to
+the extended domain $[-2\pi n, 2 \pi (n + 1))$. So, instead of $K$
+source points, there are $(2n + 1)K$. The evaluation points consist of
+the $J$ interpolation points and $q$ checkpoints and periodic offsets
+thereof\----hence, there are $J + 2q$ evaluation points. Choosing
+$M = J + 2q$ and $N = (2n + 1)K$, the complexity of the FMM is
+$O(2^{-L}(J+q)nK + (J + q + nK)p + 2^Lp^2)$.
+
+The periodic summation step is dominated by the cost of the linear
+least squares problem that must be the solved. The complexity for a
+general system of $q$ equations in $p$ unknowns is $O(qp^2)$.
+
+All told, the complexity of our NUFFT is:
+\begin{align*}
+  \underbrace{O(K \log K)}_{\text{IFFT}} + \underbrace{O(2^{-L}(J+q)nK + (J + q + nK)p + 2^Lp^2)}_{\text{FMM}} + \underbrace{O(qp^2)}_{\text{LLS}},
+\end{align*}
+which can be simplified to $O((2^{-L}(J+q)n + \log K)K + (J + nK)p + (2^L + q)p^2)$.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "writeup"
+%%% End:

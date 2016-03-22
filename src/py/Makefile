@@ -1,5 +1,5 @@
 LIBFMM = libfmm.dylib
-LIBFMM_BUILD_PATH = ../cpp/build/
+LIBFMM_BUILD_PATH = ../cpp/Build/
 LIBFMM_PATH = $(shell ./find_cmake_output.sh $(LIBFMM) $(LIBFMM_BUILD_PATH))
 PYTHON = $(shell which python3)
 
@@ -14,8 +14,6 @@ _fmm.py: fmm.py fmm_build.py
 	$(PYTHON) fmm_build.py
 
 libfmm.dylib: $(LIBFMM_PATH)
-	echo $(LIBFMM_PATH)
-	ifeq ($(LIBFMM_PATH), "")
-		$(error could not find $(LIBFMM) in $(LIBFMM_BUILD_PATH))
-	endif
+	# TODO: come up with a way of checking if $(LIBFMM_PATH) has been
+	# set correctly at this point.
 	cp $(LIBFMM_PATH) .

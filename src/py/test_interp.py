@@ -1,6 +1,5 @@
 import matplotlib.pyplot as plt
 
-import fmm
 import groundtruth
 import nufft
 import testseries

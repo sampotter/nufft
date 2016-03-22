@@ -1,10 +1,11 @@
-import fmm
-import groundtruth
-import testseries
-
 import functools
 import matplotlib.pyplot as plt
 import numpy as np
+
+import fmm
+import groundtruth
+import nufft
+import testseries
 
 twopi = 2*np.pi
 
@@ -44,7 +45,28 @@ def approx_interp_fmm(F, K, Y, L, p, q):
                                 scaled_domain=(-twopi*q, twopi*(q + 1)))
     def g(j):
         return (-Fas_sum*np.cos(K*Y[j]) + 2*np.sin(K*Y[j])*V[j])/N
-    return [g(j) for j in range(len(Y))]
+    G = [g(j) for j in range(len(Y))]
+
+    index_ratio = len(Y)/(2*K)
+    
+    def test(y):
+        '''
+        This test is necessary to check if we've passed a point that we
+        essentially already know the value of (i.e. an evaluation
+        point that's nearly equal to a source point). We could
+        probably handle this correctly in the FMM itself, but for now,
+        a test like this should give us approximately what we
+        want... That is, no interpolates that are NaN, +/-Inf, or
+        incorrectly equal to zero.
+        '''
+        return np.abs(np.mod(y*(len(Y)/twopi), index_ratio)) < 1e-13
+
+    for i, y in enumerate(Y):
+        if test(y):
+            j = int(i/index_ratio)
+            G[i] = F[j]
+            
+    return G
 
 def transpose_argsort_indices(I):
     J = np.zeros(len(I), dtype=np.int)
@@ -127,18 +149,6 @@ if __name__ == '__main__':
     K = 10
     XY_index_ratio = J/(2*K)
 
-    def test(y):
-        '''
-        This test is necessary to check if we've passed a point that we
-        essentially already know the value of (i.e. an evaluation
-        point that's nearly equal to a source point). We could
-        probably handle this correctly in the FMM itself, but for now,
-        a test like this should give us approximately what we
-        want... That is, no interpolates that are NaN, +/-Inf, or
-        incorrectly equal to zero.
-        '''
-        return np.abs(np.mod(y*(J/twopi), XY_index_ratio)) < 1e-13
-
     def compute_G_fmm():
         X = np.linspace(0, twopi, 2*K, endpoint=False)
         F = testseries.semicircle(X, K).real
@@ -146,10 +156,6 @@ if __name__ == '__main__':
         p = 4
         q = 4
         G = approx_interp_fmm(F, K, Y, L, p, q)
-        for i, y in enumerate(Y):
-            if test(y):
-                j = int(i/XY_index_ratio)
-                G[i] = F[j]
         return G
         
     def compute_G_persum():
@@ -157,14 +163,9 @@ if __name__ == '__main__':
         F = testseries.semicircle(X, K).real
         L = 4
         p = 4
-        q = 4
-        num_cps = 10
-        G = approx_interp_persum(F, K, Y, L, p, q, num_cps)
-        for i, y in enumerate(Y):
-            if test(y):
-                j = int(i/XY_index_ratio)
-                G[i] = F[j]
-        return G
+        n = 4
+        q = 10
+        return nufft.inufft(F, K, Y, L, p, n, q)
         
     def compute_G_gt():
         N = 30

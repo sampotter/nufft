@@ -13,6 +13,8 @@
   - [ ] Compare final performance with results from Dott & Rokhlin II.
   - [ ] Find some applications...
   - [ ] Figure out what the deal with computing Bernoulli numbers is...
+  - [ ] Test what happens when an evaluation point is a very small
+    perturbation of one of the grid points.
 
 * Applications
 
@@ -79,3 +81,29 @@
    - [ ] Duff's device for loop unrolling (maybe this can be done using TMP?)
    - [ ] Loop tiling
    - [ ] Index types
+* Things to Verify Using Plots
+  - [ ] Increasing the size of the radial neighborhood, all else being
+    equal, should improve the accuracy.
+  - [ ] Different checkpoint methods should perform differently.
+  - [ ] Increasing the truncation number should improve accuracy.
+  - [ ] Increasing the FMM depth should decrease accuracy but improve
+    speed.
+  - [ ] With the rest of the parameters fixed, there should be an
+    optimal FMM depth.
+* Questions to be Explored with Plots
+  - [ ] How does the "radial neighborhood approximation" compare with
+    the periodic summation method? Should the periodic summation
+    method experience "diminishing returns" as the radial neighborhood
+    increases in size?
+  - [ ] Are any of the different test series actually more or less
+    "difficult" to interpolate?
+* Goals
+  - Approximate good choices for:
+	+ the FMM depth,
+	+ the truncation number,
+	+ the radial neighborhood size,
+	+ and the number of checkpoint pairs,
+	based on:
+	+ the bandlimit,
+	+ the function evaluates,
+	+ and the evaluation points.

@@ -62,5 +62,4 @@ def fmm1d_cauchy_double(sources, targets, weights, max_level, p,
     _lib.fmm1d_cauchy_double(output, sources, num_sources, targets, num_targets,
                              weights, num_weights, max_level, p)
 
-    print(scale_factor)
     return scale_factor*np.array(list(output))

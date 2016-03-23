@@ -308,10 +308,6 @@ nufft::fmm1d<kernel_type>::evaluate(
     assert(max < max_index);
 #endif
     for (index_type i {0}; i < max_index; ++i) {
-        output[i] = 0;
-    }
-
-    for (index_type i {0}; i < max_index; ++i) {
         auto const opt = target_bookmarks(max_level, i);
         if (!opt) {
             continue;

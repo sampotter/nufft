@@ -1,6 +1,8 @@
 #define BOOST_TEST_MODULE fmm1d
 
+#include <algorithm>
 #include <boost/test/included/unit_test.hpp>
+#include <random>
 
 #include "cauchy.hpp"
 #include "fmm1d.hpp"
@@ -1803,6 +1805,29 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
 
     BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(actual), std::cend(actual),
                                   std::cbegin(expected), std::cend(expected));
+}
+
+BOOST_AUTO_TEST_CASE (deeper_depths_dont_crash) {
+    using namespace nufft;
+
+    std::random_device device;
+    std::mt19937 gen(device());
+    std::uniform_real_distribution<> unif_dist(0, 1);
+    std::normal_distribution<> normal_dist(0, 1);
+    std::vector<double> X(100);
+    std::vector<double> U(100);
+    std::vector<double> Y(100);
+    for (int i = 0; i < 100; ++i) {
+        X[i] = unif_dist(gen);
+        Y[i] = unif_dist(gen);
+        U[i] = normal_dist(gen);
+    }
+    std::sort(std::begin(X), std::end(X));
+    std::sort(std::begin(Y), std::end(Y));
+
+    for (int L = 2; L < 15; ++L) {
+        fmm1d<cauchy>::fmm(X, Y, U, L, 4);
+    }
 }
 
 // Local Variables:

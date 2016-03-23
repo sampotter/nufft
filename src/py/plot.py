@@ -16,29 +16,53 @@ def _get_ground_truth_interp(X, F, Y, K):
     KK = _groundtruth.K(X, Y, 1 - K, K - 1)
     return _np.matrix(KK) * _np.matrix(F).transpose()
 
-def vary_neighborhood_size():
+def rad_vs_per_for_mse_wrt_n(path=None):
+    # TODO: this plot indicates that the error due to the position of
+    # the evaluation points dwarfs the error due to ignoring the use
+    # of least squares collocation.
+
     K = 20
     X = _get_X(K)
     J = 100
-    Y = _np.sort(_np.random.uniform(0, _twopi, J))
-    F = _testseries.semicircle(X, K).real
     L = 4
     p = 4
-    q = 100
+    q = 10
     min_n = 1
     max_n = 20
     Ns = range(min_n, max_n + 1)
-    G_gt = _get_ground_truth_interp(X, F, Y, K)
-    norms = []
-    for n in Ns:
-        G = _nufft.inufft(F, K, Y, L, p, n, q)
-        norms.append(_np.log10(_np.linalg.norm(G - G_gt, 2)))
+
+    trials = 50
+    mses = {
+        'per': _np.zeros((len(Ns), 1), dtype=_np.float64),
+        'rad': _np.zeros((len(Ns), 1), dtype=_np.float64)
+    }
+    for i, n in enumerate(Ns):
+        print('n = %d' % n)
+        _mses = _np.zeros((trials, 2), dtype=_np.float64)
+        for t in range(trials):
+            Y = _np.sort(_np.random.uniform(0, _twopi, J))
+            F = _testseries.semicircle(X, K).real
+            G_gt = _get_ground_truth_interp(X, F, Y, K)
+            G_per = _nufft.inufft(F, K, Y, L, p, n, q)
+            G_rad = _groundtruth.inufft_radial_approximation(F, K, Y, L, p, n)
+            _mses[t, 0] = _np.log10(_np.linalg.norm(G_per - G_gt, 2)**2/len(G_gt))
+            _mses[t, 1] = _np.log10(_np.linalg.norm(G_rad - G_gt, 2)**2/len(G_gt))
+        mses['per'][i] = _np.median(_mses[:, 0])
+        mses['rad'][i] = _np.median(_mses[:, 1])
         
     _plt.figure()
-    _plt.plot(Ns, norms, 'o')
-    _plt.show()
+    _plt.plot(Ns, mses['per'], label='INUFFT')
+    _plt.plot(Ns, mses['rad'], label='Radial Approx.')
+    _plt.legend()
+    if path:
+        _plt.savefig(path)
+    else:
+        _plt.show()
     
-    return Ns, norms
+    return Ns, mses
+
+# TODO: plot of error vs location of evaluation point... This would be
+# a useful graph.
 
 # TODO: try different check point distributions
 

@@ -147,7 +147,7 @@ def rad_vs_persum_with_n_wrt_mse():
             F = _testseries.semicircle(X, K).real
             G_gt = _get_ground_truth_interp(X, F, Y, K).real
             G_persum = _nufft.inufft(F, K, Y, L, p, n, q)
-            G_radial = _groundtruth.inufft_radial_approximation(F, K, Y, L, p, q)
+            G_radial = _groundtruth.inufft_radial_approximation(F, K, Y, L, p, n)
             diff_persum = G_persum - G_gt
             diff_radial = G_radial - G_gt
             digits_persum = -_np.log10(_np.abs(diff_persum))
@@ -191,7 +191,7 @@ def gt_vs_rad_vs_per_with_bandlimit_wrt_time():
         F = _testseries.semicircle(X, K).real
         
         timer_gt = _util.Timer(lambda: _get_ground_truth_interp(X, F, Y, K))
-        timer_rad = _util.Timer(lambda: _groundtruth.inufft_radial_approximation(F, K, Y, L, p, q))
+        timer_rad = _util.Timer(lambda: _groundtruth.inufft_radial_approximation(F, K, Y, L, p, n))
         timer_per = _util.Timer(lambda: _nufft.inufft(F, K, Y, L, p, n, q))
 
         times['gt'][i] = timer_gt.median

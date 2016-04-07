@@ -1,4 +1,4 @@
-\section{Periodic Summation}
+\section{Periodic Summation (Old)}
 
 This section contains a formulation of the periodic summation method
 as applied to our problem. The original presentation focused on a
@@ -195,3 +195,55 @@ generate. There was not enough time to go into depth with
 experimenting with the trade-offs associated with check point
 distributions, but this is one of the first things that will be looked
 into in future work.
+
+\section{Periodic Summation (New)}
+
+We let $n \in \nats$ and $\mathcal{N} = \set{-n, -n+1, \hdots,
+  n}$. Then, for $y$ such that $0 \leq y < 2\pi$, we define:
+\begin{align*}
+  \phi(y) \equiv \sum_{l=-\infty}^{\infty} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l},
+\end{align*}
+so that if we define:
+\begin{align*}
+  \phinear(y) &\equiv \sum_{l \in \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l}, \\
+  \phifar(y) &\equiv \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l},
+\end{align*}
+we can write $\phi(y) = \phinear(y) + \phifar(y)$.
+
+For $l \in \mathbb{Z} \backslash \mathcal{N}$, we have that a regular
+expansion of $(y - x_k - 2\pi)^{-1}$ about $x_* = \pi$ is valid for
+$y$ such that $-2\pi n \leq y < 2\pi(n+1)$. Then, for such a choice of
+$y$, we can write $\phifar(y)$ as:
+\begin{align*}
+  \phifar(y) &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l} \\
+  &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{m=0}^\infty a_m(x_k + 2\pi l, \pi) R_m(y - \pi) \\
+  &= \sum_{m=0}^\infty \parens{\sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k a_m(x_k + 2\pi l, \pi)} R_m(y - \pi). & \mathtodo
+\end{align*}
+From this, we define $c_m$ by:
+\begin{align*}
+  c_m \equiv \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k a_m(x_k + 2\pi l, \pi).
+\end{align*}
+
+Letting $L \geq 2K$, we choose $\set{y_l}_{l=1}^L$ such that
+$0 \leq y_l < 2\pi$. Then, if we choose
+$\set{p_l}_{l=1}^L \subseteq \mathcal{N}$ and define
+$\tilde{y}_l \equiv y_l + 2\pi p_l$, we have
+$\phinear(y_l) + \phifar(y_l) = \phinear(\tilde{y}_l) +
+\phifar(\tilde{y}_l)$ by assumption. Then, we can write:
+\begin{align*}
+  \phinear(\tilde{y}_l) - \phinear(y_l) &= \phifar(y_l) - \phifar(\tilde{y}_l) = \sum_{m=0}^\infty c_m (R_m(y_l - \pi) - R_m(\tilde{y_l} - \pi)).
+\end{align*}
+Defining $\boldsymbol{\phi} \in \mathbb{R}^{L}$, $\boldsymbol{c} \in \mathbb{R}^\infty$, and $\boldsymbol{R} \in \mathbb{R}^{L \times \infty}$
+by:
+\begin{align*}
+  \boldsymbol{\phi}_l = \phinear(\tilde{y}_l) - \phinear(y_l), \hspace{1cm} \boldsymbol{c}_m = c_m, \hspace{1cm} \boldsymbol{R}_{l,m} = R_m(y_l - \pi) - R_m(\tilde{y}_l - \pi)
+\end{align*}
+lets us write $\boldsymbol{\phi} = \boldsymbol{R}
+\boldsymbol{c}$. Then, to apply the periodic summation method, we
+recover $\boldsymbol{c}$ by solving a minimization problem and, for
+$y$ such that $0 \leq y < 2\pi$, compute
+$\phi(y) = \phinear(y) + \phifar(y)$, where $\phifar(y)$ is computed
+from:
+\begin{align*}
+  \phifar(y) = \sum_{m=0}^\infty c_m R_m(y - \pi).
+\end{align*}

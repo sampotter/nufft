@@ -54,8 +54,9 @@ def inufft(F, K, Y, L, p, n, q):
     Fas_per = _np.tile(Fas, 2*n + 1)
 
     # Compute uniformly distributed checkpoints.
-    Yc = _np.concatenate((_np.random.uniform(-_twopi, 0, _np.ceil(q/2)),
-                         _np.random.uniform(0, _twopi, _np.floor(q/2))))
+    Yc = _np.concatenate(
+        (_np.random.uniform(-n*_twopi, 0, int(_np.ceil(q/2))),
+         _np.random.uniform(_twopi, (n + 1)*_twopi, int(_np.floor(q/2)))))
     Yc_tilde = _np.mod(Yc, _twopi)
 
     # Join together actual targets and checkpoint targets and compute

@@ -114,3 +114,18 @@ def inufft(F, K, Y, L, p, n, q):
             G[i] = F[int(i/index_ratio)]
 
     return G
+
+if __name__ == '__main__':
+    from testseries import semicircle
+    from util import get_X
+
+    K = 10
+    J = 2*K
+    X = get_X(K)
+    Y = _np.sort(_np.random.uniform(0, _twopi, J))
+    F = semicircle(X, K).real
+    L = 4
+    n = 3
+    p = 4
+    q = 2*J
+    inufft(F, K, Y, L, p, n, q)

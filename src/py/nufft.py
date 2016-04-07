@@ -24,8 +24,32 @@ def _test(y, N, index_ratio):
     incorrectly equal to zero.
     '''
     return _np.abs(_np.mod(y*(N/_twopi), index_ratio)) < 1e-13
+
+def _uniform_checkpoints(**kwargs):
+    n = kwargs['n']
+    q = kwargs['q']
+    Yc = _np.concatenate(
+        (_np.random.uniform(-n*_twopi, 0, int(_np.ceil(q/2))),
+         _np.random.uniform(_twopi, (n + 1)*_twopi, int(_np.floor(q/2)))))
+    Yc_tilde = _np.mod(Yc, _twopi)
+    return Yc, Yc_tilde
+
+def _interleaved_checkpoints(**kwargs):
+    n = kwargs['n']
+    K = kwargs['K']
+    Yc = _np.concatenate(
+        (_np.linspace(-_twopi*n, 0, 2*K*n, endpoint=False),
+         _np.linspace(_twopi, _twopi*(n + 1), 2*K*n, endpoint=False))
+    ) + _twopi/(4*K)
+    Yc_tilde = _np.mod(Yc, _twopi)
+    return Yc, Yc_tilde
     
-def inufft(F, K, Y, L, p, n, q):
+_cpmethods = {
+    'uniform': _uniform_checkpoints,
+    'interleaved': _interleaved_checkpoints
+}
+
+def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
     '''
     Arguments:
         F: samples of a K-bandlimited function spaced equally along [0, 2pi).
@@ -54,10 +78,10 @@ def inufft(F, K, Y, L, p, n, q):
     Fas_per = _np.tile(Fas, 2*n + 1)
 
     # Compute uniformly distributed checkpoints.
-    Yc = _np.concatenate(
-        (_np.random.uniform(-n*_twopi, 0, int(_np.ceil(q/2))),
-         _np.random.uniform(_twopi, (n + 1)*_twopi, int(_np.floor(q/2)))))
-    Yc_tilde = _np.mod(Yc, _twopi)
+    if cpmethod not in _cpmethods.keys():
+        raise Exception('invalid checkpoint method "%s"' % cpmethod)
+    Yc, Yc_tilde = _cpmethods[cpmethod](K=K, n=n, q=q)
+    q = len(Yc)
 
     # Join together actual targets and checkpoint targets and compute
     # the sorting permutation and its inverse for use with FMM.

@@ -10,9 +10,6 @@ from matplotlib import cm as _cm
 
 _twopi = 2*_np.pi
 
-def _get_X(K):
-    return _np.linspace(0, _twopi, 2*K, endpoint=False)
-
 def _get_ground_truth_interp(X, F, Y, K):
     KK = _groundtruth.K(X, Y, 1 - K, K - 1)
     return _np.matrix(KK) * _np.matrix(F).transpose()
@@ -31,7 +28,7 @@ def radial_error_vs_target_location(save=False, preamble=False):
         print('#')
 
     K = 2
-    X = _get_X(K).real
+    X = _util.get_X(K).real
     J = 500
     L = 10
     p = 50
@@ -75,7 +72,7 @@ def per_error_vs_target_location(save=False, preamble=False):
         print('#')
 
     K = 2
-    X = _get_X(K).real
+    X = _util.get_X(K).real
     J = 500
     L = 10
     p = 50
@@ -119,7 +116,7 @@ def rad_vs_per_wrt_n_with_fixed_Y(save=False, preamble=False):
         print('#')
 
     K = 20
-    X = _get_X(K)
+    X = _util.get_X(K)
     J = 100
     L = 4
     p = 4
@@ -169,7 +166,7 @@ def rad_vs_per_for_mse_wrt_n(save=False, preamble=False):
         print('#')
 
     K = 20
-    X = _get_X(K)
+    X = _util.get_X(K)
     J = 100
     L = 4
     p = 4
@@ -218,7 +215,7 @@ def p_vs_n_wrt_mse(save=False, preamble=False):
         print('#')
 
     K = 10
-    X = _get_X(K)
+    X = _util.get_X(K)
     J = 100
     q = 100
     L = 4
@@ -269,7 +266,7 @@ def L_vs_p_wrt_time(save=False, preamble=False):
         print('#')
 
     K = 10
-    X = _get_X(K)
+    X = _util.get_X(K)
     J = 100
     Y = _np.sort(_np.random.uniform(0, _twopi, J))
     F = _testseries.semicircle(X, K).real
@@ -316,7 +313,7 @@ def rad_vs_persum_with_n_wrt_mse(save=False, preamble=False):
         print('#')
 
     K = 10
-    X = _get_X(K)
+    X = _util.get_X(K)
     J = 100
     q = 100
     L = 4
@@ -385,7 +382,7 @@ def gt_vs_rad_vs_per_with_bandlimit_wrt_time(save=False, preamble=False):
         print('K = %d' % K)
         
         J = 2*K
-        X = _get_X(K)
+        X = _util.get_X(K)
         Y = _np.sort(_np.random.uniform(0, _twopi, J))
         F = _testseries.semicircle(X, K).real
         

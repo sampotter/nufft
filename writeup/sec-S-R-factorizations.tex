@@ -21,6 +21,28 @@ For the singular kernel, following a similar derivation, we define $S_m(y - x_*)
 \end{align*}
 where we require that $|x - x_*| < |y - x_*|$. \\
 
+\subsection{Orthogonalized $R$ Factorization}
+
+In this section we orthogonalize the set of functions
+$\set{R_m(y-\pi)}_{m=0}^\infty$. First, for $n \geq 1$ and
+$i, j \in \set{0, 1, 2, \hdots}$, we compute the inner product between
+$R_i(y - \pi)$ and $R_j(y - \pi)$ in $L^2[-2\pi n, 2\pi(n+1)]$:
+\begin{align*}
+  \ip{R_i(y - \pi), R_j(y - \pi)} &= \int_{-2\pi n}^{2\pi(n+1)} R_i(y - \pi)R_j(y - \pi) dy \\
+  &= \int_{-2\pi n}^{2\pi(n+1)} {(y - \pi)}^{i+j} dy \\
+  &= \left. \frac{1}{i+j+1} (y - \pi)^{i+j+1} \right|_{y = -2\pi n}^{2\pi(n+1)} \\
+  &= \frac{\pi^{i+j+1} (2n + 1)^{i+j+1}}{i+j+1} \cdot \left\{ \begin{tabular}{cl} 2 & if $i + j$ is even, \\ 0 & otherwise. \end{tabular} \right.
+\end{align*}
+From this, we readily compute that
+$\norm{R_0(y - \pi)}_{L^2} = \sqrt{2\pi(2n + 1)}$. We apply
+Gram-Schmidt to orthogonalize $\set{R_m(y - \pi)}_{m=0}^\infty$,
+generating a new function sequence
+$\set{\tilde{R}_m(y - \pi)}_{m=0}^\infty$. This involves setting:
+\begin{align*}
+  \tilde{R}_0(y - \pi) \equiv \frac{R_0(y - \pi)}{\norm{R_0(y - \pi)}_{L^2}} = \frac{1}{\sqrt{2\pi(2n + 1)}}.
+\end{align*}
+The latter terms in the s
+
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "writeup.tex"

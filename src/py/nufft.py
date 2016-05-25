@@ -1,6 +1,8 @@
 import fmm as _fmm
 import numpy as _np
 
+from manual_c import c as _c
+
 _twopi = 2*_np.pi
 
 def _transpose_argsort_indices(I):
@@ -49,7 +51,7 @@ _cpmethods = {
     'interleaved': _interleaved_checkpoints
 }
 
-def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
+def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', manualc_N=None, debug=False):
     '''
     Arguments:
         F: samples of a K-bandlimited function spaced equally along [0, 2pi).
@@ -61,6 +63,8 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
            the intervals [-2pi*n, 0) and [2pi, 2pi(n+1)).
         q: the number of checkpoint pairs.
     '''
+
+    import pdb; pdb.set_trace()
 
     # Compute N equally spaced gridpoints that lie in [0, 2pi).
     N = len(F)
@@ -84,7 +88,7 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
     q = len(Yc)
 
     # Join together actual targets and checkpoint targets and compute
-    # the sorting permutation and its inverse for use with FMM.
+    # the sorting permutation and its inverse for use with the FMM.
     Ycat = _np.concatenate((Y, Yc, Yc_tilde))
     I = _np.argsort(Ycat)
     J = _transpose_argsort_indices(I)
@@ -101,8 +105,8 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
     # Extract checkpoint evaluates for computing far summation.
     Vc_start = len(Y)
     Vc_tilde_start = Vc_start + len(Yc)
-    Vc = V[Vc_start:Vc_start + len(Yc)]
-    Vc_tilde = V[Vc_tilde_start:Vc_tilde_start + len(Yc_tilde)]
+    Vc = V[Vc_start : Vc_start + len(Yc)]
+    Vc_tilde = V[Vc_tilde_start : Vc_tilde_start + len(Yc_tilde)]
 
     # Compute far summation using least squares collocation.
     f = Vc_tilde - Vc
@@ -112,10 +116,26 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='interleaved'):
     for m in range(p):
         A[:, m] = R(Yc, m) - R(Yc_tilde, m)
     C = _np.linalg.lstsq(A, f)[0]
-    
+
+    if manualc_N:
+        if type(manualc_N) is not int:
+            raise Exception('manualc_N must be None or an int')
+        else:
+            C = [_c(m, X, F, n, manualc_N, K) for m in range(manualc_N)]
+            if debug:
+                print(C)
+
     phifar = _np.zeros(Y.shape, dtype=Y.dtype)
-    for j in range(len(Y)):
-        phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
+    if manualc_N:
+        for j in range(len(Y)):
+            for m in range(manualc_N):
+                tmp = C[m]*(Y[j] - _np.pi)**m
+                phifar[j] += tmp
+    else:
+        for j in range(len(Y)):
+            phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
+
+    # import pdb; pdb.set_trace()
 
     # Extract near summation from evaluates computed using FMM and
     # compute final V from phinear and phifar.
@@ -152,4 +172,4 @@ if __name__ == '__main__':
     n = 3
     p = 4
     q = 2*J
-    inufft(F, K, Y, L, p, n, q)
+    inufft(F, K, Y, L, p, n, q, cpmethod='interleaved')

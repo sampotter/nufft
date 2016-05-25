@@ -1,8 +1,12 @@
-import inspect as _inspect
+# TODO: try different check point distributions
+# TODO: different test series -- with respect to what, though...? do this last
+
+import itertools as _itertools
 import groundtruth as _groundtruth
 import matplotlib.pyplot as _plt
 import nufft as _nufft
 import numpy as _np
+import scipy as _sp
 import testseries as _testseries
 import util as _util
 
@@ -14,19 +18,21 @@ def _get_ground_truth_interp(X, F, Y, K):
     KK = _groundtruth.K(X, Y, 1 - K, K - 1)
     return _np.matrix(KK) * _np.matrix(F).transpose()
 
-# TODO: plot of error vs location of evaluation point... This would be
-# a useful graph.
+def _plotfunc(f):
+    def g(save=False, preamble=False):
+        if preamble:
+            print('#' * 80)
+            print('# ' + f.__name__)
+            print('#')
+        f()
+        if save:
+            _plt.savefig(f.__name__ + '.pdf')
+        else:
+            _plt.show()
+    return g
 
-# TODO: try different check point distributions
-
-# TODO: different test series -- with respect to what, though...? do this last
-
-def radial_error_vs_target_location(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def radial_error_vs_target_location():
     K = 2
     X = _util.get_X(K).real
     J = 500
@@ -60,17 +66,9 @@ def radial_error_vs_target_location(save=False, preamble=False):
     _plt.title('Number of Correct Digits by Radial Approx. INUFFT (K = %d)' % K)
     _plt.xlabel('Neighborhood Radius (n)')
     _plt.ylabel('Evaluation Point (y)')
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
 
-def per_error_vs_target_location(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def per_error_vs_target_location():
     K = 2
     X = _util.get_X(K).real
     J = 500
@@ -104,17 +102,9 @@ def per_error_vs_target_location(save=False, preamble=False):
     _plt.title('Number of Correct Digits by Per. Sum. INUFFT (K = %d)' % K)
     _plt.xlabel('Neighborhood Radius (n)')
     _plt.ylabel('Evaluation Point (y)')
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
 
-def rad_vs_per_wrt_n_with_fixed_Y(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def rad_vs_per_wrt_n_with_fixed_Y():
     K = 20
     X = _util.get_X(K)
     J = 100
@@ -148,23 +138,9 @@ def rad_vs_per_wrt_n_with_fixed_Y(save=False, preamble=False):
     _plt.xlabel('Neighborhood Size')
     _plt.ylabel('Log10 MSE')
     _plt.legend()
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
-    
-    return Ns, mses
-    
-def rad_vs_per_for_mse_wrt_n(save=False, preamble=False):
-    # TODO: this plot indicates that the error due to the position of
-    # the evaluation points dwarfs the error due to ignoring the use
-    # of least squares collocation.
 
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc    
+def rad_vs_per_for_mse_wrt_n():
     K = 20
     X = _util.get_X(K)
     J = 100
@@ -201,19 +177,9 @@ def rad_vs_per_for_mse_wrt_n(save=False, preamble=False):
     _plt.xlabel('Neighborhood Size')
     _plt.ylabel('Median of Log10 of MSE (50 trials)')
     _plt.legend()
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
-    
-    return Ns, mses
 
-def p_vs_n_wrt_mse(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def p_vs_n_wrt_mse():
     K = 10
     X = _util.get_X(K)
     J = 100
@@ -252,19 +218,9 @@ def p_vs_n_wrt_mse(save=False, preamble=False):
     _plt.ylabel('Truncation Number')
     _plt.xticks(range(len(Ns)))
     _plt.yticks(range(len(Ps)))
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
-    
-    return Ps, Ns, mses
 
-def L_vs_p_wrt_time(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def L_vs_p_wrt_time():
     K = 10
     X = _util.get_X(K)
     J = 100
@@ -299,19 +255,9 @@ def L_vs_p_wrt_time(save=False, preamble=False):
     _plt.ylabel('FMM Depth')
     _plt.xticks(range(len(Ps)))
     _plt.yticks(range(len(Ls)))
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
-    
-    return Ls, Ps, times
 
-def rad_vs_persum_with_n_wrt_mse(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def rad_vs_persum_with_n_wrt_mse():
     K = 10
     X = _util.get_X(K)
     J = 100
@@ -351,19 +297,9 @@ def rad_vs_persum_with_n_wrt_mse(save=False, preamble=False):
     _plt.xlabel('Neighborhood Size')
     ax = _plt.gca()
     ax.set_xticklabels([''] + [str(n) for n in Ns] + [''])
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
 
-    return Ns, mses
-
-def gt_vs_rad_vs_per_with_bandlimit_wrt_time(save=False, preamble=False):
-    if preamble:
-        print('#' * 80)
-        print('# ' + _inspect.stack()[0][3])
-        print('#')
-
+@_plotfunc
+def gt_vs_rad_vs_per_with_bandlimit_wrt_time():
     q = 100
     L = 4
     p = 4
@@ -401,8 +337,102 @@ def gt_vs_rad_vs_per_with_bandlimit_wrt_time(save=False, preamble=False):
     _plt.ylabel('Log10 Execution Time (sec.)')
     _plt.xlabel('Bandlimit (determines problem size)')
     _plt.legend()
-    if save:
-        _plt.savefig(_inspect.stack()[0][3] + '.pdf')
-    else:
-        _plt.show()
 
+@_plotfunc
+def manual_c_error_vs_target_location():
+    K = 2
+    X = _util.get_X(K).real
+    J = 100
+    L = 4
+    p = 4
+    n = 4
+    q = 10 # not used
+    Y = _np.linspace(0, _twopi, J, endpoint=False)
+    F = _testseries.semicircle(X, K).real
+    G_gt = _get_ground_truth_interp(X, F, Y, K).real
+    N_min_power = 1
+    N_max_power = 2
+    num_Ns = 500
+    Ns = _np.logspace(N_min_power, N_max_power, num_Ns)
+    
+    digits = _np.matrix(_np.zeros((J, num_Ns), dtype=_np.float64))
+    for i, N in enumerate(Ns):
+        print('N = %d' % N)
+        G_per = _np.matrix(_nufft.inufft(F, K, Y, L, p, n, q, manualc_N=int(N), debug=False)).T
+        digits[:, i] = -_np.log10(_np.abs(G_gt - G_per))
+
+    fig = _plt.figure()
+    imshow_ax = _plt.imshow(digits, interpolation='nearest', cmap=_cm.cubehelix)
+    _plt.xticks(_np.linspace(1, num_Ns, N_max_power - N_min_power + 1))
+    _plt.yticks(_np.linspace(1, J, 5))
+    ax = _plt.gca()
+    xticklabels = ['1e%d' % power for power in range(N_min_power, N_max_power + 1)]
+    ax.set_xticklabels(xticklabels)
+    yticklabels = ['0', u'π/2', u'π', u'3π/2', u'2π']
+    ax.set_yticklabels(yticklabels)
+    fig.colorbar(imshow_ax)
+    _plt.title('Number of Correct Digits by INUFFT with Manual Coefs (K = %d)' % K)
+    _plt.xlabel('Truncation Number of Coefs (N)')
+    _plt.ylabel('Evaluation Point (y)')
+
+@_plotfunc
+def semicircle_persum_error_bound_vs_p_vs_n():
+    K = 4
+    min_p = 2
+    max_p = 20
+    min_n = 2
+    max_n = 20
+    ps = _np.arange(min_p, max_p + 1)
+    ns = _np.arange(min_n, max_n + 1)
+    X = _util.get_X(K).real
+    F = _testseries.semicircle(X, K).real
+
+    def A(n, p):
+        tmp1 = (2*(p + n + 1) - 1)/(2*p*(2*(n + 1) - 1)**(p+1))
+        tmp2 = (2*(p + n + 1) + 1)/(2*p*(2*(n - 1) + 1)**(p+1))
+        return tmp1 + tmp2
+
+    def B(n, p):
+        tmp1 = ((2*(n + 1) - 1)**(-p-1))/(2*_np.log(2*(n + 1) - 1))
+        tmp2 = ((2*(n + 1) + 1)**(-p-1))/(2*_np.log(2*(n + 1) + 1))
+        return tmp1 + tmp2
+
+    def C(n, p):
+        tmp1 = _sp.special.expi(-p*_np.log(2*(n + 1) - 1))
+        tmp2 = _sp.special.expi(-p*_np.log(2*(n + 1) + 1))
+        return -(1/4)*(tmp1 + tmp2)
+
+    D = (1/_np.pi)*sum([abs(F[k]) for k in range(2*K)])
+    print(D)
+
+    E = _np.zeros((len(ns), len(ps)))
+    for i, j in _itertools.product(range(len(ns)), range(len(ps))):
+        n = ns[i]
+        p = ps[j]
+        print("n = %d, p = %d" % (n, p))
+        E[i, j] = min(15, -_np.log10(D*(A(n, p) + B(n, p) + C(n, p))))
+
+    fig = _plt.figure()
+    imshow_ax = _plt.imshow(E, interpolation='nearest', cmap=_cm.cubehelix)
+    _plt.xticks(_np.linspace(0, len(ps) - 1, len(ps)))
+    _plt.yticks(_np.linspace(0, len(ns) - 1, len(ns)))
+    ax = _plt.gca()
+    ax.set_xticklabels(map(str, ps))
+    ax.set_yticklabels(map(str, ns))
+    fig.colorbar(imshow_ax)
+    _plt.title('Semicircle Periodic Summation Error Bound (K = %d)' % K)
+    _plt.xlabel('Truncation Number(p)')
+    _plt.ylabel('Neighborhood Size (n)')
+
+@_plotfunc
+def c_m_convergence():
+    K = 4
+    min_p = 2
+    max_p = 20
+    min_n = 2
+    max_n = 20
+    ps = _np.arange(min_p, max_p + 1)
+    ns = _np.arange(min_n, max_n + 1)
+    X = _util.get_X(K).real
+    F = _testseries.semicircle(X, K).real
+    

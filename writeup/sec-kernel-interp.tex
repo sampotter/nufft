@@ -123,9 +123,20 @@ $\sum_{k=-\infty}^\infty \parens{t - 2 \pi k}^{-1}$, which we have
 encountered in our previous derivations. Appealing to
 Equations~\ref{eqn:K-entries-final} and
 \ref{eqn:G-in-cot-and-G-per-sum} we have that:
+\begin{align*}
+  2K g_j &= \sum_{k=0}^{2K-1} f_k \cdot (-1)^k \cdot \parens{-\cos(Ky_j) + \sin(Ky_j) \sum_{l=-\infty}^\infty \frac{1}{y_j - x_k - 2\pi l}} \notag \\
+  &= - \cos(Ky_j) \sum_{k=0}^{2K-1} (-1)^k f_k + 2 \sin(Ky_j) \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l}. \label{eqn:gj-per-sum-form}
+\end{align*}
+Finally, we note that:
+\begin{align*}
+  \sum_{k=0}^{2K-1} (-1)^k f_k
+  &= \sum_{k=0}^{2K-1} (-1)^k \sum_{n=1-K}^{K-1} c_n e^{inx_k} \\
+  &= \sum_{n=1-K}^{K-1} c_n \sum_{k=0}^{2K-1} (-1)^k e^{i\pi nk/K} \\
+  &= \sum_{n=1-K}^{K-1} c_n \cdot \frac{1 - {(-1)}^{2kK} e^{i 2\pi nk}}{1 + e^{i n \pi/ K}} = 0.
+\end{align*}
+This lets us write:
 \begin{align}
-  2K g_j &= \sum_{k=0}^{2K-1} f_k \cdot (-1)^k \cdot \parens{-\cos(Ky_j) + \sin(Ky_j) \sum_{l=-\infty}^\infty {1 \over y_j - x_k - 2\pi l}} \notag \\
-  &= - \cos(Ky_j) \sum_{k=0}^{2K-1} (-1)^k f_k + 2 \sin(Ky_j) \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} \parens{(-1)^k f_k \over y_j - x_k - 2\pi l}. \label{eqn:gj-per-sum-form}
+  g_j &= \frac{\sin(Ky_j)}{K} \sum_{l=-\infty}^\infty \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l}
 \end{align}
 
 In the next section, we will define a kernel function $\Phi$ from the
@@ -134,3 +145,8 @@ useful properties of this kernel that pertain to the fast multipole
 method. Later, we will use Equation~\ref{eqn:gj-per-sum-form} in
 conjunction with the fast multipole method and the periodic
 summation method to compute each $g_j$.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "writeup.tex"
+%%% End:

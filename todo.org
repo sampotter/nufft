@@ -107,3 +107,13 @@
 	+ the bandlimit,
 	+ the function evaluates,
 	+ and the evaluation points.
+* Debug
+** Least Squares Collocation Bug
+   - [ ] Check what the condition number of the matrix is...
+	 - [ ] Analytically
+	 - [ ] Numerically
+   - [ ] Consult Golub & Van Loan
+   - [ ] Try choosing checkpoints to be the points that are in the
+     troughs for a given K -- it might only be necessary to use 2K of
+     them, which would give a square matrix that may also be exactly
+     invertible.

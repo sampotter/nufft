@@ -10,7 +10,9 @@ PLOT_PDFS = \
 	gt_vs_rad_vs_per_with_bandlimit_wrt_time.pdf \
 	radial_error_vs_target_location.pdf \
 	per_error_vs_target_location.pdf \
-	rad_vs_per_wrt_n_with_fixed_Y.pdf
+	rad_vs_per_wrt_n_with_fixed_Y.pdf \
+	manual_c_error_vs_target_location.pdf \
+	semicircle_persum_error_bound_vs_p_vs_n.pdf 
 
 all: libfmm.dylib _fmm.py $(PLOT_PDFS)
 
@@ -20,8 +22,8 @@ clean:
 	rm -rf __pycache__
 	rm -rf $(PLOT_PDFS)
 
-$(PLOT_PDFS): make_plots.py plot.py
-	$(PYTHON) make_plots.py
+$(PLOT_PDFS): %.pdf: plot.py nufft.py
+	@ $(PYTHON) -c "from plot import *; $*(True, True)"
 
 _fmm.py: fmm.py fmm_build.py
 	$(PYTHON) fmm_build.py
@@ -30,3 +32,4 @@ libfmm.dylib: $(LIBFMM_PATH)
 	# TODO: come up with a way of checking if $(LIBFMM_PATH) has been
 	# set correctly at this point.
 	cp $(LIBFMM_PATH) .
+

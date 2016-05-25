@@ -127,15 +127,12 @@ $\phinear(y) - \phinear(y + 2\pi l)$ can be written:
 \end{align*}
 
 For the collocation step, we assume that we have chosen a set of $L$
-\textbf{check points} $Y = \set{y_1, \hdots, y_L}$
-that satisfies $\pi < \abs{y_i - \pi} < r$
-for each $i = 1, \hdots, L$.
-The choice of such a set is nontrivial and is considered in another
-section.  Now, if we consider the equation derived in the preceding
-paragraph in turn for each of our check points $y_i \in Y$,
-we end up with $L$
-equations in $p$
-unknowns and can correspondingly define
+\textbf{check points} $Y = \set{y_1, \hdots, y_L}$ that satisfies
+$\pi < \abs{y_i - \pi} < r$ for each $i = 1, \hdots, L$.  The choice
+of such a set is nontrivial and is considered in another section.
+Now, if we consider the equation derived in the preceding paragraph in
+turn for each of our check points $y_i \in Y$, we end up with $L$
+equations in $p$ unknowns and can correspondingly define
 $\bold{R} \in \mathbb{C}^{L \times p}$,
 $\bold{c} \in \mathbb{C}^{p \times 1}$,
 $\boldsymbol{\phi}_{\operatorname{near}} \in \mathbb{C}^{L \times 1}$,
@@ -201,12 +198,12 @@ into in future work.
 We let $n \in \nats$ and $\mathcal{N} = \set{-n, -n+1, \hdots,
   n}$. Then, for $y$ such that $0 \leq y < 2\pi$, we define:
 \begin{align*}
-  \phi(y) \equiv \sum_{l=-\infty}^{\infty} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l},
+  \phi(y) \equiv \sum_{l=-\infty}^{\infty} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l},
 \end{align*}
 so that if we define:
 \begin{align*}
-  \phinear(y) &\equiv \sum_{l \in \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l}, \\
-  \phifar(y) &\equiv \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y_j - x_k - 2\pi l},
+  \phinear(y) &\equiv \sum_{l \in \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l}, \\
+  \phifar(y) &\equiv \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l},
 \end{align*}
 we can write $\phi(y) = \phinear(y) + \phifar(y)$.
 
@@ -245,8 +242,125 @@ $y$ such that $0 \leq y < 2\pi$, compute
 $\phi(y) = \phinear(y) + \phifar(y)$, where $\phifar(y)$ is computed
 from:
 \begin{align*}
-  \phifar(y) = \sum_{m=0}^\infty c_m R_m(y - \pi).
+  \phifar(y) = \sum_{m=0}^\infty c_m R_m(y - \pi) \equiv \varepsilon^{(p)} + \sum_{m=0}^{p-1} c_m R_m(y - \pi),
 \end{align*}
+with $\varepsilon^{(p)}$ defined by:
+\begin{align*}
+  \varepsilon^{(p)} = \sum_{m=p}^{\infty} c_mR_m(y - \pi).
+\end{align*}
+
+\subsection{Necessary Conditions}
+
+For the periodic summation to work, it is necessary to have
+$\varepsilon^{(p)}$ and each $c_m$ converge. We first show that each
+$c_m$ converges. For a general argument $y$, we have:
+\begin{align*}
+  \phifar(y) &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l}
+\end{align*}
+We expand the kernel regularly about $x_* = \pi$ so that:
+\begin{align*}
+  \phifar(y) &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{m=0}^\infty a_m(x_k + 2\pi l, \pi) R_m(y - \pi) \\
+  &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k \parens{\varepsilon_{l,k}^{(p)} + \sum_{m=0}^{p-1} a_m(x_k + 2\pi l, \pi) R_m(y - \pi)} \\
+  &\equiv \underbrace{\sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2N-1} {(-1)}^k f_k \varepsilon_{l,k}^{(p)}}_{\varepsilon^{(p)}} + \sum_{m=0}^{p-1} \underbrace{\parens{\sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} {(-1)}^k f_k a_m(x_k + 2\pi l, \pi)}}_{c_m} R_m(y - \pi)
+\end{align*}
+\textbf{TODO:} $m = 0$?
+% Then, for $m=0$, we have:
+% \begin{align*}
+%   c_0 = \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{l = n+1}^\infty \parens{\frac{-1}{x_k + 2\pi l - \pi} + \frac{-1}{x_k - 2\pi l - \pi}}.
+% \end{align*}
+% Next, we write:
+% \begin{align*}
+%   \int_{n+1}^\infty &\parens{\frac{-1}{x_k + 2\pi l - \pi} + \frac{-1}{x_k - 2\pi l - \pi}} dl = -\lim_{N \to \infty} \parens{\int_{n+1}^N \frac{dl}{x_k + 2\pi l - \pi} + \int_{n+1}^N \frac{dl}{x_k - 2\pi l - \pi}}.
+% \end{align*}
+% Then, since:
+% \begin{align*}
+%   \int_{n+1}^N \frac{dl}{x_k \pm 2 \pi l - \pi} = \mp \left. \frac{1}{2 \pi} \ln |x_k \pm 2 \pi l - \pi| \right|_{l=n+1}^N = \mp \frac{1}{2\pi} \ln \abs{\frac{x_k \pm 2 \pi N - \pi}{x_k \pm 2 \pi (n+1) - \pi}}
+% \end{align*}
+% we have:
+% \begin{align*}
+%   \lim_{N\to\infty} \ln \abs{\frac{x_k - 2\pi N - \pi}{x_k + 2\pi N - \pi}} = \lim_{N \to \infty} \ln \parens{\frac{2 \pi N - x_k + \pi}{2 \pi N + x_k - \pi}} = 0.
+% \end{align*}
+% So, by the integral test, we have that $c_0 < \infty$. This handles
+% the case of $m = 0$. \textbf{TODO}: this is incorrect... But in our
+% experiments, $c_0$ always wound up equal to 0. Maybe it's possible to
+% show that $c_0$ is necessarily 0.
+
+When $m>0$, we have:
+\begin{align*}
+  c_m = \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{l = n+1}^\infty \parens{\frac{-1}{(x_k + 2\pi l - \pi)^{m+1}} + \frac{-1}{(x_k - 2\pi l - \pi)^{m+1}}}.
+\end{align*}
+Next, we write:
+\begin{align*}
+  \int_{n+1}^\infty &\parens{\frac{-1}{(x_k + 2\pi l - \pi)^{m+1}} + \frac{-1}{(x_k - 2\pi l - \pi)^{m+1}}} dl \\
+  &= -\lim_{N \to \infty} \parens{\int_{n+1}^N \frac{dl}{(x_k + 2\pi l - \pi)^{m+1}} + \int_{n+1}^N \frac{dl}{(x_k - 2\pi l - \pi)^{m+1}}}.
+\end{align*}
+Then, since:
+\begin{align*}
+  \int_{n+1}^N \frac{dl}{(x_k \pm 2 \pi l - \pi)^{m+1}} &= \left. \mp \frac{1}{2 \pi m} (x_k \pm 2 \pi l - \pi)^{-m} \right|_{l=n+1}^N \\
+  &= \mp \frac{1}{2\pi m} \parens{(x_k \pm 2 \pi N - \pi)^{-m} - (x_k \pm 2 \pi (n+1) - \pi)^{-m}},
+\end{align*}
+we have:
+\begin{align*}
+  \lim_{N\to\infty} \parens{\parens{x_k - 2\pi N - \pi}^{-m} - \parens{x_k + 2\pi N - \pi}^{-m}} &= 0,
+\end{align*}
+since the individual limits exist. Then, again by the integral test,
+we have that $c_m < \infty$. Our two cases prove that each $c_m$ converges.
+
+To show that $\varepsilon^{(p)}$ converges, we first note that for
+each $x_k$ and each $l \in \mathbb{Z} \backslash \mathcal{N}$ (i.e., for
+any choice of $\mathcal{N}$), we have:
+\begin{align*}
+  \abs{x_k + 2\pi l - \pi} \geq \pi (2l - 1).
+\end{align*}
+Then, we can compute:
+\begin{align*}
+  \abs{\varepsilon^{(p)}} &\leq \sum_{m=p}^\infty \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \abs{f_k \cdot \frac{(y-\pi)^m}{(x_k + 2\pi l - \pi)^{m+1}}} \\
+  &\leq \sum_{m=p}^\infty \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \abs{f_k} \frac{\pi^m}{\pi^{m+1}} \abs{2l - 1}^{-m-1} \\
+  &= \frac{1}{\pi} \sum_{k=0}^{2K-1} \abs{f_k} \cdot \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{m=p}^\infty \abs{2l - 1}^{-m-1} \\
+  &= \frac{1}{\pi} \sum_{k=0}^{2K-1} \abs{f_k} \cdot \sum_{l=n+1}^\infty \parens{\sum_{m=p}^\infty (2l - 1)^{-m-1} + \sum_{m=p}^\infty (2l + 1)^{-m-1}}.
+\end{align*}
+Then, since $n = 1, 2, \hdots$, we have that $l > 1$. This allows us to compute:
+\begin{align*}
+  \int_p^\infty {(2l - 1)}^{-m-1} dm = \left. \frac{-1}{2} \cdot \frac{{(2l - 1)}^{-m-1}}{\ln(2l - 1)} \right|_{m=p}^{\infty} = \frac{(2l - 1)^{-p-1}}{2 \ln(2l - 1)}.
+\end{align*}
+Likewise:
+\begin{align*}
+  \int_p^\infty {(2l + 1)}^{-m-1} dm = \frac{(2l + 1)^{-p-1}}{2 \ln(2l + 1)}.
+\end{align*}
+The integral test lets us bound the corresponding sums as follows:
+\begin{align*}
+  \sum_{m=p}^\infty (2l \mp 1)^{-m-1} \leq (2l \mp 1)^{-p-1} + \int_p^\infty {(2l \mp 1)}^{-m-1} dm = (2l \mp 1)^{-p-1} + \frac{(2l \mp 1)^{-p-1}}{2 \ln(2l \mp 1)}.
+\end{align*}
+Next, we consider the corresponding series in turn. First, for $(2l \mp 1)^{-p-1}$, we have:
+\begin{align*}
+  \sum_{l=n+1}^\infty (2l \mp 1)^{-p-1} \leq (2(n+1) \mp 1)^{-p-1} + \frac{(2(n+1) \mp 1)^{-p}}{2p} = \frac{2(p+n+1) \mp 1}{2p(2(n+1) \mp 1)^{p+1}}.
+\end{align*}
+The other term is a little more complicated. We start by computing:
+\begin{align*}
+  \frac{1}{2} \int_{n+1}^\infty \frac{(2l \mp 1)^{-p-1}}{\ln(2l \mp 1)} dl = \frac{1}{2} \int_{2(n+1) \mp 1}^\infty \frac{dx}{x^{p+1} \ln x} = \frac{1}{4} \int_{p \ln(2(n+1) \mp 1)}^\infty \frac{dy}{ye^y}.
+\end{align*}
+The first equality follows by making the change of variables
+$x = 2l \mp 1$. The second follows from the change of variables
+$y = p \ln x$. The final expression is an evaluate of a special
+function known as the exponential integral, written, for $x \neq 0$:
+\begin{align*}
+  \Ei(x) = - \int_{-x}^\infty \frac{dt}{te^t}.
+\end{align*}
+Thus, our original series is bounded as:
+\begin{align*}
+  \sum_{l=n+1}^\infty \frac{{(2l \mp 1)}^{-p-1}}{2\ln(2l \mp 1)} \leq \frac{{(2(n+1) \mp 1)}^{-p-1}}{2 \ln(2(n+1) \mp 1)} - \frac{1}{4} \Ei(-p \ln (2(n+1) \mp 1))
+\end{align*}
+
+We define $A(n, p), B(n, p), C(n, p),$ as follows:
+\begin{align}
+  A(n, p) &\equiv \frac{2(p + n + 1) - 1}{2p(2(n+1) - 1)^{p+1}} + \frac{2(p+n+1) + 1}{2p(2(n-1)+1)^{p+1}}, \\
+  B(n, p) &\equiv \frac{2((n+1) - 1)^{-p-1}}{2 \ln (2(n+1) - 1)} + \frac{(2(n+1) + 1)^{-p-1}}{2 \ln (2(n+1) + 1)}, \\
+  C(n, p) &\equiv \frac{-1}{4} \parens{\Ei(-p \ln(2(n+1)-1)) + \Ei(-p \ln(2(n+1) + 1))}.
+\end{align}
+Then, we have that:
+\begin{align}
+  \abs{\varepsilon^{(p)}} = O(A(n,p) + B(n,p) + C(n,p)).
+\end{align}
 
 %%% Local Variables:
 %%% mode: latex

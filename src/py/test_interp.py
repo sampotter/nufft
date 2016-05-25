@@ -7,9 +7,10 @@ import testseries
 twopi = 2*np.pi
 
 if __name__ == '__main__':
-    J = 100
-    Y = np.linspace(0, twopi, J, endpoint=False)
-    K = 10
+    J = 1000
+    # Y = np.linspace(0, twopi, J, endpoint=False)
+    Y = np.sort(np.random.uniform(0, twopi, J))
+    K = 5
 
     def compute_G_fmm():
         X = np.linspace(0, twopi, 2*K, endpoint=False)

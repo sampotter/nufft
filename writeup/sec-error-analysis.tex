@@ -18,8 +18,8 @@ where the remainder $R_{p-1}$ is given by:
 \end{align*}
 This lets us write:
 \begin{align*}
-  \Phi(y, x) &= -\frac{1}{x - y} \parens{\frac{y - x_*}{x - x_*}}^p + \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*) \\
-  &\equiv \epsilon_p + \sum_{m=0}^\infty a_m(x, x_*) R_m(y - x_*).
+  \Phi(y, x) &= -\frac{1}{x - y} \parens{\frac{y - x_*}{x - x_*}}^p + \sum_{m=0}^{p-1} a_m(x, x_*) R_m(y - x_*) \\
+  &\equiv \epsilon_p + \sum_{m=0}^{p-1} a_m(x, x_*) R_m(y - x_*).
 \end{align*}
 We let $r$ and $R$ be radii that satisfy $R > r > x_*$ and:
 \begin{align*}
@@ -130,6 +130,22 @@ Making use of these inequalities, we bound $\epsilon_p$ as follows:
   &= \frac{1}{R' - 2^{-l'-1}} \parens{\frac{2^{-l'}}{R}}^p. & \mbox{(assumption 5)}
 \end{align*}
 \textbf{TODO}: \emph{now, do we need to consider the absolute difference between this and the error we would have expected to already have from expanding $\Phi$ at $x_*'$?}
+
+\subsection{$\SSmat$ Translation (Improved)}
+
+The goal of this section is to show that after each of the $\SSmat$
+translations that occur in the FMM, the error of the resultant
+approximation to $\Phi$ is the same as if $\Phi$ had been expanded at
+that point with that many terms. This will be made more clear through
+the following definitions:
+\begin{align*}
+  x_*^{(n)} &\equiv \mbox{the target of the $n$th $\SSmat$ translation,} \\
+  b^{(n)} &\equiv \parens{b_m(x, x_*^{(n)})}_{m=0}^\infty \text{, the sequence of coefficients of the $S$-expansion at $x_*^{(n)}$,} \\
+  S^{(n)} &\equiv \parens{S_m(y - x_*^{(n)})}_{m=0}^\infty \text{, the sequence of basis functions of the $S$-expansion at $x_*^{(n)}$,} \\
+  (\SSmat)^{(n)} &\equiv \text{the $\SSmat$ translation from $x_*^{(n-1)}$ to $x_*^{(n)}$\----i.e., such that $\delta = x_*^{(n)} - x_*^{(n-1)}$,} \\
+  \Phi^{(n)} &\equiv \left\langle (\SSmat)^{(n)} b^{(n)}, S^{(n)} \right\rangle, \\
+  \tilde{\Phi}^{(n)} &\equiv \text{$\left\langle (\SSmat)_{:p,:p}^{(n)} b_{:p}^{(n)}, S_{:p}^{(n)} \right\rangle$, the $n$th approximation}
+\end{align*}
 
 %%% Local Variables:
 %%% mode: latex

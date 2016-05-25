@@ -1,5 +1,7 @@
 #!/usr/bin/env bash
 
+# TODO: this needs to be fixed.
+
 OUTPUT=$1
 BUILD_PATH=$2
 

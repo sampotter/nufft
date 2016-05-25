@@ -29,6 +29,10 @@ n = 50                    # size of periodically extended neighborhoo
 X_per = reduce((S, T) -> [S; T], map(k -> X + 2π*k, -n:n))
 F_per = real(repmat(F, 2n + 1, 1)[:, 1])
 φ_Y_fmm = FMM1D.Cauchy.scaled_fmm(Y, X_per, F_per, depth, p)
+# normalizeinput(lst) = (lst + 2pi*n)/(2pi*(2n + 1))
+# X_per_normalized = normalizeinput(X_per)
+# Y_normalized = normalizeinput(Y)
+# φ_Y_fmm = FMM1D.Cauchy.fmm(Y_normalized, X_per_normalized, F_per, depth, p)
 
 #
 # interpolation
@@ -44,4 +48,3 @@ G_fmm = α.*(β/2 + im*φ_Y_fmm)/K
 
 KK = GroundTruth.compute_K(X, Y, -(N-1):N-1)
 G_gt = KK*F
-

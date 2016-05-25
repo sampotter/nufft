@@ -1,8 +1,6 @@
 import fmm as _fmm
 import numpy as _np
 
-from manual_c import c as _c
-
 _twopi = 2*_np.pi
 
 def _transpose_argsort_indices(I):
@@ -51,7 +49,7 @@ _cpmethods = {
     'interleaved': _interleaved_checkpoints
 }
 
-def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', manualc_N=None, debug=False):
+def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', debug=False):
     '''
     Arguments:
         F: samples of a K-bandlimited function spaced equally along [0, 2pi).
@@ -116,26 +114,9 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', manualc_N=None, debug=False)
     for m in range(p):
         A[:, m] = R(Yc, m) - R(Yc_tilde, m)
     C = _np.linalg.lstsq(A, f)[0]
-
-    if manualc_N:
-        if type(manualc_N) is not int:
-            raise Exception('manualc_N must be None or an int')
-        else:
-            C = [_c(m, X, F, n, manualc_N, K) for m in range(manualc_N)]
-            if debug:
-                print(C)
-
     phifar = _np.zeros(Y.shape, dtype=Y.dtype)
-    if manualc_N:
-        for j in range(len(Y)):
-            for m in range(manualc_N):
-                tmp = C[m]*(Y[j] - _np.pi)**m
-                phifar[j] += tmp
-    else:
-        for j in range(len(Y)):
-            phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
-
-    # import pdb; pdb.set_trace()
+    for j in range(len(Y)):
+        phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
 
     # Extract near summation from evaluates computed using FMM and
     # compute final V from phinear and phifar.

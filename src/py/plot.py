@@ -339,43 +339,6 @@ def gt_vs_rad_vs_per_with_bandlimit_wrt_time():
     _plt.legend()
 
 @_plotfunc
-def manual_c_error_vs_target_location():
-    K = 2
-    X = _util.get_X(K).real
-    J = 100
-    L = 4
-    p = 4
-    n = 4
-    q = 10 # not used
-    Y = _np.linspace(0, _twopi, J, endpoint=False)
-    F = _testseries.semicircle(X, K).real
-    G_gt = _get_ground_truth_interp(X, F, Y, K).real
-    N_min_power = 1
-    N_max_power = 2
-    num_Ns = 500
-    Ns = _np.logspace(N_min_power, N_max_power, num_Ns)
-    
-    digits = _np.matrix(_np.zeros((J, num_Ns), dtype=_np.float64))
-    for i, N in enumerate(Ns):
-        print('N = %d' % N)
-        G_per = _np.matrix(_nufft.inufft(F, K, Y, L, p, n, q, manualc_N=int(N), debug=False)).T
-        digits[:, i] = -_np.log10(_np.abs(G_gt - G_per))
-
-    fig = _plt.figure()
-    imshow_ax = _plt.imshow(digits, interpolation='nearest', cmap=_cm.cubehelix)
-    _plt.xticks(_np.linspace(1, num_Ns, N_max_power - N_min_power + 1))
-    _plt.yticks(_np.linspace(1, J, 5))
-    ax = _plt.gca()
-    xticklabels = ['1e%d' % power for power in range(N_min_power, N_max_power + 1)]
-    ax.set_xticklabels(xticklabels)
-    yticklabels = ['0', u'π/2', u'π', u'3π/2', u'2π']
-    ax.set_yticklabels(yticklabels)
-    fig.colorbar(imshow_ax)
-    _plt.title('Number of Correct Digits by INUFFT with Manual Coefs (K = %d)' % K)
-    _plt.xlabel('Truncation Number of Coefs (N)')
-    _plt.ylabel('Evaluation Point (y)')
-
-@_plotfunc
 def semicircle_persum_error_bound_vs_p_vs_n():
     K = 4
     min_p = 2

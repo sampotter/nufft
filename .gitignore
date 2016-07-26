@@ -23,3 +23,5 @@ GRTAGS
 GTAGS
 *.nb
 *.ipynb
+reports
+questions

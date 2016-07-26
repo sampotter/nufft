@@ -4,6 +4,7 @@ __pycache__
 *~
 auto
 build
+thirdparty
 .juliahistory
 _region_*
 *.mat

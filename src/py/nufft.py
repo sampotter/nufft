@@ -1,57 +1,121 @@
 import fmm as _fmm
+import matplotlib.pyplot as _plt
 import numpy as _np
+
+from sanitycheck import cest
 
 _twopi = 2*_np.pi
 
+
 def _transpose_argsort_indices(I):
-    '''
-    Compute the inverse permutation of I, where I is a list of indices
+    '''Compute the inverse permutation of I, where I is a list of indices
     (a permutation) computed using np.argsort.
+
     '''
     J = _np.zeros(len(I), dtype=_np.int)
     for i, j in enumerate(I):
         J[j] = i
     return J
 
+
 def _test(y, N, index_ratio):
-    '''
-    This test is necessary to check if we've passed a point that we
-    essentially already know the value of (i.e. an evaluation
-    point that's nearly equal to a source point). We could
-    probably handle this correctly in the FMM itself, but for now,
-    a test like this should give us approximately what we
-    want... That is, no interpolates that are NaN, +/-Inf, or
-    incorrectly equal to zero.
+    '''This test is necessary to check if we've passed a point that we
+    essentially already know the value of (i.e. an evaluation point
+    that's nearly equal to a source point). We could probably handle
+    this correctly in the FMM itself, but for now, a test like this
+    should give us approximately what we want... That is, no
+    interpolates that are NaN, +/-Inf, or incorrectly equal to zero.
+
     '''
     return _np.abs(_np.mod(y*(N/_twopi), index_ratio)) < 1e-13
 
-def _uniform_checkpoints(**kwargs):
-    n = kwargs['n']
-    q = kwargs['q']
-    Yc = _np.concatenate(
-        (_np.random.uniform(-n*_twopi, 0, int(_np.ceil(q/2))),
-         _np.random.uniform(_twopi, (n + 1)*_twopi, int(_np.floor(q/2)))))
-    Yc_tilde = _np.mod(Yc, _twopi)
-    return Yc, Yc_tilde
 
-def _interleaved_checkpoints(**kwargs):
-    n = kwargs['n']
-    K = kwargs['K']
-    Yc = _np.concatenate(
-        (_np.linspace(-_twopi*n, 0, 2*K*n, endpoint=False),
-         _np.linspace(_twopi, _twopi*(n + 1), 2*K*n, endpoint=False))
-    ) + _twopi/(4*K)
-    Yc_tilde = _np.mod(Yc, _twopi)
-    return Yc, Yc_tilde
-    
-_cpmethods = {
-    'uniform': _uniform_checkpoints,
-    'interleaved': _interleaved_checkpoints
-}
+def _extend_X(X, n):
+    '''Periodically extend the grid points in X that lie in [0, 2*pi) to
+    [-2*pi*n, 2*pi*(n + 1)).
 
-def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', debug=False):
     '''
-    Arguments:
+    return _np.concatenate([X + _twopi*l for l in range(-n, n + 1)])
+
+
+def _get_extended_alt_sign_F_and_sum(F, n, N):
+    '''Modulate F with (-1)^n and periodically extend the result to
+    [-2*pi*n, 2*pi*(n + 1)). Also, return the sum of one period of the
+    modulated F as the second return value.
+
+    '''
+    Fas = _np.multiply(F, _np.power(-1, range(N)))
+    return _np.tile(Fas, 2*n + 1), _np.sum(Fas)
+
+
+def _get_checkpoints(q):
+    '''Compute q checkpoint pairs. The first point in each checkpoint pair
+    is uniformly distributed in [2*pi, 4*pi). The second is simply
+    that point but shifted into [0, 2*pi).
+
+    '''
+    Yc = _np.random.uniform(_twopi, 2*_twopi, q)
+    return Yc, Yc - _twopi
+
+
+def _R(Y, m):
+    'Evaluate the mth Cauchy regular basis function R.'
+    return _np.power(Y - _np.pi, m)
+
+
+def _get_phinear_and_f(Y, Yc, Yc_tilde, n, X_per, Fas_per, L, p):
+    '''This is a workhorse function that uses the FMM to compute both
+    phinear and the difference in the checkpoint values. These are
+    returned as the first and second return values.
+
+    '''
+    Ycat = _np.concatenate((Y, Yc, Yc_tilde))
+    I = _np.argsort(Ycat)
+    J = _transpose_argsort_indices(I)
+    dom = (-_twopi*n, _twopi*(n + 1))
+    fmm = _fmm.fmm1d_cauchy_double
+    V = fmm(X_per, Ycat[I], Fas_per, L, p, scaled_domain=dom)[J]
+    i = len(Y)
+    j = i + len(Yc)
+    k = j + len(Yc_tilde)
+    return V[:i], V[j:k] - V[i:j]
+
+
+def _get_phifar(Y, Yc, Yc_tilde, f, p, q):
+    '''Use least squares collocation to compute phifar. TODO: this needs
+    to be updated and replaced with the Vandermonde approach.
+
+    '''
+    A = _np.zeros((q, p))
+    for m in range(p):
+        A[:, m] = _R(Yc, m) - _R(Yc_tilde, m)
+    C = _np.linalg.lstsq(A, f)[0]
+    C[0] = cest(1e-6)
+    phifar = _np.zeros(Y.shape, dtype=Y.dtype)
+    for j in range(len(Y)):
+        phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
+    return phifar
+
+
+def _finish_interpolation(Y, F, phi, K, N, Fas_sum):
+    '''This function takes care of the last couple steps: it modulates the
+    result by the sine-based factor and sets any values that were too
+    close source points to the corresponding weight (i.e. function
+    value).
+
+    '''
+    G = [(-Fas_sum*_np.cos(K*Y[j]) + 2*_np.sin(K*Y[j])*phi[j])/N
+         for j in range(len(Y))]
+    index_ratio = len(Y)/(2*K)
+    for i, y in enumerate(Y):
+        if _test(y, len(Y), index_ratio):
+            G[i] = F[int(i/index_ratio)]
+    return G
+
+
+def inufft(F, K, Y, L, p, n, q):
+    '''Arguments:
+
         F: samples of a K-bandlimited function spaced equally along [0, 2pi).
         K: the bandlimit of the sampled function.
         Y: a list of target points in [0, 2pi).
@@ -60,85 +124,18 @@ def inufft(F, K, Y, L, p, n, q, cpmethod='uniform', debug=False):
         n: the 'radius' of the neighborhood around [0, 2pi) -- i.e. determining
            the intervals [-2pi*n, 0) and [2pi, 2pi(n+1)).
         q: the number of checkpoint pairs.
+
     '''
-
-    import pdb; pdb.set_trace()
-
-    # Compute N equally spaced gridpoints that lie in [0, 2pi).
     N = len(F)
     X = _np.linspace(0, _twopi, N, endpoint=False)
+    X_per = _extend_X(X, n)
+    Fas_per, Fas_sum = _get_extended_alt_sign_F_and_sum(F, n, N)
+    Yc, Yc_tilde = _get_checkpoints(q)
+    phinear, f = _get_phinear_and_f(Y, Yc, Yc_tilde, n, X_per, Fas_per, L, p)
+    phifar = _get_phifar(Y, Yc, Yc_tilde, f, p, q)
+    phi = phinear + phifar
+    return _finish_interpolation(Y, F, phi, K, N, Fas_sum)
 
-    # Extend X to the radial neighborhood of [0, 2pi) -- the intervals
-    # [-2pin, 0) and [2pi, 2pi(n+1)).
-    def translate_X(l):
-        return X + _twopi*l
-    X_per = _np.concatenate([translate_X(l) for l in range(-n, n + 1)])
-
-    # Extend (F), but with (a)lternating (s)igns, to the radial
-    # neighborhood.
-    Fas = [F[n]*(-1)**n for n in range(N)]
-    Fas_per = _np.tile(Fas, 2*n + 1)
-
-    # Compute uniformly distributed checkpoints.
-    if cpmethod not in _cpmethods.keys():
-        raise Exception('invalid checkpoint method "%s"' % cpmethod)
-    Yc, Yc_tilde = _cpmethods[cpmethod](K=K, n=n, q=q)
-    q = len(Yc)
-
-    # Join together actual targets and checkpoint targets and compute
-    # the sorting permutation and its inverse for use with the FMM.
-    Ycat = _np.concatenate((Y, Yc, Yc_tilde))
-    I = _np.argsort(Ycat)
-    J = _transpose_argsort_indices(I)
-
-    # Use the FMM to evaluate the truncated periodic summation at the
-    # evaluation points Y.
-    dom = (-_twopi*n, _twopi*(n + 1))
-    V = _fmm.fmm1d_cauchy_double(
-        X_per, Ycat[I], Fas_per, L, p, scaled_domain=dom)
-
-    # Permute V so that it is in the same order as Ycat.
-    V = V[J]
-
-    # Extract checkpoint evaluates for computing far summation.
-    Vc_start = len(Y)
-    Vc_tilde_start = Vc_start + len(Yc)
-    Vc = V[Vc_start : Vc_start + len(Yc)]
-    Vc_tilde = V[Vc_tilde_start : Vc_tilde_start + len(Yc_tilde)]
-
-    # Compute far summation using least squares collocation.
-    f = Vc_tilde - Vc
-    A = _np.zeros((q, p))
-    def R(Y, m):
-        return _np.power(Y - _np.pi, m)
-    for m in range(p):
-        A[:, m] = R(Yc, m) - R(Yc_tilde, m)
-    C = _np.linalg.lstsq(A, f)[0]
-    phifar = _np.zeros(Y.shape, dtype=Y.dtype)
-    for j in range(len(Y)):
-        phifar[j] = _np.sum([C[m]*(Y[j] - _np.pi)**m for m in range(p)])
-
-    # Extract near summation from evaluates computed using FMM and
-    # compute final V from phinear and phifar.
-    V = V[:len(Y)] + phifar
-    
-    # Use the interpolation formula with the values of V to compute G.
-    Fas_sum = sum(Fas)
-    def g(j):
-        return (-Fas_sum*_np.cos(K*Y[j]) + 2 * _np.sin(K*Y[j])*V[j])/N
-    G = [g(j) for j in range(len(Y))]
-
-    # Update the values of any of the points that might have coincided
-    # with the grid points.
-    # TODO: it might be cheaper to do this if we do it first?
-    # Although, then we need to futz with Y, which might be too
-    # expensive...
-    index_ratio = len(Y)/(2*K)
-    for i, y in enumerate(Y):
-        if _test(y, len(Y), index_ratio):
-            G[i] = F[int(i/index_ratio)]
-
-    return G
 
 if __name__ == '__main__':
     from testseries import semicircle
@@ -153,4 +150,8 @@ if __name__ == '__main__':
     n = 3
     p = 4
     q = 2*J
-    inufft(F, K, Y, L, p, n, q, cpmethod='interleaved')
+    G = inufft(F, K, Y, L, p, n, q)
+
+    _plt.plot(Y, G)
+    _plt.xlim(0, _twopi)
+    _plt.ylim(0, _np.pi)

@@ -14,9 +14,11 @@ from matplotlib import cm as _cm
 
 _twopi = 2*_np.pi
 
+
 def _get_ground_truth_interp(X, F, Y, K):
     KK = _groundtruth.K(X, Y, 1 - K, K - 1)
     return _np.matrix(KK) * _np.matrix(F).transpose()
+
 
 def _plotfunc(f):
     def g(save=False, preamble=False):
@@ -30,6 +32,7 @@ def _plotfunc(f):
         else:
             _plt.show()
     return g
+
 
 @_plotfunc
 def radial_error_vs_target_location():

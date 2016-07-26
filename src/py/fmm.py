@@ -1,10 +1,8 @@
-'''
-
-This is a quickly put together test module. The goal here is to expose
-the optimized C++ FMM to Python (in particular, numpy) for rapidly
-testing the rest of the NUFFT algorithm. On OS X, libfmm.dylib will
-need to be built and copied to this directory before importing this
-module.
+'''This is a quickly put together test module. The goal here is to
+expose the optimized C++ FMM to Python (in particular, numpy) for
+rapidly testing the rest of the NUFFT algorithm. On OS X, libfmm.dylib
+will need to be built and copied to this directory before importing
+this module.
 
 '''
 

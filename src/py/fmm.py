@@ -19,6 +19,11 @@ def _issorted(lst):
     next(it)
     return all(b >= a for a, b in zip(lst, it))
 
+
+def _normalize(lst, L, R):
+    return (lst - L)/(R - L)
+
+
 def fmm1d_cauchy_double(sources, targets, weights, max_level, p,
                         scaled_domain=None):
     '''Nota bene: this is super inefficient!'''
@@ -42,10 +47,8 @@ def fmm1d_cauchy_double(sources, targets, weights, max_level, p,
         assert(max(sources) < R)
         assert(min(targets) >= L)
         assert(max(targets) < R)
-        def normalize(lst):
-            return (lst - L)/(R - L)
-        sources = normalize(sources)
-        targets = normalize(targets)
+        sources = _normalize(sources, L, R)
+        targets = _normalize(targets, L, R)
         scale_factor = 1/(R - L)
 
     assert(min(sources) >= 0.0)

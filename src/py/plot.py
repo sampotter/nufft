@@ -41,7 +41,6 @@ def radial_error_vs_target_location():
     J = 500
     L = 10
     p = 50
-    q = 10
     Y = _np.linspace(0, _twopi, J, endpoint=False)
     F = _testseries.semicircle(X, K).real
     G_gt = _get_ground_truth_interp(X, F, Y, K).real

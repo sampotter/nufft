@@ -8,7 +8,7 @@
 #include "index_manip.hpp"
 #include "util.hpp"
 
-template <typename kernel_type>
+template <class kernel_type>
 nufft::vector_type<nufft::domain_elt_type>
 nufft::fmm1d<kernel_type>::get_multipole_coefs(
     vector_type<domain_elt_type> const & sources,
@@ -46,7 +46,7 @@ nufft::fmm1d<kernel_type>::get_multipole_coefs(
     return coefs;
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 nufft::vector_type<nufft::range_elt_type>
 nufft::fmm1d<kernel_type>::evaluate_regular(
     vector_type<domain_elt_type> const & targets,
@@ -80,7 +80,7 @@ nufft::fmm1d<kernel_type>::evaluate_regular(
     return sums;
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 nufft::coefs_type
 nufft::fmm1d<kernel_type>::get_finest_farfield_coefs(
     bookmarks const & source_bookmarks,
@@ -127,7 +127,7 @@ nufft::fmm1d<kernel_type>::get_finest_farfield_coefs(
     return coefs;
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 nufft::coefs_type
 nufft::fmm1d<kernel_type>::get_parent_farfield_coefs(
     coefs_type const & coefs,
@@ -191,7 +191,7 @@ nufft::fmm1d<kernel_type>::get_parent_farfield_coefs(
     return parent_coefs;
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 void
 nufft::fmm1d<kernel_type>::do_E4_SR_translations(
     coefs_type const & input_coefs,
@@ -233,7 +233,7 @@ nufft::fmm1d<kernel_type>::do_E4_SR_translations(
     }
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 void
 nufft::fmm1d<kernel_type>::do_RR_translations(
     coefs_type const & parent_coefs,
@@ -285,7 +285,7 @@ nufft::fmm1d<kernel_type>::do_RR_translations(
     }
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 void
 nufft::fmm1d<kernel_type>::evaluate(
     bookmarks const & source_bookmarks,
@@ -349,7 +349,7 @@ nufft::fmm1d<kernel_type>::evaluate(
     }
 }
 
-template <typename kernel_type>
+template <class kernel_type>
 nufft::vector_type<nufft::range_elt_type>
 nufft::fmm1d<kernel_type>::fmm(
     vector_type<domain_elt_type> const & sources,

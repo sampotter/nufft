@@ -9,7 +9,7 @@
 namespace nufft {
     using coefs_type = std::unordered_map<index_type, vector_type<range_elt_type>>;
 
-    template <typename kernel_type>
+    template <class kernel_type>
     struct fmm1d {
         static vector_type<domain_elt_type>
         get_multipole_coefs(vector_type<domain_elt_type> const & sources,

@@ -1,1 +1,109 @@
 \section{Periodic Summation}
+
+The FMM sees frequent application in dynamics problems such as the
+$n$-body problem. For problems with periodic boundary conditions, the
+FMM on its own is not sufficient. Others algorithms are used
+instead---for example, Ewald summation, accelerated using the
+FFT~\cite{ewald}.\@ Recent work inspired by kernel-independent FMM
+algorithms has resulted in a method for computing periodic sums which
+is ideally suited for use with the FMM~\cite{periodic-sums}. Our
+method makes use of a simplified and accelerated version of this
+approach. We briefly derive the necessary results as they pertain to
+our problem.
+
+The periodic summation method uses an FMM and least squares fitting to
+evaluate a sum which is a sum of weighted kernels which periodically
+repeat in some infinite computational domain. In our case, we are
+interested in computing the part of (\ref{eq:per-interp-cot-kernel})
+which matches this description---namely, we define:
+\begin{align}
+  \label{eq:phi}
+  \phi(\phiarg{}) \defd \sum_{\persumindex{}=-\infty}^\infty \sum_{\unifptindex{}=0}^{\bandlimit{}-1} \frac{{(-1)}^{\unifptindex{}}\unifval{\unifptindex{}}}{\phiarg{} - \unifpt{\unifptindex{}} - 2\pi{}\persumindex{}},
+\end{align}
+where we have ingored the constant factor. Next, in order to apply the
+method, we select some region of interest, a larger neighborhood which
+contains it, and decompose $\phi$ into a term due to the neighborhood
+and one due to its complement. Our region of interest is the interval
+$[0, 2\pi)$. We fix $\neighborhoodradius\in\N$ and consider it to be
+an integer ``neighborhood radius'' and define:
+\begin{align}
+  \label{eq:neighborhood}
+  \persumdomain \defd \set{-n, -n+1, \hdots, n}.
+\end{align}
+Then, letting:
+\begin{align}
+  \phinear(\phiarg) &\defd \sum_{\persumindex\in\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phinear} \\
+  \phifar(\phiarg) &\defd \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phifar}
+\end{align}
+we can decompose $\phi$ as:
+\begin{align}
+  \label{eq:phinear-plus-phifar}
+  \phi(\phiarg) = \phinear(\phiarg) + \phifar(\phiarg).
+\end{align}
+
+With $\xstar = \pi$, we have that when $\phiarg$ satisfies
+$0 \leq \phiarg < 2\pi$, the $R$-factorization:
+\begin{align}
+  \label{eq:phifar-R-factorization}
+  \frac{1}{\phiarg - \unifpt{\unifptindex} - 2\pi\persumindex} = \sum_{m=0}^{\infty}a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi)R_m(\phiarg - \pi)
+\end{align}
+is valid. Making use of (\ref{eq:phifar-R-factorization}), we can
+define, for each $m = 0, 1, \hdots$:
+\begin{align}
+  \label{eq:phifar-over-R-coefs}
+  \persumcoef{m} \defd \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} {(-1)}^\unifptindex \unifval{\unifptindex} a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi),
+\end{align}
+which allows us to define:
+\begin{align}
+  \label{eq:phifar-over-R}
+  \phifar(\phiarg) = \sum_{m=0}^\infty \persumcoef{m} R_m(\phiarg - \pi).
+\end{align}
+Reexpressing $\phifar$ in terms of the $R_m$ basis functions of the
+$R$-factorization is the crucial step that enables the method.
+
+The periodic summation method involves using the FMM to compute the
+neighborhood term $\phinear$ and then using the FMM and least squares
+collocation to compute $\phifar$. In particular, if we choose
+$\phiarg \suchthat {-2\pi\neighborhoodradius} \leq \phiarg < 0$ or
+$2\pi \leq \phiarg < 2\pi(\neighborhoodradius + 1)$, then there exists
+some $\persumindex$ such that $\phiargcp = \phiarg - 2\pi\persumindex$
+satisfies $0 \leq \phiargcp < 2\pi$. Since
+$\phi(\phiarg) = \phi(\phiargcp)$, we have:
+\begin{align}
+  \label{eq:phinear-minus-phinear}
+  \phinear(\phiarg) - \phinear(\phiargcp) = \phifar(\phiargcp) - \phifar(\phiarg) = \sum_{m=0}^\infty \persumcoef{m}(R_m(\phiarg - \pi) - R_m(\phiargcp - \pi)).
+\end{align}
+Fixing $\numcps\in\N$, we let
+$\phiarg_0, \hdots, \phiarg_{\numcps - 1}$ and
+$\phiargcp_0, \hdots, \phiargcp_{\numcps - 1}$ satisfy the same
+properties as $\phiarg$ and $\phiargcp$. Defining the matrices
+$\m{\phi} \in \R^L, \m{\persumcoef{}} \in \R^\infty$, and
+$\m{R} \in \mathbb{R}^{L\times\infty}$ by:
+\begin{align}
+  \m{\phi}_\cpindex &= \phinear(\phiarg_\cpindex) - \phinear(\phiargcp_\cpindex), \label{eq:phi-vector} \\
+  \m{\persumcoef{}}_m &= \persumcoef{m}, \label{eq:coef-vector} \\
+  \m{R}_{l,m} &= R_m(\phiarg_\cpindex - \pi) - R_m(\phiargcp_\cpindex - \pi), \label{eq:fitting-matrix}
+\end{align}
+the coefficients $\persumcoef{m}$ can be recovered by solving the
+corresponding least squares problems, e.g.\ by computing each
+$\persumcoef{m}$ from
+$\m{\persumcoef{}} \approx \m{R}^\dagger \m{\phi}$.
+
+There are two practical considerations in all of this. First, we only
+compute and apply a finite portion of $\m{R}$, although the full
+matrix will be used in our error analysis. Second, since
+$\m{R}_{l,0} = 0$ for each $l\in\N$, this column can be ignored. As a
+result, the question as to what to do about $\persumcoef{0}$
+arises---this is addressed in the next section. The resulting
+submatrix can be dealt with by making use of a convenient matrix
+decomposition, also addressed in a later section.
+
+\begin{itemize}
+\item \TODO\ add necessary conditions---or break them out into
+  appendix?
+\end{itemize}
+
+% Local Variables:
+% TeX-master: "../paper.tex"
+% indent-tabs-mode: nil
+% End:

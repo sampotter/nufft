@@ -1,0 +1,53 @@
+\section{Computation of $\persumcoef{0}$}
+
+The first column of the fitting matrix $\m{R}$ is zero, which prevents
+the preceding least squares fitting procedure from recovering
+$\persumcoef{0}$. For some problems, this does not present a problem,
+but for this one it does, and a method of computing $\persumcoef{0}$
+is necessary. As it happens, approximating $\persumcoef{0}$ from:
+\begin{align}
+  \label{eq:c0-direct}
+  \persumcoef{0} = \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^k \unifval{\unifptindex}}{\unifpt{\unifptindex} + 2\pi(\persumindex - 1)}
+\end{align}
+is unrealistic due to slow convergence---the series is similar to the
+alternating harmonic series, for instance. Other methods have been
+suggested~\cite{periodic-sums}.
+
+Empirically, the coefficients $\persumcoef{m}$ are small for $m >
+0$. Then, for some small $\eps > 0$, we should have:
+\begin{align}
+  \label{eq:g-approx-for-c0}
+  \unifval{\unifptindex} \approx \tfrac{1}{\bandlimit} \sin(\bandlimit{} \cdot (\unifpt{\unifptindex} + \eps)/2) (\persumcoef{0} + \phinear(\unifpt{\unifptindex} + \eps)).
+\end{align}
+This suggests that we can approximate $\persumcoef{0}$ by solving:
+\begin{align}
+  \label{eq:c0-min-prob}
+  \persumcoef{0} \approx \min_c \sum_{\unifptindex=0}^{\bandlimit-1} \parens{\unifval{\unifptindex} - \tfrac{1}{K} \sin(\bandlimit{} \cdot (\unifpt{\unifptindex} + \eps)/2) (\persumcoef{0} + \phinear(\unifpt{\unifptindex} + \eps))}^2.
+\end{align}
+If we let
+$s_\unifptindex = \tfrac{1}{\bandlimit{}} \sin(\bandlimit{} \cdot
+(\unifpt{\unifptindex} + \eps)/2)$ and
+$\phi_\unifptindex = \phinear(\unifpt{\unifptindex} + \eps)$, then the
+analytic solution to (\ref{eq:c0-min-prob}) is:
+\begin{align}
+  \label{eq:c0-minimizer}
+  \persumcoef{0} \approx \frac{\sum_{\unifptindex=0}^{\bandlimit-1} s_\unifptindex(\unifval{\unifptindex} - s_\unifptindex\phi_\unifptindex)}{\sum_{k=0}^{\bandlimit-1} s_\unifptindex^2}.
+\end{align}
+Despite this method's heuristic nature, it was found to compute
+accurate approximations to $\persumcoef{0}$ in essentially constant
+time as compared to the direct method mentioned earlier. However, it
+should be noted that choosing $\eps$ to be too small can be
+problematic.
+
+\begin{itemize}
+\item \TODO\ add figure showing divergence.
+\item \TODO\ try using the coefficients $\persumcoef{m}$ for $m>0$ to
+  recover even more accurately\ldots If this isn't possible, make sure
+  to indicate why (compare \texttt{cest\_new} with \texttt{cest} in
+  \texttt{sanitycheck.py}).
+\end{itemize}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper.tex"
+%%% End:

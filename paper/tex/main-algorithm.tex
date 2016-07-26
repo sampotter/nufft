@@ -1,0 +1,68 @@
+\section{Main Algorithm}
+
+Our main algorithms apply $\interpop$ and $\invinterpop$ by evaluating
+(\ref{eq:per-interp-cot-kernel}) using the periodic summation method
+as applied to (\ref{eq:phi}). Evaluating $\transinterpop$ and
+$\invtransinterpop$ can be done by interchanging arguments.
+
+\begin{centering}
+  \begin{algorithm}\label{alg:main}
+    Compute $\phi(\arbpt{\arbptindex})$ for each $\arbptindex$.
+    \begin{enumerate}
+    \item Evaluate $\phinear(\arbpt{\arbptindex})$ for each
+      $\arbptindex$ using the FMM.\@
+    \item Compute $\m{\phi}$ using the FMM and the checkpoint sets
+      $\set{\phiarg_\cpindex}$ and $\set{\phiargcp_\cpindex}$.
+    \item Form $\uppertriinv\lowertriinv\m{\phi}$.
+    \item Solve
+      $\uppertrifactor\m{\persumcoef{}} =
+      \uppertriinv\lowertriinv\m{\phi}$ for $\m{\persumcoef{}}$ using
+      back substitution.
+    \item Compute $\persumcoef{0}$ \TODO{} \emph{by some method}.
+    \item Evaluate $\phifar(\arbpt{\arbptindex})$ for each
+      $\arbptindex$ using $\m{\persumcoef{}}$ and
+      (\ref{eq:phifar-over-R}).
+    \item Compute
+      $\phi(\arbpt{\arbptindex}) = \phinear(\arbpt{\arbptindex}) +
+      \phifar(\arbpt{\arbptindex})$ for each $\arbptindex$.
+    \end{enumerate}
+  \end{algorithm}
+\end{centering}
+
+\begin{centering}
+  \begin{algorithm}\label{alg:apply-P}
+    Compute $\arbval{\arbptindex}$ for each $\arbptindex$ (apply
+      $\interpop$ to $\m{\unifval{}}$).
+    \begin{enumerate}
+    \item Evaluate $\phi(\arbpt{\arbptindex})$ for each $\arbptindex$
+      using Algorithm~\ref{alg:main}.
+    \item Compute each
+      $\arbval{\arbptindex} =
+      \sin(\bandlimit{}\arbpt{\arbptindex}/2)\phi(\arbpt{\arbptindex})/2$.
+    \end{enumerate}
+  \end{algorithm}
+\end{centering}
+
+\begin{centering}
+  \begin{algorithm}\label{alg:apply-P-inv}
+    Compute $\unifval{\unifptindex}$ for each $\unifptindex$ (apply
+    $\invinterpop$ to $\m{\arbval{}}$).
+    \begin{enumerate}
+    \item Precompute $\ccoef{\arbptindex}$ for each $\arbptindex$ using the FMM.\@
+    \item Precompute $\dcoef{\unifptindex}$ for each $\unifptindex$ using the FMM.\@
+    \item Evaluate (\ref{eq:per-inv-interp-cot-kernel}) for each
+      $\unifptindex$ using the precomputed coefficients and
+      Algorithm~\ref{alg:main}.
+    \end{enumerate}
+  \end{algorithm}
+\end{centering}
+
+\begin{itemize}
+\item \TODO\ include the main algorithm.
+\item \TODO\ include Vandermonde step and $c_0$ step.
+\end{itemize}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper.tex"
+%%% End:

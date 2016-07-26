@@ -1,6 +1,7 @@
 \documentclass{article}
 
 \usepackage{../nufft}
+\usepackage[nottoc,numbib]{tocbibind}
 
 \title{Fast Interpolation of Periodic Bandlimited Nonuniform Data}
 \author{Samuel F. Potter, Nail Gumerov, Ramani Duraiswami}
@@ -17,7 +18,10 @@
 \input{tex/nufft.tex}
 \input{tex/fmm.tex}
 \input{tex/periodic-summation.tex}
+\input{tex/c0.tex}
+\input{tex/vandermonde.tex}
 \input{tex/checkpoint-distribution.tex}
+\input{tex/main-algorithm.tex}
 \input{tex/error-analysis.tex}
 \input{tex/complexity.tex}
 \input{tex/numerical-results.tex}
@@ -26,14 +30,14 @@
 \appendix
 \input{tex/appendix.tex}
 
-% uncomment this once there are some citations -- error otherwise
-% \clearpage
-% \bibliography{../refs}{}
-% \bibliographystyle{plain}
+\clearpage
+\bibliography{../refs}{}
+\bibliographystyle{plain}
 
 \end{document}
 
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: t
+%%% indent-tabs-mode: nil
 %%% End:

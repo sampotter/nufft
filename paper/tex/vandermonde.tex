@@ -1,0 +1,88 @@
+\section{Fitting Matrix}
+
+The least squares fitting matrix $\m{R}$ from
+(\ref{eq:fitting-matrix}) is given by:
+\begin{align}
+  \label{eq:fitting-matrix-explicit}
+  \m{R} = \begin{bmatrix}
+    R_1(\phiarg_0 - \pi) - R_1(\phiargcp_0 - \pi) & \cdots & R_\truncnum(\phiarg_0 - \pi) - R_\truncnum(\phiargcp_0 - \pi) \\
+    \vdots & \ddots & \vdots \\
+    R_1(\phiarg_{\numcps-1} - \pi) - R_1(\phiargcp_{\numcps-1} - \pi) & \cdots & R_\truncnum(\phiarg_{\numcps-1} - \pi - R_\truncnum(\phiargcp_{\numcps-1} - \pi)
+  \end{bmatrix}
+\end{align}
+If we define $\fitarg_\cpindex = \phiarg_\cpindex - \pi$ and
+$\fitargcp_\cpindex = \phiargcp_\cpindex - \pi = \phiarg_\cpindex -
+2\pi\persumindex$, we have that $\m{R}$ can also be written:
+\begin{align}
+  \label{eq:fitting-matrix-with-shifted-arg}
+  \m{R}_{l,m} = \fitarg_\cpindex^m - {(\fitarg_\cpindex - 2\pi\persumindex)}^m.
+\end{align}
+This requires us to choose the same $\persumindex$ for each
+$\phiargcp_\cpindex$. In a later section, we will see that this does
+not present a problem.
+
+Some algebra yields that this matrix can be decomposed as the product
+of a Vandermonde matrix in $\fitarg_0, \hdots, \fitarg_{\numcps - 1}$
+and an upper triangular matrix. In particular, letting:
+\begin{align}
+  \label{eq:vandermonde-factor-of-R}
+  \vandermondefactor \defd \begin{bmatrix}
+    1 & \fitarg_0 & \fitarg_0^2 & \cdots & \fitarg_0^{\truncnum - 1} \\
+    1 & \fitarg_1 & \fitarg_1^2 & \cdots & \fitarg_1^{\truncnum - 1} \\
+    \vdots & \vdots & \vdots & \ddots & \vdots \\
+    1 & \fitarg_{\numcps-1} & \fitarg_{\numcps-1}^2 & \cdots & \fitarg_{\numcps-1}^{\truncnum-1}
+  \end{bmatrix}
+\end{align}
+denote the Vandermonde matrix, and:
+\begin{align}
+  \label{eq:upper-tri-factor-of-R}
+  \uppertrifactor_{i,j} \defd \begin{cases}
+    {(-2\pi\persumindex)}^{j-i+1} {j \choose j - i + 1}, & \mbox{if } i \leq j, \\
+    0, & \mbox{if } i > j, \\
+  \end{cases}
+\end{align}
+where $\uppertrifactor \in \R^{\truncnum\times\truncnum}$, we have
+that $\m{R} = \vandermondefactor\uppertrifactor$. The appendix
+contains a proof of this as well as some of $\uppertrifactor$
+explicitly tabulated.
+
+The properties of the Vandermonde matrix $\vandermondefactor$ are well
+understood. One property, the fact that $\vandermondefactor$
+is---generally speaking---extremely poorly conditioned, will be
+considered in the next section. In this section, we make use of a
+well-known factorization of $\vandermondefactor^{-1}$ which will aid
+us in developing a fast and easily implemented algorithm for computing
+the fitting coefficients~\cite{inverse-vandermonde}. In particular, we
+have that there exists a lower triangular matrix $\lowertriinv$ and an
+upper triangular matrix $\uppertriinv$ such that
+$\vandermondefactor^{-1} = \uppertriinv\lowertriinv$ and such that the
+lower triangular factor is given by:
+\begin{align}
+  \label{eq:lower-tri-inverse}
+  \lowertriinv_{i,j} = \begin{cases}
+    1, &\mbox{if } i = 1 = j, \\
+    0, &\mbox{if } i < j, \\
+    \prod_{k=1,k\neq{}j}^i \frac{1}{z_j - z_k}, & \mbox{otherwise,}
+  \end{cases}
+\end{align}
+and the upper triangular factor by:
+\begin{align}
+  \label{eq:upper-tri-inverse}
+  \uppertriinv_{i,j} = \begin{cases}
+    1, & i = j, \\
+    0, & j = 1, i > 1, \\
+    \uppertriinv_{i-1,j-1} - \uppertriinv_{i,j-1} z_{j-1}, & \mbox{otherwise,}
+  \end{cases}
+\end{align}
+where $\uppertriinv_{0,j} = 0$. Our algorithm for computing the
+coefficients $\persumcoef{m}$, then, is based on writing
+$\m{R}\m{c} = \m{\phi}$ as
+$\uppertrifactor\m{c} = \uppertriinv\lowertriinv\m{\phi}$. The right-hand side
+can be computed efficiently due to the simple and regular form of the
+matrices which allows $\m{c}$ to be computed using an efficient
+back-substitution.
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: "../paper.tex"
+%%% End:

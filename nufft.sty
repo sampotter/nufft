@@ -4,6 +4,7 @@
   amsmath,
   amssymb,
   amsthm,
+  booktabs,
   color,
   enumitem,
   fullpage,
@@ -13,6 +14,9 @@
   standalone,
   tikz
 }
+
+\theoremstyle{definition}
+\newtheorem{algorithm}{Algorithm}
 
 \newcommand{\abs}[1]{\card{#1}}
 \newcommand{\asconv}{\overset{\operatorname{as}}{\longrightarrow}}
@@ -37,7 +41,9 @@
 \newcommand{\io}{\mbox{i.o.}}
 \newcommand{\inlinetodo}[1]{\fbox{\color{red}{\textbf{#1}}}\color{black}}
 \newcommand{\ip}[1]{\left\langle#1\right\rangle}
+\newcommand{\m}[1]{\boldsymbol{#1}}
 \newcommand{\nats}{\mathbb{N}}
+\newcommand{\N}{\mathbb{N}}
 \newcommand{\norm}[1]{\left|\left|#1\right|\right|}
 \newcommand{\probarc}[1]{\stackrel{#1}{\longrightarrow}}
 \newcommand{\parens}[1]{\left(#1\right)}
@@ -48,12 +54,17 @@
 \newcommand{\qmconv}{\overset{\operatorname{qm}}{\longrightarrow}}
 \newcommand{\range}{\operatorname{range}}
 \newcommand{\reaches}{\longrightarrow}
+\newcommand{\R}{\mathbb{R}}
 \newcommand{\set}[1]{\left\{#1\right\}}
 \newcommand{\squareb}[1]{\left[#1\right]}
+\newcommand{\suchthat}{\mbox{ such that }}
 \newcommand{\todo}[1]{\fbox{\parbox{\textwidth}{\color{red}{\textbf{TODO:}} \color{black}{#1}}}}
+\newcommand{\TODO}{\color{red}{\textbf{TODO:}} \color{black}}
 \newcommand{\mathtodo}{\mbox{\color{blue}{\textbf{TODO}}}}
 \newcommand{\uniform}[2]{\operatorname{Uniform}\left(#1, #2\right)}
 \newcommand{\var}[1]{\operatorname{var} \parens{#1}}
+\newcommand{\Z}{\mathbb{Z}}
+\newcommand{\transpose}{\top}
 
 \DeclareMathOperator{\Ei}{Ei}
 
@@ -64,3 +75,46 @@
 \newcommand{\SSmat}{\bold{S}|\bold{S}}
 \newcommand{\SRmat}{\bold{S}|\bold{R}}
 \newcommand{\RRmat}{\bold{R}|\bold{R}}
+\newcommand{\bandfunc}{f}
+\newcommand{\unifpt}[1]{{x}_{#1}}
+\newcommand{\arbpt}[1]{{\tilde{x}}_{#1}}
+\newcommand{\unifval}[1]{{f}_{#1}}
+\newcommand{\arbval}[1]{{\tilde{f}}_{#1}}
+\newcommand{\unifdft}[1]{{F}_{#1}}
+\newcommand{\arbdft}[1]{{\tilde{F}}_{#1}}
+\newcommand{\bandlimit}{K}
+\newcommand{\arbptindex}{j}
+\newcommand{\unifptindex}{k}
+\newcommand{\unifdftindex}{l}
+\newcommand{\arbdftindex}{m}
+\newcommand{\unifvalvec}{\m{\unifval{}}}
+\newcommand{\arbvalvec}{\m{\arbval{}}}
+\newcommand{\numarbpts}{J}
+\newcommand{\persumcoef}[1]{{c}_{#1}}
+\newcommand{\persumindex}{p}
+\newcommand{\persumdomain}{\mathcal{P}}
+\newcommand{\xstar}{{x}_{*}}
+\newcommand{\phiarg}{y}
+\newcommand{\phiargcp}{{\tilde{y}}}
+\newcommand{\numcps}{L}
+\newcommand{\cpindex}{l}
+\newcommand{\neighborhoodradius}{n}
+\newcommand{\truncnum}{P}
+\newcommand{\fitarg}{z}
+\newcommand{\fitargcp}{\tilde{z}}
+\newcommand{\vandermondefactor}{\m{V}}
+\newcommand{\uppertrifactor}{\m{W}}
+\newcommand{\lowertriinv}{\m{L}^{-1}}
+\newcommand{\uppertriinv}{\m{U}^{-1}}
+\newcommand{\nufft}{\m{N}}
+\newcommand{\nuffttrans}{\m{N}^\transpose}
+\newcommand{\nufftinv}{\m{N}^{-1}}
+\newcommand{\nufftinvtrans}{\m{N}^{-\transpose}}
+\newcommand{\interpop}{\m{P}}
+\newcommand{\invinterpop}{\interpop^{-1}}
+\newcommand{\transinterpop}{\m{P}^\transpose}
+\newcommand{\invtransinterpop}{\m{P}^{-\transpose}}
+\newcommand{\ccoef}[1]{c_{#1}}
+\newcommand{\dcoef}[1]{d_{#1}}
+\newcommand{\fft}{\m{F}}
+\newcommand{\ifft}{\m{F}^{-1}}

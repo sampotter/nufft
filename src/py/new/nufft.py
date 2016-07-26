@@ -1,8 +1,5 @@
 import fmm as _fmm
-# import matplotlib.pyplot as _plt
 import numpy as _np
-
-# from sanitycheck import cest
 
 _twopi = 2*_np.pi
 

@@ -32,8 +32,7 @@ def _p(F, X, n, k, eps):
     return _phinear(F, X, X[k] + eps, n)
 
 
-def _cest(F, K, n, eps=1e-5):
-    X = _np.linspace(0, 2*_np.pi, 2*K, endpoint=False)
+def _cest(F, X, K, n, eps=1e-5):
     A = _np.sum([_s(K, X, k, eps)*(F[k] - _s(K, X, k, eps)*_p(F, X, n, k, eps))
                  for k in _np.arange(2*K)])
     B = _np.sum([_s(K, X, k, eps)*_s(K, X, k, eps) for k in _np.arange(2*K)])
@@ -117,7 +116,7 @@ def _get_phinear_and_f(Y, Yc, Yc_tilde, n, X_per, Fas_per, L, p):
     return V[:i], V[j:k] - V[i:j]
 
 
-def _get_phifar(Y, Yc, Yc_tilde, F, K, f, p, n, q):
+def _get_phifar(X, Y, Yc, Yc_tilde, F, K, f, p, n, q):
     '''Use least squares collocation to compute phifar. TODO: this needs
     to be updated and replaced with the Vandermonde approach.
 
@@ -125,8 +124,7 @@ def _get_phifar(Y, Yc, Yc_tilde, F, K, f, p, n, q):
     A = _np.zeros((q, p), dtype=Y.dtype)
     for m in range(p):
         A[:, m] = _R(Yc, m) - _R(Yc_tilde, m)
-    # C = _np.linalg.lstsq(A, f)[0]
-    c0 = _cest(F, K, n)
+    c0 = _cest(F, X, K, n)
     C = _np.zeros(p, dtype=c0.dtype)
     C[0] = c0
     C[1:] = _np.linalg.lstsq(A, f)[0][1:]
@@ -171,7 +169,7 @@ def inufft(F, K, Y, L, p, n, q):
     Fas_per, Fas_sum = _get_extended_alt_sign_F_and_sum(F, n, N)
     Yc, Yc_tilde = _get_checkpoints(q)
     phinear, f = _get_phinear_and_f(Y, Yc, Yc_tilde, n, X_per, Fas_per, L, p)
-    phifar = _get_phifar(Y, Yc, Yc_tilde, F, K, f, p, n, q)
+    phifar = _get_phifar(X, Y, Yc, Yc_tilde, F, K, f, p, n, q)
     phi = phinear + phifar
     return _finish_interpolation(Y, F, phi, K, N, Fas_sum)
 

@@ -1,1 +1,38 @@
 \section{Introduction}
+
+The discrete Fourier transform (DFT) is an orthogonal linear
+transformation which is a discrete analog of the continuous Fourier
+transform. Many problems in science and engineering yield to the
+methods of Fourier analysis, so much so that when the fast Fourier
+transform (FFT) algorithm of Cooley and Tukey was disclosed in 1965,
+much of the focus of research in the field of signal processing
+shifted from research in analog signal processing to digital signal
+processing, owing to the newfound feasibility of previously
+speculative numerical methods~\cite{book:dsp75}. Of course, this
+algorithm has gone on to enable the efficient solution of a myriad of
+problems since.
+
+A limitation of the real FFT is that its domain consists of real
+vectors whose components are assumed to correspond to equally spaced
+samples of some underlying continuous signal; likewise, the range is
+comprised of coefficients of equally spaced \TODO{}INTEGER?\ frequency
+components. When presented with a nonuniformly sampled input signal or
+when one's goal is to determine the strength of frequency components
+which are unequally spaced, the usual FFT is of no use without
+interpolating before or after the transform. A variety of methods have
+been introduced to formalize an approach to computing such a
+nonuniform DFT or FFT~\cite{Dutt95fastfourierII,Keiner06nfft3.0}.
+
+In this work, we extend a method for computing the nonuniform FFT
+which makes use of the fast multipole method
+(FMM)~\cite{Dutt95fastfourierII}. In particular, making use of recent
+work inspired by the kernel independent FMM, we append a step to this
+method which takes a negligible amount of time but increases the
+accuracy of the result. Algorithms are derived and their complexity is
+analyzed, relevant error bounds are established, and numerical results
+are presented.
+
+% Local Variables:
+% TeX-master: "../paper.tex"
+% indent-tabs-mode: nil
+% End:

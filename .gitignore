@@ -5,6 +5,7 @@ __pycache__
 auto
 build
 .juliahistory
+_region_*
 *.mat
 *.pdf
 *.pdf_tex

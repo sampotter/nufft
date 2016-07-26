@@ -76,6 +76,23 @@
    	 - [ ] don't unnecessarily propagate coefficients that aren't there...
    	 - [ ] SSE/SIMD?
    	 - [ ] use a heap for the index finder?
+**** Implementation-specific
+	 - [ ] Coalesce X and X_per (i.e. X is contained in X_per, so it's
+       redundant)
+	 - [ ] Also redundant: computing X_per and then scaling X_per---we
+       can compute it directly.
+	 - [ ] Look into whether or not computing values of X_per and
+       Fas_per on the fly would be more efficient than storing them
+       (it would certainly take way less memory)
+	 - [ ] Major redundancy with Y, Yc, Yc_tilde.
+	 - [ ] Look into using the FMM on Y and Yc/Yc_tilde separately to
+       avoid the overhead of sorting.
+**** Future optimizations
+	 - [ ] Compute checkpoint FMM directly if there are few enough checkpoints?
+	 - [ ] We could also use a different FMM (i.e. in terms of
+       truncation number and level) for the checkpoints. Since they
+       are more sparsely distributed, we may want to use a shallower
+       FMM...?
 **** Eventually
    	 - [ ] parallelize
 	   - OpenMP?

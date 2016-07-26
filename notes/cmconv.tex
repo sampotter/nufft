@@ -1,0 +1,69 @@
+\documentclass{article}
+
+\usepackage{../nufft}
+
+\begin{document}
+
+\noindent Define:
+\begin{itemize}
+\item $y$ st $0 \leq y < 2\pi$,
+\item $n \in \mathbb{N}$,
+\item $\mathcal{N} = \set{-n, \hdots, n}$,
+\item bandlimited evaluates: $\set{f_k}_{k=0}^{2K-1}$,
+\item sources: $\set{x_k} \subseteq [0, 2\pi)$,
+\end{itemize}
+Then:
+\begin{align*}
+  \phifar(y) &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} \frac{(-1)^k f_k}{y - x_k - 2\pi l}
+\end{align*}
+Expand the kernel regularly about $x_* = \pi$ so that:
+\begin{align*}
+  \phifar(y) &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{m=0}^\infty a_m(x_k + 2\pi l, \pi) R_m(y - \pi) \\
+  &= \sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} (-1)^k f_k \parens{\varepsilon_{l,k}^{(p)} + \sum_{m=0}^{p-1} a_m(x_k + 2\pi l, \pi) R_m(y - \pi)} \\
+  &\equiv \underbrace{\sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2N-1} {(-1)}^k f_k \varepsilon_{l,k}^{(p)}}_{\varepsilon^{(p)}} + \sum_{m=0}^{p-1} \underbrace{\parens{\sum_{l \in \mathbb{Z} \backslash \mathcal{N}} \sum_{k=0}^{2K-1} {(-1)}^k f_k a_m(x_k + 2\pi l, \pi)}}_{c_m} R_m(y - \pi)
+\end{align*}
+For $m=0$, we have:
+\begin{align*}
+  c_0 = \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{l = n+1}^\infty \parens{\frac{-1}{x_k + 2\pi l - \pi} + \frac{-1}{x_k - 2\pi l - \pi}}.
+\end{align*}
+Next, we write:
+\begin{align*}
+  \int_{n+1}^\infty &\parens{\frac{-1}{x_k + 2\pi l - \pi} + \frac{-1}{x_k - 2\pi l - \pi}} dl = -\lim_{N \to \infty} \parens{\int_{n+1}^N \frac{dl}{x_k + 2\pi l - \pi} + \int_{n+1}^N \frac{dl}{x_k - 2\pi l - \pi}}.
+\end{align*}
+Then, since:
+\begin{align*}
+  \int_{n+1}^N \frac{dl}{x_k \pm 2 \pi l - \pi} = \mp \left. \frac{1}{2 \pi} \ln |x_k \pm 2 \pi l - \pi| \right|_{l=n+1}^N = \mp \frac{1}{2\pi} \ln \abs{\frac{x_k \pm 2 \pi N - \pi}{x_k \pm 2 \pi (n+1) - \pi}}
+\end{align*}
+we have:
+\begin{align*}
+  \lim_{N\to\infty} \ln \abs{\frac{x_k - 2\pi N - \pi}{x_k + 2\pi N - \pi}} = \lim_{N \to \infty} \ln \parens{\frac{2 \pi N - x_k + \pi}{2 \pi N + x_k - \pi}} = 0.
+\end{align*}
+So, by the integral test, we have that $c_0 < \infty$.
+
+For $m>0$, we have:
+\begin{align*}
+  c_m = \sum_{k=0}^{2K-1} (-1)^k f_k \sum_{l = n+1}^\infty \parens{\frac{-1}{(x_k + 2\pi l - \pi)^{m+1}} + \frac{-1}{(x_k - 2\pi l - \pi)^{m+1}}}.
+\end{align*}
+Next, we write:
+\begin{align*}
+  \int_{n+1}^\infty &\parens{\frac{-1}{(x_k + 2\pi l - \pi)^{m+1}} + \frac{-1}{(x_k - 2\pi l - \pi)^{m+1}}} dl \\
+  &= -\lim_{N \to \infty} \parens{\int_{n+1}^N \frac{dl}{(x_k + 2\pi l - \pi)^{m+1}} + \int_{n+1}^N \frac{dl}{(x_k - 2\pi l - \pi)^{m+1}}}.
+\end{align*}
+Then, since:
+\begin{align*}
+  \int_{n+1}^N \frac{dl}{(x_k \pm 2 \pi l - \pi)^{m+1}} &= \left. \mp \frac{1}{2 \pi m} (x_k \pm 2 \pi l - \pi)^{-m} \right|_{l=n+1}^N \\
+  &= \mp \frac{1}{2\pi m} \parens{(x_k \pm 2 \pi N - \pi)^{-m} - (x_k \pm 2 \pi (n+1) - \pi)^{-m}},
+\end{align*}
+we have:
+\begin{align*}
+  \lim_{N\to\infty} \parens{\parens{x_k - 2\pi N - \pi}^{-m} - \parens{x_k + 2\pi N - \pi}^{-m}} &= 0,
+\end{align*}
+since the individual limits exist. Then, again by the integral test,
+we have that $c_m < \infty$.
+
+\end{document}
+
+%%% Local Variables:
+%%% mode: latex
+%%% TeX-master: t
+%%% End:

@@ -6,8 +6,6 @@ nufft::bookmarks::bookmarks(vector_type<domain_elt_type> const & sources,
     bookmark_hash_(make_bookmark_hash(sources, max_level))
 {}
 
-#include <iostream>
-
 nufft::bookmarks::bookmark_hash_type
 nufft::bookmarks::make_bookmark_hash(
     vector_type<domain_elt_type> const & sources,

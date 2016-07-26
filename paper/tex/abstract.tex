@@ -1,1 +1,18 @@
 \section*{Abstract}
+
+The nonuniform fast Fourier transform (FFT) is a class of algorithms
+which brackets the FFT with a pair of interpolating maps which have
+complexity equal or superior to the FFT (generally $O(n \log n)$,
+where $n$ is the size of the argument). A set of algorithms based on
+the fast multipole method (FMM) providing sufficient complexity
+guarantees exists~\cite{Dutt95fastfourierII}---each such algorithm
+relies on a fast algorithm for the Cauchy or cotangent kernel. In this
+work, a recent method for computing periodic sums is applied in order
+to improve the speed and accuracy of these kernels, which is then
+applied to the nonuniform FFT.\@ Error bounds and complexity
+guarantees are proved, and numerical results are presented.
+
+% Local Variables:
+% TeX-master: "../paper.tex"
+% indent-tabs-mode: nil
+% End:

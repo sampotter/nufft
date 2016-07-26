@@ -13,6 +13,7 @@ from _fmm import ffi as _ffi
 
 _lib = _ffi.dlopen(ctypes.util.find_library('fmm'))
 
+
 def _issorted(lst):
     it = iter(lst)
     next(it)
@@ -21,7 +22,7 @@ def _issorted(lst):
 def fmm1d_cauchy_double(sources, targets, weights, max_level, p,
                         scaled_domain=None):
     '''Nota bene: this is super inefficient!'''
-    
+
     num_sources = len(sources)
     num_targets = len(targets)
     num_weights = len(weights)
@@ -46,7 +47,7 @@ def fmm1d_cauchy_double(sources, targets, weights, max_level, p,
         sources = normalize(sources)
         targets = normalize(targets)
         scale_factor = 1/(R - L)
-    
+
     assert(min(sources) >= 0.0)
     assert(max(sources) < 1.0)
     assert(min(targets) >= 0.0)

@@ -1,5 +1,5 @@
 from plot import *
-
+    
 if __name__ == '__main__':
     rad_vs_per_for_mse_wrt_n(True, True)
     p_vs_n_wrt_mse(True, True)

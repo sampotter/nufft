@@ -1,119 +1,89 @@
-* Project Todo
-  - [ ] Get Gadfly's plotting working.
-	- [ ] eps
-	- [ ] TikZ
-  - [ ] Numerical tests for check points.
-  - [ ] Numerical tests for interpolation.
-  - [ ] Analysis for check points.
-  - [ ] Forward interpolation derivation.
-  - [ ] Complexity analysis.
-  - [ ] Adaptive FMM.
-  - [ ] Comparison with Potts's library.
-  - [ ] Get cluster access.
-  - [ ] Compare final performance with results from Dott & Rokhlin II.
-  - [ ] Find some applications...
-  - [ ] Figure out what the deal with computing Bernoulli numbers is...
-  - [ ] Test what happens when an evaluation point is a very small
-    perturbation of one of the grid points.
+* NUFFT
+** Stuff to Code
+   - [ ] Forward transform.
+   - [ ] Vandermonde inversion for collocation.
+** Analysis
+   - [ ] Compare methods of estimating c0.
+   - [ ] Are any of the test functions more or less difficult to interpolate?
+	 - [ ] What about adding test functions which are just random sums
+       of sinusoids?
+** Plots to Make
+*** Comparison Plots
+**** Problem Size vs. Time (to compute to some prescribed accuracy)
+	 Things to compare:
+	 - IFFT (baseline)
+	 - INUFFT using just phifar (note how large it needs to be to
+       achieve the required accuracy and if this changes depending on
+       the problem size)
+	 - INUFFT using phifar and phinear
+	 - min/max INUFFT
+	 Note: /since clang on OS X doesn't support OpenMP, parfor loops
+	 are treated as for loops./
+** Goals
+   - Approximate good choices for:
+	 + the FMM depth,
+	 + the truncation number,
+	 + the radial neighborhood size,
+	 + and the number of checkpoint pairs,
+	 based on:
+	 + the bandlimit,
+	 + the function evaluates,
+	 + and the evaluation points.
+** Things to Verify Using Plots
+   - [ ] Increasing the size of the radial neighborhood, all else being
+     equal, should improve the accuracy.
+   - [ ] Different checkpoint methods should perform differently.
+   - [ ] Increasing the truncation number should improve accuracy.
+   - [ ] Increasing the FMM depth should decrease accuracy but improve
+     speed.
+   - [ ] With the rest of the parameters fixed, there should be an
+     optimal FMM depth.
+** Things to Read
+   - [ ] [[https://en.wikipedia.org/wiki/Dirichlet_kernel][Wikipedia - Dirichlet kernel]]
+   - [ ] "Multipole Expansions and Pseudospectral Cardinal Functions"
+** Links
+*** References
+   	- [[http://fastmultipole.org/Main/T-NuFFT][site containing links and references to NuFFT implementations]]
+*** NUFFT Implementations
+   	- [[http://cs.nyu.edu/cs/faculty/berger/nufft/nufft.html][CMCL (Courant)]]
+   	- [[https://www-user.tu-chemnitz.de/~potts/nfft/download.php][Potts (TU Chemnitz)]]
+   	- [[http://www.mathworks.com/matlabcentral/fileexchange/25135-nufft--nfft--usfft][Matthew Ferrara (Air Force Research Laboratory)]]
+   	- [[http://web.eecs.umich.edu/~fessler/code/index.html][Image reconstruction toolbox]]
 
-* Applications
-
-** Audio
-   - Probably nothing interesting in terms of nonuniform nodes in
-     space, but as far as nonuniform frequency nodes go, maybe there
-     are some audio applications? Could compute the FFT at dyadic
-     frequencies... How would this compare to the wavelet transform?
-     Are there compression applications? (e.g. signals which only have
-     power at known frequencies... sort of along the same lines as the
-     dyadic thing...)
-
-* Things to Read
-  - [ ] [[https://en.wikipedia.org/wiki/Dirichlet_kernel][Wikipedia - Dirichlet kernel]]
-  - [ ] "Multipole Expansions and Pseudospectral Cardinal Functions"
-
-* Links
-
-** References
-   - [[http://fastmultipole.org/Main/T-NuFFT][site containing links and references to NuFFT implementations]]
-
-** NUFFT Implementations
-   - [[http://cs.nyu.edu/cs/faculty/berger/nufft/nufft.html][CMCL (Courant)]]
-   - [[https://www-user.tu-chemnitz.de/~potts/nfft/download.php][Potts (TU Chemnitz)]]
-   - [[http://www.mathworks.com/matlabcentral/fileexchange/25135-nufft--nfft--usfft][Matthew Ferrara (Air Force Research Laboratory)]]
-   - [[http://web.eecs.umich.edu/~fessler/code/index.html][Image reconstruction toolbox]]
-
-** OEIS
-   - http://oeis.org/A046990
-	 - numerators of Taylor series of log(cos(x))
-   - http://oeis.org/A046991
-	 - denominators of Taylor series of log(cos(x))
-* C++ Implementation
-  - [ ] Replace ~std::vector~ with ~boost::numeric::ublas::vector~?
-  - [ ] Figure out how to deal with domain and range types -- if this
-    is even necessary...
-  - [ ] Try out using Boost.Optional for the bookmarks instead of
-    using a pair of -1's to indicate no bookmark.
-  - [ ] Alternative bookmark data structures to try:
-	- [ ] Heap-based
-	- [ ] Linear probing (i.e. no buckets) implementation
-  - [ ] Play around with the ~inline~ keyword for optimization.
-  - [ ] Factor out Kahan summation for reuse...
-  - [ ] Kahan product?
-  - [ ] Make ~p~ a template parameter to enable use of arrays on the stack...
-  - [ ] Look into Shewchuk summation...
-* Optimization
-** General
-   - [ ] Put EVERYTHING on the stack/or preallocate all memory used
-   - [ ] Remove dependance on boost (for compilation speed)
-   - [ ] Diagram algorithm to try and figure out best way to move memory around
-   - [ ] Sum directly into coefficient vectors instead of using an intermediate workspace
-   - [ ] Don't use maps -- or at least don't use STL maps?
-   - [ ] don't unnecessarily propagate coefficients that aren't there...
-   - [ ] SSE/SIMD?
-   - [ ] use a heap for the index finder?
-** Eventually
-   - [ ] parallelize
-	 - OpenMP?
-	 - C++11 threads?
-	 - TBB?
-** Things to try autotuning
-   - [ ] Whether or not functions are inline
-   - [ ] Duff's device for loop unrolling (maybe this can be done using TMP?)
-   - [ ] Loop tiling
-   - [ ] Index types
-* Things to Verify Using Plots
-  - [ ] Increasing the size of the radial neighborhood, all else being
-    equal, should improve the accuracy.
-  - [ ] Different checkpoint methods should perform differently.
-  - [ ] Increasing the truncation number should improve accuracy.
-  - [ ] Increasing the FMM depth should decrease accuracy but improve
-    speed.
-  - [ ] With the rest of the parameters fixed, there should be an
-    optimal FMM depth.
-* Questions to be Explored with Plots
-  - [ ] How does the "radial neighborhood approximation" compare with
-    the periodic summation method? Should the periodic summation
-    method experience "diminishing returns" as the radial neighborhood
-    increases in size?
-  - [ ] Are any of the different test series actually more or less
-    "difficult" to interpolate?
-* Goals
-  - Approximate good choices for:
-	+ the FMM depth,
-	+ the truncation number,
-	+ the radial neighborhood size,
-	+ and the number of checkpoint pairs,
-	based on:
-	+ the bandlimit,
-	+ the function evaluates,
-	+ and the evaluation points.
-* Debug
-** Least Squares Collocation Bug
-   - [ ] Check what the condition number of the matrix is...
-	 - [ ] Analytically
-	 - [ ] Numerically
-   - [ ] Consult Golub & Van Loan
-   - [ ] Try choosing checkpoints to be the points that are in the
-     troughs for a given K -- it might only be necessary to use 2K of
-     them, which would give a square matrix that may also be exactly
-     invertible.
+* Cauchy Kernel FMM
+** C++ Implementation
+   - [ ] Replace ~std::vector~ with ~boost::numeric::ublas::vector~?
+   - [ ] Figure out how to deal with domain and range types -- if this
+	 is even necessary...
+   - [ ] Try out using Boost.Optional for the bookmarks instead of
+	 using a pair of -1's to indicate no bookmark.
+   - [ ] Alternative bookmark data structures to try:
+	 - [ ] Heap-based
+	 - [ ] Linear probing (i.e. no buckets) implementation
+   - [ ] Play around with the ~inline~ keyword for optimization.
+   - [ ] Factor out Kahan summation for reuse...
+   - [ ] Kahan product?
+   - [ ] Make ~p~ a template parameter to enable use of arrays on the
+	 stack...
+   - [ ] Look into Shewchuk summation...
+*** Optimization
+**** General
+   	 - [ ] Put EVERYTHING on the stack/or preallocate all memory used
+   	 - [ ] Remove dependance on boost (for compilation speed)
+   	 - [ ] Diagram algorithm to try and figure out best way to move memory around
+   	 - [ ] Sum directly into coefficient vectors instead of using an intermediate workspace
+   	 - [ ] Don't use maps -- or at least don't use STL maps?
+   	 - [ ] don't unnecessarily propagate coefficients that aren't there...
+   	 - [ ] SSE/SIMD?
+   	 - [ ] use a heap for the index finder?
+**** Eventually
+   	 - [ ] parallelize
+	   - OpenMP?
+	   - C++11 threads?
+	   - TBB?
+**** Things to try autotuning
+   	 - [ ] Whether or not functions are inline
+   	 - [ ] Duff's device for loop unrolling (this can be done using
+       TMP--Game Programming Gems (maybe #1) books has a good
+       tutorial).
+   	 - [ ] Loop tiling

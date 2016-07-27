@@ -1,60 +1,60 @@
-#include "cauchy.hpp"
+#ifndef __NUFFT_CAUCHY_IMPL_HPP__
+#define __NUFFT_CAUCHY_IMPL_HPP__
 
 #include <cassert>
 #include <cmath>
 
-// nufft::range_elt_type
-// nufft::cauchy::phi(domain_elt_type y, domain_elt_type x)
-// {
-//     return 1.0/(y - x);
-// }
-
-nufft::range_elt_type
-nufft::cauchy::R(integer_type m, domain_elt_type x)
+template <class domain_t, class range_t, class int_t>
+range_t
+nufft::cauchy<domain_t, range_t, int_t>::R(int_t m, domain_t x)
 {
     return std::pow(x, m);
 }
 
-nufft::range_elt_type
-nufft::cauchy::S(integer_type m, domain_elt_type x)
+template <class domain_t, class range_t, class int_t>
+range_t
+nufft::cauchy<domain_t, range_t, int_t>::S(int_t m, domain_t x)
 {
     return x == 0 ? 0 : std::pow(x, -(m + 1));
 }
 
-nufft::range_elt_type
-nufft::cauchy::a(integer_type m, domain_elt_type x)
+template <class domain_t, class range_t, class int_t>
+range_t
+nufft::cauchy<domain_t, range_t, int_t>::a(int_t m, domain_t x)
 {
     return x == 0 ? 0 : std::pow(-x, -(m + 1));
 }
 
-nufft::range_elt_type
-nufft::cauchy::b(integer_type m, domain_elt_type x)
+template <class domain_t, class range_t, class int_t>
+range_t
+nufft::cauchy<domain_t, range_t, int_t>::b(int_t m, domain_t x)
 {
     return std::pow(x, m);
 }
 
+template <class domain_t, class range_t, class int_t>
 void
-nufft::cauchy::apply_SS_translation(
-    vector_type<range_elt_type> const & input,
-    vector_type<range_elt_type> & output,
-    domain_elt_type delta,
-    integer_type p)
+nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
+    vector_t<range_t> const & input,
+    vector_t<range_t> & output,
+    domain_t delta,
+    int_t p)
 {
     // TODO: note: when I finally try to combine the coefficients and
     // deltas into a single array, I could use an inline struct to
     // make things a bit simpler to understand.
     
-    vector_type<domain_elt_type> deltas(p, 0);
+    vector_t<domain_t> deltas(p, 0);
     deltas[0] = 1;
 
-    index_type update_deltas_iter {1};
+    int_t update_deltas_iter {1};
     auto const update_deltas = [delta, &deltas, &update_deltas_iter, p] () {
         if (update_deltas_iter >= p) {
             return;
         }
         
         deltas[update_deltas_iter] = 1;
-        for (index_type i {update_deltas_iter - 1}; i >= 0; --i) {
+        for (int_t i {update_deltas_iter - 1}; i >= 0; --i) {
             deltas[i] *= -delta;
         }
         
@@ -68,23 +68,23 @@ nufft::cauchy::apply_SS_translation(
     // coefficients themselves, doubling the memory requirements for
     // this part of the algorithm.
 
-    vector_type<domain_elt_type> coefs(p, 0);
+    vector_t<domain_t> coefs(p, 0);
     coefs[0] = 1;
 
-    index_type update_coefs_iter {1};
+    int_t update_coefs_iter {1};
     auto const update_coefs = [&coefs, &update_coefs_iter, p] () {
         if (update_coefs_iter >= p) {
             return;
         }
-        for (index_type i {update_coefs_iter}; i > 0; --i) {
+        for (int_t i {update_coefs_iter}; i > 0; --i) {
             coefs[i] += coefs[i - 1];
         }
         ++update_coefs_iter;
     };
 
-    for (index_type i {0}; i < p; ++i) {
+    for (int_t i {0}; i < p; ++i) {
         output[i] = 0;
-        for (index_type j {0}; j <= i; ++j) {
+        for (int_t j {0}; j <= i; ++j) {
             output[i] += coefs[j] * deltas[j] * input[j];
         }
 
@@ -92,11 +92,11 @@ nufft::cauchy::apply_SS_translation(
         // just in case we need it -- what's commented below works.
 
         // output[i] = 0;
-        // range_elt_type comp {0};
-        // for (index_type j {0}; j <= i; ++j) {
-        //     range_elt_type next_term {coefs[j] * deltas[j] * input[j]};
+        // range_t comp {0};
+        // for (index_t j {0}; j <= i; ++j) {
+        //     range_t next_term {coefs[j] * deltas[j] * input[j]};
         //     next_term -= comp;
-        //     range_elt_type tmp_sum = output[i] + next_term;
+        //     range_t tmp_sum = output[i] + next_term;
         //     comp = (tmp_sum - output[i]) - next_term;
         //     output[i] = tmp_sum;
         // }
@@ -106,17 +106,18 @@ nufft::cauchy::apply_SS_translation(
     }
 }
 
+template <class domain_t, class range_t, class int_t>
 void
-nufft::cauchy::apply_SR_translation(
-    vector_type<range_elt_type> const & input,
-    vector_type<range_elt_type> & output,
-    domain_elt_type delta,
-    integer_type p)
+nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
+    vector_t<range_t> const & input,
+    vector_t<range_t> & output,
+    domain_t delta,
+    int_t p)
 {
-    domain_elt_type const delta_recip = 1.0/delta;
+    domain_t const delta_recip = 1.0/delta;
     
-    vector_type<domain_elt_type> deltas(p, delta_recip);
-    for (index_type i {1}; i < p; ++i) {
+    vector_t<domain_t> deltas(p, delta_recip);
+    for (int_t i {1}; i < p; ++i) {
         deltas[i] *= deltas[i - 1];
     }
 
@@ -126,23 +127,17 @@ nufft::cauchy::apply_SR_translation(
         }
     };
 
-    vector_type<domain_elt_type> coefs(p, 1);
+    vector_t<domain_t> coefs(p, 1);
 
     auto const update_coefs = [&coefs, p] () {
-        for (index_type i {1}; i < p; ++i) {
+        for (int_t i {1}; i < p; ++i) {
             coefs[i] += coefs[i - 1];
         }
     };
 
-    for (index_type i {0}; i < p; ++i) {
-		// std::cout << std::endl << "row " << i << std::endl << std::endl << "deltas:";
-		// for (auto delta: deltas) std::cout << ' ' << delta;
-		// std::cout << std::endl << "coefs:";
-		// for (auto coef: coefs) std::cout << ' ' << coef;
-		// std::cout << std::endl;
-
+    for (int_t i {0}; i < p; ++i) {
         output[i] = 0;
-        for (index_type j {0}; j < p; ++j) {
+        for (int_t j {0}; j < p; ++j) {
             output[i] += coefs[j] * deltas[j] * input[j];
         }
 		update_deltas();
@@ -150,28 +145,29 @@ nufft::cauchy::apply_SR_translation(
     }
 }
 
+template <class domain_t, class range_t, class int_t>
 void
-nufft::cauchy::apply_RR_translation(
-	vector_type<range_elt_type> const & input,
-	vector_type<range_elt_type> & output,
-	domain_elt_type delta,
-	integer_type p)
+nufft::cauchy<domain_t, range_t, int_t>::apply_RR_translation(
+	vector_t<range_t> const & input,
+	vector_t<range_t> & output,
+	domain_t delta,
+	int_t p)
 {
-	vector_type<domain_elt_type> coefs(p, 1);
+	vector_t<domain_t> coefs(p, 1);
 
-    index_type end {p - 1};
+    int_t end {p - 1};
 	auto const update_coefs = [&coefs, &end] () {
-		for (index_type i {1}; i < end; ++i) {
+		for (int_t i {1}; i < end; ++i) {
 			coefs[i] += coefs[i - 1];
 		}
 		--end;
 	};
 
-	for (index_type i {0}; i < p; ++i) {
+	for (int_t i {0}; i < p; ++i) {
 		output[i] = 0;
-		domain_elt_type this_delta {1};
-		index_type k = 0;
-		for (index_type j {i}; j < p; ++j) {
+		domain_t this_delta {1};
+		int_t k {0};
+		for (int_t j {i}; j < p; ++j) {
 			output[i] += this_delta * coefs[k] * input[j];
 			this_delta *= delta;
 			++k;
@@ -179,6 +175,8 @@ nufft::cauchy::apply_RR_translation(
 		update_coefs();
 	}
 }
+
+#endif // __NUFFT_CAUCHY_IMPL_HPP__
 
 // Local Variables:
 // indent-tabs-mode: nil

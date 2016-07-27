@@ -1,27 +1,36 @@
 #ifndef __NUFFT_INDEX_MANIP_HPP__
 #define __NUFFT_INDEX_MANIP_HPP__
 
-#include "types.hpp"
+#include <utility>
+#include <vector>
 
 namespace nufft {
-    using index_pair_type = std::pair<index_type, index_type>;
+    template <class domain_t = double,
+              class range_t = double,
+              class int_t = int64_t>
+    struct index_manip {
+        template <class T> using vector_t = std::vector<T>;
+        using index_pair_type = std::pair<int_t, int_t>;
 
-    index_type get_parent(index_type index);
+        static int_t get_parent(int_t index);
     
-    index_pair_type get_children(index_type index);
+        static index_pair_type get_children(int_t index);
     
-    index_type get_sibling(index_type index);
+        static int_t get_sibling(int_t index);
     
-    vector_type<index_type> get_E2_neighbors(size_type level, index_type index);
+        static vector_t<int_t> get_E2_neighbors(int_t level, int_t index);
     
-    vector_type<index_type> get_E4_neighbors(size_type level, index_type index);
+        static vector_t<int_t> get_E4_neighbors(int_t level, int_t index);
     
-    index_type get_box_index(domain_elt_type elt, size_type level);
+        static int_t get_box_index(domain_t elt, int_t level);
     
-    domain_elt_type get_box_center(size_type level, index_type index);
+        static domain_t get_box_center(int_t level, int_t index);
     
-    domain_elt_type get_box_size(size_type level);
+        static domain_t get_box_size(int_t level);
+    };
 }
+
+#include "index_manip.impl.hpp"
 
 #endif // __NUFFT_INDEX_MANIP_HPP__
 

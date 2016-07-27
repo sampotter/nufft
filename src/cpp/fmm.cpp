@@ -14,11 +14,13 @@ void fmm1d_cauchy_double(
 	uintmax_t max_level,
 	intmax_t p)
 {
+    using fmm1d_t = nufft::fmm1d<nufft::cauchy<>>;
+
 	std::vector<double> const X(sources, sources + num_sources);
 	std::vector<double> const Y(targets, targets + num_targets);
 	std::vector<double> const U(weights, weights + num_weights);
 	auto const L = max_level;
-	auto const output_vector = nufft::fmm1d<nufft::cauchy>::fmm(X, Y, U, L, p);
+	auto const output_vector = fmm1d_t::fmm(X, Y, U, L, p);
 	std::copy(std::cbegin(output_vector), std::cend(output_vector), output);
 }
 

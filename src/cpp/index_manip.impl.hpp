@@ -1,12 +1,13 @@
-#include "index_manip.hpp"
+#ifndef __NUFFT_INDEX_MANIP_IMPL_HPP__
+#define __NUFFT_INDEX_MANIP_IMPL_HPP__
 
 #include <cassert>
 #include <cmath>
 #include <iterator>
 
 template <class domain_t, class range_t, class int_t>
-typename nufft::index_manip<domain_t, range_t, int_t>::index_t
-nufft::index_manip<domain_t, range_t, int_t>::get_parent(index_t index)
+int_t
+nufft::index_manip<domain_t, range_t, int_t>::get_parent(int_t index)
 {
 #ifdef NUFFT_DEBUG
     assert(index >= 0);
@@ -14,8 +15,9 @@ nufft::index_manip<domain_t, range_t, int_t>::get_parent(index_t index)
     return ((index + 2) >> 1) - 1;
 }
 
+template <class domain_t, class range_t, class int_t>
 typename nufft::index_manip<domain_t, range_t, int_t>::index_pair_type
-nufft::index_manip<domain_t, range_t, int_t>::get_children(index_t index)
+nufft::index_manip<domain_t, range_t, int_t>::get_children(int_t index)
 {
 #if DEBUG
     assert(index >= 0);
@@ -24,8 +26,9 @@ nufft::index_manip<domain_t, range_t, int_t>::get_children(index_t index)
     return {left_index, left_index + 1};
 }
 
-typename nufft::index_manip<domain_t, range_t, int_t>::index_t
-nufft::index_manip<domain_t, range_t, int_t>::get_sibling(index_t index)
+template <class domain_t, class range_t, class int_t>
+int_t
+nufft::index_manip<domain_t, range_t, int_t>::get_sibling(int_t index)
 {
 #if DEBUG
     assert(index >= 0);
@@ -33,17 +36,18 @@ nufft::index_manip<domain_t, range_t, int_t>::get_sibling(index_t index)
     return index + (index % 2 == 0 ? 1 : -1);
 }
 
-typename nufft::index_manip<domain_t, range_t, int_t>::vector_type<
-    typename nufft::index_manip<domain_t, range_t, int_t>::index_t
-    >
-nufft::get_E2_neighbors(int_t level, index_t index)
+template <class domain_t, class range_t, class int_t>
+nufft::index_manip<domain_t, range_t, int_t>::vector_t<int_t>
+nufft::index_manip<domain_t, range_t, int_t>::get_E2_neighbors(
+    int_t level,
+    int_t index)
 {
     auto const max_index = std::pow(2, level);
 #if DEBUG
     assert(index >= 0);
     assert(index < max_index);
 #endif
-    nufft::vector_type<nufft::index_t> neighbors {};
+    vector_t<int_t> neighbors {};
     {
         auto const left_index = index - 1;
         if (left_index >= 0) {
@@ -60,10 +64,11 @@ nufft::get_E2_neighbors(int_t level, index_t index)
     return neighbors;
 }
 
-nufft::index_manip<domain_t, range_t, int_t>::vector_type<
-    typename nufft::index_manip<domain_t, range_t, int_t>::index_t
-    >
-nufft::get_E4_neighbors(int_t level, index_t index)
+template <class domain_t, class range_t, class int_t>
+nufft::index_manip<domain_t, range_t, int_t>::vector_t<int_t>
+nufft::index_manip<domain_t, range_t, int_t>::get_E4_neighbors(
+    int_t level,
+    int_t index)
 {
 #if DEBUG
     assert(level >= 2);
@@ -71,7 +76,7 @@ nufft::get_E4_neighbors(int_t level, index_t index)
     assert(index < std::pow(2, level));
 #endif
 
-    nufft::vector_type<nufft::index_t> neighbors;
+    vector_t<int_t> neighbors;
     auto const parent_neighbors = get_E2_neighbors(level - 1, get_parent(index));
     for (auto const neighbor: parent_neighbors) {
         auto const children = get_children(neighbor);
@@ -80,7 +85,7 @@ nufft::get_E4_neighbors(int_t level, index_t index)
     }
 
     auto const E2_neighbors = get_E2_neighbors(level, index);
-    nufft::vector_type<nufft::index_t> E4_neighbors;
+    vector_t<int_t> E4_neighbors;
     std::set_difference(
         std::cbegin(neighbors),
         std::cend(neighbors),
@@ -90,8 +95,11 @@ nufft::get_E4_neighbors(int_t level, index_t index)
     return E4_neighbors;
 }
 
-nufft::index_t
-nufft::get_box_index(domain_t elt, int_t level)
+template <class domain_t, class range_t, class int_t>
+int_t
+nufft::index_manip<domain_t, range_t, int_t>::get_box_index(
+    domain_t elt,
+    int_t level)
 {
 #ifdef NUFFT_DEBUG
     assert(elt >= 0);
@@ -100,8 +108,11 @@ nufft::get_box_index(domain_t elt, int_t level)
     return std::floor((1 << level) * elt);
 }
 
-nufft::domain_t
-nufft::get_box_center(int_t level, index_t index)
+template <class domain_t, class range_t, class int_t>
+domain_t
+nufft::index_manip<domain_t, range_t, int_t>::get_box_center(
+    int_t level,
+    int_t index)
 {
 #if DEBUG
     assert(index >= 0);
@@ -110,11 +121,14 @@ nufft::get_box_center(int_t level, index_t index)
     return (index + 0.5) * get_box_size(level);
 }
 
-nufft::domain_t
-nufft::get_box_size(int_t level)
+template <class domain_t, class range_t, class int_t>
+domain_t
+nufft::index_manip<domain_t, range_t, int_t>::get_box_size(int_t level)
 {
     return 1.0 / (1 << level);
 }
+
+#endif // __NUFFT_INDEX_MANIP_IMPL_HPP__
 
 // Local Variables:
 // indent-tabs-mode: nil

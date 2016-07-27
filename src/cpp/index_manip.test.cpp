@@ -1,12 +1,24 @@
 #define BOOST_TEST_MODULE index_manip
 
 #include <boost/test/included/unit_test.hpp>
+#include <cinttypes>
+#include <vector>
 
 #include "index_manip.hpp"
 
+using int_t = int64_t;
+template <class T> using vector_t = std::vector<T>;
+using index_manip_t = nufft::index_manip<>;
+auto constexpr get_parent = index_manip_t::get_parent;
+auto constexpr get_children = index_manip_t::get_children;
+auto constexpr get_sibling = index_manip_t::get_sibling;
+auto constexpr get_E2_neighbors = index_manip_t::get_E2_neighbors;
+auto constexpr get_E4_neighbors = index_manip_t::get_E4_neighbors;
+auto constexpr get_box_index = index_manip_t::get_box_index;
+auto constexpr get_box_center = index_manip_t::get_box_center;
+auto constexpr get_box_size = index_manip_t::get_box_size;
+
 BOOST_AUTO_TEST_CASE (get_parent_works) {
-    using nufft::get_parent;
-    
     BOOST_TEST(get_parent(0) == 0);
     BOOST_TEST(get_parent(1) == 0);
     BOOST_TEST(get_parent(2) == 1);
@@ -24,12 +36,9 @@ BOOST_AUTO_TEST_CASE (get_parent_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_children_works) {
-    using nufft::get_children;
-    using nufft::index_type;
-
-    auto const test_children = [] (index_type index,
-                                   index_type first,
-                                   index_type second) {
+    auto const test_children = [] (int_t index,
+                                   int_t first,
+                                   int_t second) {
         auto const children = get_children(index);
         BOOST_TEST(children.first == first);
         BOOST_TEST(children.second == second);
@@ -45,8 +54,6 @@ BOOST_AUTO_TEST_CASE (get_children_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_sibling_works) {
-    using nufft::get_sibling;
-
     BOOST_TEST(get_sibling(0) == 1);
     BOOST_TEST(get_sibling(1) == 0);
     BOOST_TEST(get_sibling(2) == 3);
@@ -58,14 +65,9 @@ BOOST_AUTO_TEST_CASE (get_sibling_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_E2_neighbors_works) {
-    using nufft::get_E2_neighbors;
-    using nufft::index_type;
-    using nufft::size_type;
-    using nufft::vector_type;
-
-    auto const compare = [] (size_type level,
-                             index_type index,
-                             vector_type<index_type> other) {
+    auto const compare = [] (int_t level,
+                             int_t index,
+                             vector_t<int_t> other) {
         auto const N = get_E2_neighbors(level, index);
         BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(N), std::cend(N),
                                       std::cbegin(other), std::cend(other));
@@ -88,15 +90,10 @@ BOOST_AUTO_TEST_CASE (get_E2_neighbors_works) {
     compare(3, 7, {6, 7});
 }
 
-BOOST_AUTO_TEST_CASE (get_E4_neighbors) {
-    using nufft::get_E4_neighbors;
-    using nufft::index_type;
-    using nufft::size_type;
-    using nufft::vector_type;
-
-    auto const compare = [] (size_type level,
-                             index_type index,
-                             vector_type<index_type> other) {
+BOOST_AUTO_TEST_CASE (get_E4_neighbors_works) {
+    auto const compare = [] (int_t level,
+                             int_t index,
+                             vector_t<int_t> other) {
         auto const N = get_E4_neighbors(level, index);
         BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(N), std::cend(N),
                                       std::cbegin(other), std::cend(other));
@@ -117,13 +114,7 @@ BOOST_AUTO_TEST_CASE (get_E4_neighbors) {
 }
 
 BOOST_AUTO_TEST_CASE (get_box_index_works) {
-    using nufft::domain_elt_type;
-    using nufft::get_box_index;
-    using nufft::index_type;
-    using nufft::size_type;
-
-    auto const compare = [] (domain_elt_type elt, size_type level,
-                             index_type index) {
+    auto const compare = [] (double elt, int_t level, int_t index) {
         BOOST_CHECK_EQUAL(get_box_index(elt, level), index);
     };
 
@@ -136,13 +127,7 @@ BOOST_AUTO_TEST_CASE (get_box_index_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_box_center_works) {
-    using nufft::domain_elt_type;
-    using nufft::get_box_center;
-    using nufft::index_type;
-    using nufft::size_type;
-
-    auto const compare = [] (size_type level, index_type index,
-                             domain_elt_type box_center) {
+    auto const compare = [] (int_t level, int_t index, double box_center) {
         BOOST_CHECK_EQUAL(get_box_center(level, index), box_center);
     };
 
@@ -156,11 +141,7 @@ BOOST_AUTO_TEST_CASE (get_box_center_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_box_size_works) {
-    using nufft::domain_elt_type;
-    using nufft::get_box_size;
-    using nufft::size_type;
-
-    auto const compare = [] (size_type level, domain_elt_type box_size) {
+    auto const compare = [] (int_t level, double box_size) {
         BOOST_CHECK_EQUAL(get_box_size(level), box_size);
     };
 

@@ -8,51 +8,51 @@
 #include "index_manip.hpp"
 #include "util.hpp"
 
-template <class kernel_type>
-nufft::vector_type<nufft::domain_elt_type>
-nufft::fmm1d<kernel_type>::get_multipole_coefs(
-    vector_type<domain_elt_type> const & sources,
-    vector_type<domain_elt_type> const & weights,
-    domain_elt_type x_star,
-    integer_type p)
+template <class kernel_t, class domain_t, class range_t, class int_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::template vector_t<domain_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
+    vector_t<domain_t> const & sources,
+    vector_t<domain_t> const & weights,
+    domain_t x_star,
+    int_t p)
 {
 #ifdef NUFFT_DEBUG
-    assert(std::size(sources) <= std::numeric_limits<index_type>::max());
+    assert(std::size(sources) <= std::numeric_limits<index_t>::max());
 #endif
-    auto const num_sources = static_cast<index_type>(std::size(sources));
+    auto const num_sources = static_cast<index_t>(std::size(sources));
 #ifdef NUFFT_DEBUG
     {
         auto const num_weights = std::size(weights);
-        assert(num_weights <= std::numeric_limits<index_type>::max());
-        assert(num_sources == static_cast<index_type>(num_weights));
+        assert(num_weights <= std::numeric_limits<index_t>::max());
+        assert(num_sources == static_cast<index_t>(num_weights));
     }
     assert(0 <= x_star);
     assert(x_star < 1);
     assert(p > 0);
 #endif
 
-    vector_type<domain_elt_type> offset_sources(sources);
+    vector_t<domain_t> offset_sources(sources);
     for (auto & offset_source: offset_sources) {
         offset_source -= x_star;
     }
     
-    vector_type<domain_elt_type> coefs(p, 0);
-    for (index_type i {0}; i < p; ++i) {
-        for (index_type j {0}; j < num_sources; ++j) {
-            coefs[i] += weights[j] * kernel_type::b(i, offset_sources[j]);
+    vector_t<domain_t> coefs(p, 0);
+    for (int_t i {0}; i < p; ++i) {
+        for (index_t j {0}; j < num_sources; ++j) {
+            coefs[i] += weights[j] * kernel_t::b(i, offset_sources[j]);
         }
     }
 
     return coefs;
 }
 
-template <class kernel_type>
-nufft::vector_type<nufft::range_elt_type>
-nufft::fmm1d<kernel_type>::evaluate_regular(
-    vector_type<domain_elt_type> const & targets,
-    vector_type<range_elt_type> const & coefs,
-    domain_elt_type x_star,
-    integer_type p)
+template <class kernel_t, class domain_t, class range_t, class int_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::template vector_t<range_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate_regular(
+    vector_t<domain_t> const & targets,
+    vector_t<range_t> const & coefs,
+    domain_t x_star,
+    int_t p)
 {
 #ifdef NUFFT_DEBUG
     assert(0 <= x_star);
@@ -60,44 +60,44 @@ nufft::fmm1d<kernel_type>::evaluate_regular(
     assert(p > 0);
 #endif
     
-    vector_type<domain_elt_type> offset_targets(targets);
+    vector_t<domain_t> offset_targets(targets);
     for (auto & offset_target: offset_targets) {
         offset_target -= x_star;
     }
 
 #ifdef NUFFT_DEBUG
-    assert(std::size(targets) <= std::numeric_limits<index_type>::max());
+    assert(std::size(targets) <= std::numeric_limits<index_t>::max());
 #endif
-    auto const num_targets = static_cast<index_type>(std::size(targets));
-    vector_type<range_elt_type> sums(num_targets, 0);
-    for (index_type i {0}; i < num_targets; ++i) {
+    auto const num_targets = static_cast<index_t>(std::size(targets));
+    vector_t<range_t> sums(num_targets, 0);
+    for (index_t i {0}; i < num_targets; ++i) {
         auto const offset_target = offset_targets[i];
-        for (index_type j {0}; j < p; ++j) {
-            sums[i] += coefs[j] * kernel_type::R(j, offset_target);
+        for (index_t j {0}; j < p; ++j) {
+            sums[i] += coefs[j] * kernel_t::R(j, offset_target);
         }
     }
 
     return sums;
 }
 
-template <class kernel_type>
-nufft::coefs_type
-nufft::fmm1d<kernel_type>::get_finest_farfield_coefs(
+template <class kernel_t, class domain_t, class range_t, class int_t>
+typename nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::coefs_type
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_farfield_coefs(
     bookmarks const & source_bookmarks,
-    vector_type<domain_elt_type> const & sources,
-    vector_type<range_elt_type> const & weights,
-    size_type max_level,
-    integer_type p)
+    vector_t<domain_t> const & sources,
+    vector_t<range_t> const & weights,
+    index_t max_level,
+    int_t p)
 {
     coefs_type coefs;
 
 #ifdef NUFFT_DEBUG
     assert(p > 0);
-    assert(std::pow(2, max_level) <= std::numeric_limits<index_type>::max());
+    assert(std::pow(2, max_level) <= std::numeric_limits<index_t>::max());
 #endif
-    auto const max_index = static_cast<index_type>(std::pow(2, max_level));
+    auto const max_index = static_cast<index_t>(std::pow(2, max_level));
     
-    for (index_type index {0}; index < max_index; ++index) {
+    for (index_t index {0}; index < max_index; ++index) {
         auto const opt_bookmark = source_bookmarks(max_level, index);
         if (!opt_bookmark) {
             continue;
@@ -107,12 +107,12 @@ nufft::fmm1d<kernel_type>::get_finest_farfield_coefs(
         auto const right_index = opt_bookmark->second;
 
         auto const sources_cbegin = std::cbegin(sources);
-        vector_type<domain_elt_type> const box_sources(
+        vector_t<domain_t> const box_sources(
             sources_cbegin + left_index,
             sources_cbegin + right_index + 1); // TODO: ugly
 
         auto const weights_cbegin = std::cbegin(weights);
-        vector_type<domain_elt_type> const box_weights(
+        vector_t<domain_t> const box_weights(
             weights_cbegin + left_index,
             weights_cbegin + right_index + 1); // TODO: ugly
 
@@ -127,20 +127,20 @@ nufft::fmm1d<kernel_type>::get_finest_farfield_coefs(
     return coefs;
 }
 
-template <class kernel_type>
-nufft::coefs_type
-nufft::fmm1d<kernel_type>::get_parent_farfield_coefs(
+template <class kernel_t, class domain_t, class range_t, class int_t>
+typename nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::coefs_type
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_farfield_coefs(
     coefs_type const & coefs,
-    size_type level,
-    integer_type p)
+    index_t level,
+    int_t p)
 {
 #ifdef NUFFT_DEBUG
     assert(p > 0);
     assert(level > 0);
-    assert(std::pow(2, level) <= std::numeric_limits<index_type>::max());
+    assert(std::pow(2, level) <= std::numeric_limits<index_t>::max());
 #endif
     
-    auto const max_index = static_cast<index_type>(std::pow(2, level));
+    auto const max_index = static_cast<index_t>(std::pow(2, level));
     
 #ifdef NUFFT_DEBUG
     auto const keys = coefs | boost::adaptors::map_keys;
@@ -155,26 +155,27 @@ nufft::fmm1d<kernel_type>::get_parent_farfield_coefs(
 
     auto const max_parent_index = max_index / 2;
     
-    for (index_type parent_index {0}; parent_index < max_parent_index; ++parent_index) {
-        auto workspace = util::zeros<range_elt_type>(p); // TODO: move out of this loop
-        auto parent_box_coefs = util::zeros<range_elt_type>(p);
-        auto const parent_center = get_box_center(parent_level, parent_index);
+    for (index_t parent_index {0}; parent_index < max_parent_index; ++parent_index) {
+        auto workspace = util::zeros<range_t>(p); // TODO: move out of this loop
+        auto parent_box_coefs = util::zeros<range_t>(p);
+        auto const parent_center =
+            get_box_center(parent_level, parent_index);
         
-        auto const translate_child_coefs = [&] (index_type index) {
+        auto const translate_child_coefs = [&] (index_t index) {
             auto const child_center = get_box_center(level, index);
             // TODO: no need to keep recomputing delta!!! fix this.
             auto const delta = parent_center - child_center;
-            kernel_type::apply_SS_translation(coefs.at(index), workspace, delta, p);
+            kernel_t::apply_SS_translation(coefs.at(index), workspace, delta, p);
         };
 
         auto const children = get_children(parent_index);
 
         bool found_coefs = false;
-        auto const add_coefs = [&] (index_type const index) {
+        auto const add_coefs = [&] (index_t const index) {
             if (coefs.find(index) != std::cend(coefs)) {
                 found_coefs = true;
                 translate_child_coefs(index);
-                for (index_type i {0}; i < p; ++i) {
+                for (int_t i {0}; i < p; ++i) {
                     parent_box_coefs[i] += workspace[i];
                 }
             }
@@ -191,13 +192,13 @@ nufft::fmm1d<kernel_type>::get_parent_farfield_coefs(
     return parent_coefs;
 }
 
-template <class kernel_type>
+template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_type>::do_E4_SR_translations(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     coefs_type const & input_coefs,
     coefs_type & output_coefs,
-    size_type level,
-    integer_type p)
+    index_t level,
+    int_t p)
 {
     auto const max_key = std::pow(2, level);
 #ifdef NUFFT_DEBUG
@@ -212,8 +213,8 @@ nufft::fmm1d<kernel_type>::do_E4_SR_translations(
     validate_coefs(output_coefs); // TODO: maybe unnecessary
 #endif
 
-    auto workspace = util::zeros<range_elt_type>(p);
-    for (index_type i {0}; i < max_key; ++i) {
+    auto workspace = util::zeros<range_t>(p);
+    for (index_t i {0}; i < max_key; ++i) {
         auto const center = get_box_center(level, i);
         auto const E4_neighbors = get_E4_neighbors(level, i);
         for (auto const n: E4_neighbors) {
@@ -222,30 +223,30 @@ nufft::fmm1d<kernel_type>::do_E4_SR_translations(
             }
             auto const neighbor_center = get_box_center(level, n);
             auto const delta = center - neighbor_center;
-            kernel_type::apply_SR_translation(input_coefs.at(n), workspace, delta, p);
+            kernel_t::apply_SR_translation(input_coefs.at(n), workspace, delta, p);
             if (output_coefs.find(i) == std::cend(output_coefs)) {
-                output_coefs[i] = util::zeros<range_elt_type>(p);
+                output_coefs[i] = util::zeros<range_t>(p);
             }
-            for (index_type j {0}; j < p; ++j) {
+            for (int_t j {0}; j < p; ++j) {
                 output_coefs[i][j] += workspace[j];
             }
         }
     }
 }
 
-template <class kernel_type>
+template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_type>::do_RR_translations(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
     coefs_type const & parent_coefs,
     coefs_type & child_coefs,
-    size_type level,
-    integer_type p)
+    index_t level,
+    int_t p)
 {
     auto const parent_level = level;
     auto const child_level = level + 1;
     auto const max_parent_index = std::pow(2, parent_level);
 #ifdef NUFFT_DEBUG
-    auto const verify_keys = [] (coefs_type const & coefs, index_type max_index) {
+    auto const verify_keys = [] (coefs_type const & coefs, index_t max_index) {
         auto const keys = coefs | boost::adaptors::map_keys;
         auto const cbegin = std::cbegin(keys);
         auto const cend = std::cend(keys);
@@ -259,8 +260,8 @@ nufft::fmm1d<kernel_type>::do_RR_translations(
     verify_keys(parent_coefs, max_parent_index);
     verify_keys(child_coefs, std::pow(2, child_level));
 #endif
-    auto workspace = util::zeros<range_elt_type>(p);
-    for (index_type i {0}; i < max_parent_index; ++i) {
+    auto workspace = util::zeros<range_t>(p);
+    for (index_t i {0}; i < max_parent_index; ++i) {
         auto const parent_center = get_box_center(parent_level, i);
         auto const translate = [&parent_coefs,
                                 &child_coefs,
@@ -268,14 +269,14 @@ nufft::fmm1d<kernel_type>::do_RR_translations(
                                 child_level,
                                 parent_center,
                                 p,
-                                i] (index_type j) {
+                                i] (index_t j) {
             auto const child_center = get_box_center(child_level, j);
             auto const delta = child_center - parent_center;
-            kernel_type::apply_RR_translation(parent_coefs.at(i), workspace, delta, p);
+            kernel_t::apply_RR_translation(parent_coefs.at(i), workspace, delta, p);
             if (child_coefs.find(j) == std::cend(child_coefs)) {
-                child_coefs[j] = util::zeros<range_elt_type>(p);
+                child_coefs[j] = util::zeros<range_t>(p);
             }
-            for (index_type k {0}; k < p; ++k) {
+            for (int_t k {0}; k < p; ++k) {
                 child_coefs[j][k] += workspace[k];
             }
         };
@@ -285,18 +286,18 @@ nufft::fmm1d<kernel_type>::do_RR_translations(
     }
 }
 
-template <class kernel_type>
+template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_type>::evaluate(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
     bookmarks const & source_bookmarks,
     bookmarks const & target_bookmarks,
     coefs_type const & coefs,
-    vector_type<range_elt_type> & output,
-    vector_type<domain_elt_type> const & sources,
-    vector_type<domain_elt_type> const & targets,
-    vector_type<range_elt_type> const & weights,
-    size_type max_level,
-    integer_type p)
+    vector_t<range_t> & output,
+    vector_t<domain_t> const & sources,
+    vector_t<domain_t> const & targets,
+    vector_t<range_t> const & weights,
+    index_t max_level,
+    int_t p)
 {
     auto const max_index = std::pow(2, max_level);
 #ifdef NUFFT_DEBUG
@@ -307,7 +308,7 @@ nufft::fmm1d<kernel_type>::evaluate(
     assert(0 <= min);
     assert(max < max_index);
 #endif
-    for (index_type i {0}; i < max_index; ++i) {
+    for (index_t i {0}; i < max_index; ++i) {
         auto const opt = target_bookmarks(max_level, i);
         if (!opt) {
             continue;
@@ -316,7 +317,7 @@ nufft::fmm1d<kernel_type>::evaluate(
         auto const right = opt->second;
 
         // TODO: this can very likely be greatly simplified
-        vector_type<index_type> direct_indices;
+        vector_t<index_t> direct_indices;
         for (auto const j: get_E2_neighbors(max_level, i)) {
             auto const opt = source_bookmarks(max_level, j);
             if (!opt) {
@@ -324,39 +325,39 @@ nufft::fmm1d<kernel_type>::evaluate(
             }
             auto const left = opt->first;
             auto const right = opt->second;
-            for (index_type k {left}; k <= right; ++k) {
+            for (int_t k {left}; k <= right; ++k) {
                 direct_indices.push_back(k);
             }
         }
         if (!direct_indices.empty()) {
-            for (index_type j {left}; j <= right; ++j) {
+            for (int_t j {left}; j <= right; ++j) {
                 auto const y = targets[j];
                 auto & tmp = output[j];
                 for (auto const k: direct_indices) {
-                    tmp += weights[k] * kernel_type::phi(y, sources[k]);
+                    tmp += weights[k] * kernel_t::phi(y, sources[k]);
                 }
             }
         }
 
         auto const center = get_box_center(max_level, i);
         auto const coef_vec = coefs.at(i);
-        for (index_type j {left}; j <= right; ++j) {
+        for (int_t j {left}; j <= right; ++j) {
             auto const y_off = targets[j] - center;
-            for (index_type k {0}; k < p; ++k) {
-                output[j] += coef_vec[k] * kernel_type::R(k, y_off);
+            for (int_t k {0}; k < p; ++k) {
+                output[j] += coef_vec[k] * kernel_t::R(k, y_off);
             }
         }
     }
 }
 
-template <class kernel_type>
-nufft::vector_type<nufft::range_elt_type>
-nufft::fmm1d<kernel_type>::fmm(
-    vector_type<domain_elt_type> const & sources,
-    vector_type<domain_elt_type> const & targets,
-    vector_type<range_elt_type> const & weights,
-    size_type max_level,
-    integer_type p)
+template <class kernel_t, class domain_t, class range_t, class int_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::template vector_t<range_t>
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
+    vector_t<domain_t> const & sources,
+    vector_t<domain_t> const & targets,
+    vector_t<range_t> const & weights,
+    index_t max_level,
+    int_t p)
 {
 #ifdef NUFFT_DEBUG
     {
@@ -386,24 +387,24 @@ nufft::fmm1d<kernel_type>::fmm(
     bookmarks const src_bookmarks {sources, max_level};
     bookmarks const trg_bookmarks {targets, max_level};
 
-    std::unordered_map<size_type, coefs_type> source_coefs;
+    std::unordered_map<index_t, coefs_type> source_coefs;
     source_coefs[max_level] = get_finest_farfield_coefs(
         src_bookmarks, sources, weights, max_level, p);
     if (max_level > 2) { // TODO: this line is prob unnecessary, remove later
-        for (size_type level {max_level}; level > 2; --level) {
+        for (index_t level {max_level}; level > 2; --level) {
             source_coefs[level - 1] = get_parent_farfield_coefs(
                 source_coefs[level], level, p);
         }
     }
 
-    std::unordered_map<size_type, coefs_type> target_coefs;
-    for (size_type level {2}; level < max_level; ++level) {
+    std::unordered_map<index_t, coefs_type> target_coefs;
+    for (index_t level {2}; level < max_level; ++level) {
         do_E4_SR_translations(source_coefs[level], target_coefs[level], level, p);
         do_RR_translations(target_coefs[level], target_coefs[level + 1], level, p);
     }
     do_E4_SR_translations(source_coefs[max_level], target_coefs[max_level], max_level, p);
 
-    vector_type<range_elt_type> output(std::size(targets), 0);
+    vector_t<range_t> output(std::size(targets), 0);
     evaluate(src_bookmarks, trg_bookmarks, target_coefs[max_level],
              output, sources, targets, weights, max_level, p);
 

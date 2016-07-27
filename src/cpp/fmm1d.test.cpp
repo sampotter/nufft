@@ -2,15 +2,20 @@
 
 #include <algorithm>
 #include <boost/test/included/unit_test.hpp>
+#include <cinttypes>
 #include <random>
+#include <vector>
 
 #include "cauchy.hpp"
 #include "fmm1d.hpp"
 
+using int_t = int64_t;
+template <class T> using vector_t = std::vector<T>;
+
 BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
     using namespace nufft;
     
-    vector_type<domain_elt_type> const sources = {
+    vector_t<double> const sources = {
         0.29485291464409813,
         0.5666788017655526,
         0.5654834502137871,
@@ -22,7 +27,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         0.6513973042753114,
         0.27746230058138965
     };
-    vector_type<range_elt_type> const weights = {
+    vector_t<double> const weights = {
         1.0445860347168028,
         0.5869693012415074,
         -0.3081203031469292,
@@ -34,9 +39,9 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         -1.1087134957611795,
         -0.522790996978465
     };
-    domain_elt_type const x_star = 0.01411425398533006;
-    integer_type const p = 8;
-    vector_type<range_elt_type> const expected = {
+    double const x_star = 0.01411425398533006;
+    int_t const p = 8;
+    vector_t<double> const expected = {
         1.1893499989713934,
         -0.561401797039591,
         -0.9246407244775339,
@@ -46,7 +51,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         -0.6855300683488881,
         -0.6047525248078208
     };
-    auto const actual = fmm1d<cauchy>::get_multipole_coefs(
+    auto const actual = fmm1d<cauchy<>>::get_multipole_coefs(
         sources, weights, x_star, p);
     
     BOOST_CHECK_EQUAL_COLLECTIONS(
@@ -59,7 +64,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
 BOOST_AUTO_TEST_CASE (evaluate_regular_works) {
     using namespace nufft;
 
-    vector_type<domain_elt_type> targets = {
+    vector_t<double> targets = {
         0.9482536724346731,
         0.7499818943527383,
         0.8298628321249875,
@@ -71,7 +76,7 @@ BOOST_AUTO_TEST_CASE (evaluate_regular_works) {
         0.8889124953814553,
         0.494916793867477
     };
-    vector_type<range_elt_type> coefs = {
+    vector_t<double> coefs = {
         -0.44172701759315597,
         0.8759135544966249,
         1.2966258801174102,
@@ -83,9 +88,9 @@ BOOST_AUTO_TEST_CASE (evaluate_regular_works) {
         0.05118043173330569,
         0.7551316717373412
     };
-    domain_elt_type const x_star = 0.5327985806084505;
-    integer_type const p = 10;
-    vector_type<range_elt_type> expected = {
+    double const x_star = 0.5327985806084505;
+    int_t const p = 10;
+    vector_t<double> expected = {
         0.07252219300692292,
         -0.20114859676536195,
         -0.09434507604911568,
@@ -97,7 +102,7 @@ BOOST_AUTO_TEST_CASE (evaluate_regular_works) {
         -0.01187614807116009,
         -0.4729871827285726
     };
-    auto const actual = fmm1d<cauchy>::evaluate_regular(
+    auto const actual = fmm1d<cauchy<>>::evaluate_regular(
         targets, coefs, x_star, p);
     BOOST_CHECK_EQUAL_COLLECTIONS(
         std::cbegin(actual),
@@ -109,7 +114,7 @@ BOOST_AUTO_TEST_CASE (evaluate_regular_works) {
 BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
     using namespace nufft;
 
-    vector_type<domain_elt_type> const sources = {
+    vector_t<double> const sources = {
         0.027724759164648782,
         0.1017675782233114,
         0.20430735891109553,
@@ -121,9 +126,9 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
         0.8758118163708446,
         0.9070928255682373
     };
-    size_type const max_level = 6;
+    int_t const max_level = 6;
     bookmarks const source_bookmarks {sources, max_level};
-    vector_type<range_elt_type> weights = {
+    vector_t<double> weights = {
         -0.8529660132143484,
         0.060626135963114336,
         -0.9946726382955,
@@ -135,12 +140,12 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
         1.3386182215257358,
         1.664974984102497
     };
-    integer_type const p = 9;
+    int_t const p = 9;
 
     // setting up the expected output value, this is a little
     // involved:
 
-    coefs_type expected_coefs;
+    fmm1d<cauchy<>>::coefs_type expected_coefs;
     expected_coefs[6] = {
         0.060626135963114336,
         1.2433100249550532e-5,
@@ -252,7 +257,7 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
         -4.477479584367964e-27,
     };
 
-    auto const actual_coefs = fmm1d<cauchy>::get_finest_farfield_coefs(
+    auto const actual_coefs = fmm1d<cauchy<>>::get_finest_farfield_coefs(
         source_bookmarks, sources, weights, max_level, p);
 
     for (auto const & entry: expected_coefs) {
@@ -282,10 +287,10 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
 BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
     using namespace nufft;
 
-    size_type level = 4;
-    integer_type p = 5;
+    int_t level = 4;
+    int_t p = 5;
 
-    coefs_type child_coefs;
+    fmm1d<cauchy<>>::coefs_type child_coefs;
     child_coefs[1] = {
         -3.012747815605832,
         -0.04650204578472563,
@@ -400,9 +405,9 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
     };
 
     auto const actual_parent_coefs =
-        fmm1d<cauchy>::get_parent_farfield_coefs(child_coefs, level, p);
+        fmm1d<cauchy<>>::get_parent_farfield_coefs(child_coefs, level, p);
 
-    coefs_type expected_parent_coefs;
+    fmm1d<cauchy<>>::coefs_type expected_parent_coefs;
     expected_parent_coefs[6] = {
         0.4134492556906605,
         0.007774886797179758,
@@ -490,10 +495,10 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
 BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
     using namespace nufft;
 
-    size_type level = 3;
-    integer_type p = 5;
+    int_t level = 3;
+    int_t p = 5;
     
-    coefs_type input_coefs;
+    fmm1d<cauchy<>>::coefs_type input_coefs;
     input_coefs[6] = {
         0.4134492556906605,
         0.007774886797179758,
@@ -551,7 +556,7 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
         -1.1946889829296134e-5,
     };
 
-    coefs_type expected_coefs;
+    fmm1d<cauchy<>>::coefs_type expected_coefs;
     expected_coefs[6] = {
         -11.507875730900956,
         36.82155322053612,
@@ -609,13 +614,13 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
         3732.2818319838607,
     };
 
-    coefs_type actual_coefs;
-    fmm1d<cauchy>::do_E4_SR_translations(input_coefs, actual_coefs, level, p);
+    fmm1d<cauchy<>>::coefs_type actual_coefs;
+    fmm1d<cauchy<>>::do_E4_SR_translations(input_coefs, actual_coefs, level, p);
 
     auto const max_index = std::pow(2, level);
     auto const assert_indices_subset = [max_index] (
-        coefs_type const & lhs_coefs,
-        coefs_type const & rhs_coefs) {
+        fmm1d<cauchy<>>::coefs_type const & lhs_coefs,
+        fmm1d<cauchy<>>::coefs_type const & rhs_coefs) {
         for (auto const & entry: lhs_coefs) {
             auto const index = entry.first;
             assert(0 <= index);
@@ -639,10 +644,10 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
 BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
     using namespace nufft;
 
-    size_type level = 3;
-    integer_type p = 5;
+    int_t level = 3;
+    int_t p = 5;
 
-    coefs_type input_coefs;
+    fmm1d<cauchy<>>::coefs_type input_coefs;
     input_coefs[6] = {
         -11.507875730900956,
         36.82155322053612,
@@ -700,7 +705,7 @@ BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
         3732.2818319838607,
     };
 
-    coefs_type expected_coefs;
+    fmm1d<cauchy<>>::coefs_type expected_coefs;
     expected_coefs[1] = {
         5.731654136683816,
         39.95857554366885,
@@ -814,13 +819,13 @@ BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
         3732.2818319838607,
     };
 
-    coefs_type actual_coefs;
-    fmm1d<cauchy>::do_RR_translations(input_coefs, actual_coefs, level, p);
+    fmm1d<cauchy<>>::coefs_type actual_coefs;
+    fmm1d<cauchy<>>::do_RR_translations(input_coefs, actual_coefs, level, p);
 
     auto const max_index = std::pow(2, level + 1);
     auto const assert_indices_subset = [max_index] (
-        coefs_type const & lhs_coefs,
-        coefs_type const & rhs_coefs) {
+        fmm1d<cauchy<>>::coefs_type const & lhs_coefs,
+        fmm1d<cauchy<>>::coefs_type const & rhs_coefs) {
         for (auto const & entry: lhs_coefs) {
             auto const index = entry.first;
             assert(0 <= index);
@@ -844,7 +849,7 @@ BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
 BOOST_AUTO_TEST_CASE (evaluate_works) {
     using namespace nufft;
 
-    vector_type<domain_elt_type> const X = {
+    vector_t<double> const X = {
         0.008151352509715437,
         0.014187502925144813,
         0.02034366727145609,
@@ -947,7 +952,7 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
         0.9996043195049491,
     };
 
-    vector_type<domain_elt_type> const Y = {
+    vector_t<double> const Y = {
         0.008574352027924226,
         0.015532094909469718,
         0.02503638261672947,
@@ -1050,7 +1055,7 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
         0.9892665037123389,
     };
 
-    vector_type<range_elt_type> const U = {
+    vector_t<double> const U = {
         -0.03449954875282528,
         0.6093486993474703,
         0.06145654095009269,
@@ -1153,12 +1158,12 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
         -0.11213536207937418,
     };
 
-    integer_type const p {5};
-    size_type const L {4};
+    int_t const p {5};
+    int_t const L {4};
     bookmarks const X_bookmarks {X, L};
     bookmarks const Y_bookmarks {Y, L};
 
-    coefs_type coefs;
+    fmm1d<cauchy<>>::coefs_type coefs;
     coefs[1] = {
         5.731654136683816,
         39.95857554366885,
@@ -1272,9 +1277,9 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
         3732.2818319838607,
     };
 
-    vector_type<range_elt_type> output(100, 0);
+    vector_t<double> output(100, 0);
 
-    vector_type<range_elt_type> const expected = {
+    vector_t<double> const expected = {
         -201.94042374614466,
         449.9495034196414,
         -470.7289253653951,
@@ -1377,7 +1382,7 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
         426.36963937474866,
     };
 
-    fmm1d<cauchy>::evaluate(X_bookmarks, Y_bookmarks, coefs, output, X, Y, U, L, p);
+    fmm1d<cauchy<>>::evaluate(X_bookmarks, Y_bookmarks, coefs, output, X, Y, U, L, p);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(output), std::cend(output),
                                   std::cbegin(expected), std::cend(expected));
@@ -1386,7 +1391,7 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
 BOOST_AUTO_TEST_CASE (fmm_works) {
     using namespace nufft;
 
-    vector_type<domain_elt_type> const X = {
+    vector_t<double> const X = {
         0.008151352509715437,
         0.014187502925144813,
         0.02034366727145609,
@@ -1489,7 +1494,7 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
         0.9996043195049491,
     };
 
-    vector_type<domain_elt_type> const Y = {
+    vector_t<double> const Y = {
         0.008574352027924226,
         0.015532094909469718,
         0.02503638261672947,
@@ -1592,7 +1597,7 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
         0.9892665037123389,
     };
 
-    vector_type<range_elt_type> const U = {
+    vector_t<double> const U = {
         -0.03449954875282528,
         0.6093486993474703,
         0.06145654095009269,
@@ -1695,10 +1700,10 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
         -0.11213536207937418,
     };
 
-    integer_type const p {5};
-    size_type const L {4};
+    int_t const p {5};
+    int_t const L {4};
 
-    vector_type<range_elt_type> const expected = {
+    vector_t<double> const expected = {
         -204.36644480198223,
         447.5099066880207,
         -473.1780611050121,
@@ -1801,7 +1806,7 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
         429.4448711318911,
     };
 
-    auto const actual = fmm1d<cauchy>::fmm(X, Y, U, L, p);
+    auto const actual = fmm1d<cauchy<>>::fmm(X, Y, U, L, p);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(actual), std::cend(actual),
                                   std::cbegin(expected), std::cend(expected));
@@ -1826,7 +1831,7 @@ BOOST_AUTO_TEST_CASE (deeper_depths_dont_crash) {
     std::sort(std::begin(Y), std::end(Y));
 
     for (int L = 2; L < 15; ++L) {
-        fmm1d<cauchy>::fmm(X, Y, U, L, 4);
+        fmm1d<cauchy<>>::fmm(X, Y, U, L, 4);
     }
 }
 

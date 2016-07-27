@@ -2,18 +2,22 @@
 
 #include <boost/numeric/ublas/matrix.hpp>
 #include <boost/test/included/unit_test.hpp>
+#include <cinttypes>
 
 #include "cauchy.hpp"
+
+using int_t = int64_t;
+template <class T> using vector_t = std::vector<T>;
 
 BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
     using namespace nufft;
 
-    auto const test = [] (integer_type p,
-                          domain_elt_type delta,
-                          vector_type<range_elt_type> input,
-                          vector_type<range_elt_type> expected) {
-        vector_type<range_elt_type> actual(p, 0);
-        cauchy::apply_SS_translation(input, actual, delta, p);
+    auto const test = [] (int_t p,
+                          double delta,
+                          vector_t<double> input,
+                          vector_t<double> expected) {
+        vector_t<double> actual(p, 0);
+        cauchy<>::apply_SS_translation(input, actual, delta, p);
         BOOST_CHECK_EQUAL_COLLECTIONS(
             std::cbegin(expected), std::cend(expected),
             std::cbegin(actual), std::cend(actual));
@@ -159,7 +163,7 @@ BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
 BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
     using namespace nufft;
 
-    vector_type<range_elt_type> const expected_translation = {
+    vector_t<double> const expected_translation = {
         -3.385028620601427e8,
         2.6097095714834618e10,
         -1.1121491687723486e12,
@@ -172,7 +176,7 @@ BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
         1.7906817290346446e21,
     };
 
-    vector_type<range_elt_type> const input = {
+    vector_t<double> const input = {
         -1.7083192093163444,
         -0.09075075558871018,
         -0.5493915134960792,
@@ -185,10 +189,10 @@ BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
         -0.19039037675098727,
     };
 
-    domain_elt_type const delta {0.125};
-    integer_type const p {10};
-    vector_type<range_elt_type> actual_translation(p, 0);
-    cauchy::apply_SR_translation(input, actual_translation, delta, p);
+    double const delta {0.125};
+    int_t const p {10};
+    vector_t<double> actual_translation(p, 0);
+    cauchy<>::apply_SR_translation(input, actual_translation, delta, p);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(
         std::cbegin(expected_translation),
@@ -201,7 +205,7 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
     using namespace nufft;
 
     {
-        vector_type<range_elt_type> const expected_translation = {
+        vector_t<double> const expected_translation = {
             -1.4812594873128075,
             0.06294450407242579,
             -0.6726878191271809,
@@ -214,7 +218,7 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
             1.0199736784144198,
         };
 
-        vector_type<range_elt_type> const input = {
+        vector_t<double> const input = {
             -1.496250990422328,
             0.15241036870181457,
             -0.08581985807615482,
@@ -227,10 +231,10 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
             1.0199736784144198,
         };
 
-        domain_elt_type const delta {0.125};
-        integer_type const p {10};
-        vector_type<range_elt_type> actual_translation(p, 0);
-        cauchy::apply_RR_translation(input, actual_translation, delta, p);
+        double const delta {0.125};
+        int_t const p {10};
+        vector_t<double> actual_translation(p, 0);
+        cauchy<>::apply_RR_translation(input, actual_translation, delta, p);
 
         BOOST_CHECK_EQUAL_COLLECTIONS(
             std::cbegin(expected_translation),
@@ -240,7 +244,7 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
     }
 
     {
-        vector_type<range_elt_type> const expected_translation = {
+        vector_t<double> const expected_translation = {
             5.731654136683816,
             39.95857554366885,
             242.50121090735004,
@@ -248,7 +252,7 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
             3732.2818319838607,
         };
 
-        vector_type<range_elt_type> const input = {
+        vector_t<double> const input = {
             4.685945552052858,
             27.935135675696912,
             149.53847782084546,
@@ -256,10 +260,10 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
             3732.2818319838607,
         };
 
-        domain_elt_type const delta {0.03125};
-        integer_type const p {5};
-        vector_type<range_elt_type> actual_translation(p, 0);
-        cauchy::apply_RR_translation(input, actual_translation, delta, p);
+        double const delta {0.03125};
+        int_t const p {5};
+        vector_t<double> actual_translation(p, 0);
+        cauchy<>::apply_RR_translation(input, actual_translation, delta, p);
 
         BOOST_CHECK_EQUAL_COLLECTIONS(
             std::cbegin(expected_translation),

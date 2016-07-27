@@ -66,6 +66,16 @@
    - [ ] Make ~p~ a template parameter to enable use of arrays on the
 	 stack...
    - [ ] Look into Shewchuk summation...
+*** Refactoring
+	- [ ] There are a lot of loops involving indices compared to
+      variables which are initially declared in the argument list of
+      some function. It would be nice to be able to allow for
+      arbitrary types for the indices, which will require those
+      arguments to be of some template type, in which case we will
+      need to go and replace a lot of things with auto and decltype,
+      and MOST LIKELY provide some separate---conditionally
+      compiled---sections of code for dealing with signed and unsigned
+      cases...
 *** Optimization
 **** General
    	 - [ ] Put EVERYTHING on the stack/or preallocate all memory used

@@ -2,47 +2,37 @@
 #define __NUFFT_BOOKMARKS_HPP__
 
 #include <boost/optional.hpp>
-#include <cstddef>
+#include <cinttypes>
 #include <unordered_map>
 #include <utility>
 #include <vector>
 
 namespace nufft {
+    template <class domain_t = double, class int_t = int64_t>
     struct bookmarks {
-        using domain_elt_type = double;
-        
-        template <typename T>
-        using vector_type = std::vector<T>;
-        
-        using size_type = std::size_t;
-        using index_type = int64_t;
-        using bookmark_type = std::pair<index_type, index_type>;
+        template <class T> using opt_t = boost::optional<T>;
+        template <class T> using vector_t = std::vector<T>;
+        using bookmark_t = std::pair<int_t, int_t>;
 
-        bookmarks(
-            vector_type<domain_elt_type> const & sources,
-            size_type max_level);
+        bookmarks(vector_t<domain_t> const & sources, int_t max_level);
         
-        boost::optional<bookmark_type>
-        operator()(size_type level, size_type index) const;
+        opt_t<bookmark_t>
+        operator()(int_t level, int_t index) const;
         
     private:
-        template <typename K, typename V>
-        using hash_type = std::unordered_map<K, V>;
+        template <class K, class V> using hash_t = std::unordered_map<K, V>;
+        using bookmark_hash_t = hash_t<int_t, vector_t<opt_t<bookmark_t>>>;
         
-        using bookmark_hash_type = hash_type<
-            size_type,
-            vector_type<boost::optional<bookmark_type>>>;
+        bookmark_hash_t make_bookmark_hash(vector_t<domain_t> const & sources,
+                                           int_t max_level) const;
         
-        bookmark_hash_type make_bookmark_hash(
-            vector_type<domain_elt_type> const & sources,
-            size_type max_level) const;
+        vector_t<opt_t<bookmark_t>> get_empty_bookmarks(int_t level) const;
         
-        vector_type<boost::optional<bookmark_type>>
-        get_empty_bookmarks(size_type level) const;
-        
-        bookmark_hash_type bookmark_hash_;
+        bookmark_hash_t bookmark_hash_;
     };
 }
+
+#include "bookmarks.impl.hpp"
 
 #endif // __NUFFT_BOOKMARKS_HPP__
 

@@ -7,6 +7,8 @@ build
 thirdparty
 .juliahistory
 _region_*
+_*.py
+*.dylib
 *.npz
 *.mat
 *.pdf

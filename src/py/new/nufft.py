@@ -1,8 +1,33 @@
+import ctypes.util as _util
 import fmm as _fmm
 import numpy as _np
+import time
 import unittest as _unittest
 
+from _nufft import ffi as _ffi
+_lib = _ffi.dlopen(_util.find_library('nufft'))
+
 _twopi = 2*_np.pi
+
+
+def inufft_cpp(F, K, Y, L, p, n):
+    num_values = F.size
+    values = _ffi.new(
+        'double[%d]' % (2*num_values),
+        list(_np.array([F.real, F.imag]).T.reshape(2*num_values)))
+    num_nodes = Y.size
+    nodes = _ffi.new('double[%d]' % num_nodes, list(Y))
+    fmm_depth = L
+    truncation_number = p
+    neighborhood_radius = n
+    output = _ffi.new('double[%d]' % (2*num_nodes))
+    t0 = time.clock()
+    _lib.compute_P_ddi(
+        values, nodes, num_values, num_nodes, fmm_depth, truncation_number,
+        neighborhood_radius, output)
+    t = time.clock() - t0
+    output = _np.array(list(output)).reshape(num_nodes, 2)
+    return output[:, 0] + 1j*output[:, 1], t
 
 
 # TODO: implement c0 estimate
@@ -10,7 +35,7 @@ _twopi = 2*_np.pi
 # TODO: rewrite this as a class to simplify code a bit
 
 
-#### ALL THIS IS TEMPORARY (for cest implementation)...
+# ALL THIS IS TEMPORARY (for cest implementation)...
 
 
 def _phinear(F, X, y, n):
@@ -250,8 +275,20 @@ class inufft_test(_unittest.TestCase):
             -0.05936333 + 8.41511326e-19j, -0.06188170 + 9.64474493e-19j,
             -0.06228141 + 9.73915329e-19j, -0.05715692 - 9.84725529e-19j,
             -0.04839742 - 9.63722365e-19j, -0.02781498 - 6.51686509e-19j])
-        actual = inufft(F, K, Y, L, p, n, q)
-        for i, val in enumerate(actual):
+
+        # actual = inufft(F, K, Y, L, p, n, q)
+        # for i, val in enumerate(actual):
+        #     try:
+        #         self.assertTrue(_np.abs(val - expected[i]) <= 1e-5)
+        #     except:
+        #         print('failure at i = %d' % i)
+        #         print('expected: %g + j*%g'
+        #               % (expected[i].real, expected[i].imag))
+        #         print('actual: %g + j*%g' % (val.real, val.imag))
+        #         self.assertTrue(False)
+
+        actual_cpp = inufft_cpp(F, K, Y, L, p, n)
+        for i, val in enumerate(actual_cpp):
             try:
                 self.assertTrue(_np.abs(val - expected[i]) <= 1e-5)
             except:

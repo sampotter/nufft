@@ -55,6 +55,17 @@ def get_nufft_timing(pts, coefs):
     return time.clock() - t0
 
 
+def get_nufft_cpp_timing(pts, coefs):
+    F = np.fft.ifft(np.fft.fftshift(coefs))
+    K = int(F.size/2)
+    Y = pts
+    L = 4
+    p = 4
+    n = 3
+    output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
+    return t
+
+
 def get_ifft_timing(pts, coefs):
     t0 = time.clock()
     np.fft.ifft(coefs)
@@ -78,12 +89,14 @@ timing_methods = [
     get_potts_timing,
     get_greengard_timing,
     get_nufft_timing,
+    get_nufft_cpp_timing,
     get_ifft_timing
 ]
 if include_gt:
     timing_methods += [get_gt_timing]
 
-timing_method_names = ['irt', 'potts', 'greengard', 'nufft', 'ifft']
+timing_method_names = ['irt', 'potts', 'greengard', 'nufft', 'nufft cpp',
+                       'ifft']
 if include_gt:
     timing_method_names += ['gt']
 

@@ -7,7 +7,7 @@ import tempfile as _tempfile
 from matlab import double as _double
 
 default_nufft_path = '/Volumes/Molly/Dropbox/Research/nufft/' + \
-                     'Build/nufftall-1.33'
+                     'thirdparty/nufftall-1.33'
 
 
 class nufft_greengard(object):

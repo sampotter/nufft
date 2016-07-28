@@ -3,7 +3,7 @@ import numpy as np
 import os.path
 import tempfile
 
-default_irt_path = '/Volumes/Molly/Dropbox/research/nufft/build/irt'
+default_irt_path = '/Volumes/Molly/Dropbox/research/nufft/thirdparty/irt'
 
 # TODO: add unit tests to make sure our wrapper doesn't diverge!
 # import unittest

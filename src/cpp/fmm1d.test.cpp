@@ -127,7 +127,7 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
         0.9070928255682373
     };
     int_t const max_level = 6;
-    bookmarks const source_bookmarks {sources, max_level};
+    bookmarks<> const source_bookmarks {sources, max_level};
     vector_t<double> weights = {
         -0.8529660132143484,
         0.060626135963114336,
@@ -1160,8 +1160,8 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
 
     int_t const p {5};
     int_t const L {4};
-    bookmarks const X_bookmarks {X, L};
-    bookmarks const Y_bookmarks {Y, L};
+    bookmarks<> const X_bookmarks {X, L};
+    bookmarks<> const Y_bookmarks {Y, L};
 
     fmm1d<cauchy<>>::coefs_type coefs;
     coefs[1] = {

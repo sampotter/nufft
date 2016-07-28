@@ -6,6 +6,7 @@
 #endif
 
 #include "index_manip.hpp"
+#include "multiply.hpp"
 #include "util.hpp"
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
@@ -39,7 +40,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
     vector_t<range_t> coefs(p, 0);
     for (int_t i {0}; i < p; ++i) {
         for (int_t j {0}; j < num_sources; ++j) {
-            coefs[i] += weights[j] * kernel_t::b(i, offset_sources[j]);
+            coefs[i] += multiply(weights[j], kernel_t::b(i, offset_sources[j]));
         }
     }
 
@@ -73,7 +74,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate_regular(
     for (int_t i {0}; i < num_targets; ++i) {
         auto const offset_target = offset_targets[i];
         for (int_t j {0}; j < p; ++j) {
-            sums[i] += coefs[j] * kernel_t::R(j, offset_target);
+            sums[i] += multiply(coefs[j], kernel_t::R(j, offset_target));
         }
     }
 
@@ -334,7 +335,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
                 auto const y = targets[j];
                 auto & tmp = output[j];
                 for (auto const k: direct_indices) {
-                    tmp += weights[k] * kernel_t::phi(y, sources[k]);
+                    tmp += multiply(weights[k], kernel_t::phi(y, sources[k]));
                 }
             }
         }
@@ -344,7 +345,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
         for (int_t j {left}; j <= right; ++j) {
             auto const y_off = targets[j] - center;
             for (int_t k {0}; k < p; ++k) {
-                output[j] += coef_vec[k] * kernel_t::R(k, y_off);
+                output[j] += multiply(coef_vec[k], kernel_t::R(k, y_off));
             }
         }
     }

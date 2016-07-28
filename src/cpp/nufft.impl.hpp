@@ -58,8 +58,9 @@ nufft::compute_P(
 
 	std::vector<std::complex<range_t>> Fas_per(X_per_size);
 	for (int_t i {0}; i < X_per_size; ++i) {
-		auto const sign = std::complex<range_t>(i % 2 == 0 ? 1 : -1, 0);
-		Fas_per[i] = F[i % N]*sign;
+		auto const f = F[i % N];
+		Fas_per[i].real(f.real()*(2*static_cast<range_t>(i % 2 == 0) - 1));
+		Fas_per[i].imag(f.imag());
 	}
 
 	// Sum up the values of a single period of Fas_per for later use:

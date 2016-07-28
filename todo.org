@@ -1,3 +1,56 @@
+* Todo
+** Immediate todo
+   - [ ] Figure this bug out:
+#+BEGIN_SRC:
+K = 380
+  method: irt, time: 0.0176377 (out of 100 trials)
+  method: potts, time: 0.000340558 (out of 10 trials)
+  method: greengard, time: 0.000290388 (out of 28 trials)
+  method: nufft, time: 0.079888 (out of 14 trials)
+Assertion failed: (*std::min_element(std::cbegin(X_per), std::cend(X_per)) >= 0), function compute_P, file ../../nufft.impl.hpp, line 140.
+abort trap: 6
+#+END_SRC
+   - [ ] Generate plots using tikz
+   - [ ] Add references in paper to other definitions (i.e. (38) in
+     Fessler)
+	 - [ ] Rewrite section to use IDFT consistent with (38)
+   - [ ] Add reference to that sinc interpolation/bandlimited note!
+   - [ ] elpy
+   - [ ] Test [-N/2, ..., N/2) with [0, ..., N) but for my test funcs
+   - [ ] Use -⌊K/2⌋, ..., ⌈K/2⌉ instead of
+   - [ ] Move timer into C++ timer wrapper for timing NUFFT C++
+** NUFFTs to add
+   - [ ] The Julia NUFFT
+   - [ ] The Airforce Research Lab (?) NUFFT
+   - [ ] Are there any NUFFT packages on CRAN?
+** NUFFT
+   - [ ] Make Python NUFFT use complex numbers with its
+     FMM... (weights and output values)
+   - [ ] Add C++ NUFFT to nufft.py
+   - [ ] Add least squares collocation to C++ NUFFT
+   - [ ] Get C++ unit tests working
+   - [ ] Add unit test for C++ NUFFT in nufft.py
+   - [ ] Figure out what the invalid value in np.multiply is
+   - [ ] Get FMM to use new c0 estimation method
+   - [ ] Change least squares to upper triangular approach
+** Plots
+   - [ ] Plots comparing checkpoint methods
+   - [ ] Time vs. problem size vs. method (fixed error)
+   - [ ] Error vs. problem size vs. method (fixed time)
+   - [ ] Time/error vs. problem size... where number of source/target
+     points are alternatingly fixed
+   - [ ] Correct digits vs. radians vs. method (fixed... what?)
+** Analysis
+   - [ ] Figure out optimal P-by-P fitting matrix for upper triangular
+     approach using explicit forms that we have...
+   - [ ] Figure out method of choosing correct FMM parameters
+** Cauchy kernel stuff
+   - [ ] Find paper Nail was talking about re: Chebyshev expansions
+	 - [ ] Implement using C++ framework
+   - [ ] Try applying Gram-Schmidt to 1/(x-y)
+	 - [ ] Implement using C++ framework
+   - [ ] See if there were other methods of representing the Cauchy
+     kernel discussed in the slides in class
 * NUFFT
 ** Stuff to Code
    - [ ] Forward transform.
@@ -55,7 +108,7 @@
    - [ ] Replace ~std::vector~ with ~boost::numeric::ublas::vector~?
    - [ ] Figure out how to deal with domain and range types -- if this
 	 is even necessary...
-   - [ ] Try out using Boost.Optional for the bookmarks instead of
+   - [X] Try out using Boost.Optional for the bookmarks instead of
 	 using a pair of -1's to indicate no bookmark.
    - [ ] Alternative bookmark data structures to try:
 	 - [ ] Heap-based
@@ -97,6 +150,13 @@
 	 - [ ] Major redundancy with Y, Yc, Yc_tilde.
 	 - [ ] Look into using the FMM on Y and Yc/Yc_tilde separately to
        avoid the overhead of sorting.
+	 - [ ] Look into going back to -1's instead of
+       boost::optional... Only problem here, though, is that if we
+       want to support unsigned ints, this will be problematic.
+	   - [ ] In order to support unsigned types, we could encode "not
+         there" as a nonsense value---i.e. if we require first <=
+         second, then choosing some value (e.g. (1, 0)) s.t. first >
+         second would encode "not there".
 **** Future optimizations
 	 - [ ] Compute checkpoint FMM directly if there are few enough checkpoints?
 	 - [ ] We could also use a different FMM (i.e. in terms of

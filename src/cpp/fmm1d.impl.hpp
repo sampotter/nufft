@@ -65,10 +65,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate_regular(
     auto const num_targets = static_cast<int_t>(std::size(targets));
     vector_t<range_t> sums(num_targets, 0);
     for (int_t i {0}; i < num_targets; ++i) {
-        auto const offset_target = offset_targets[i];
-        for (int_t j {0}; j < p; ++j) {
-            sums[i] += multiply(coefs[j], kernel_t::R(j, offset_target));
-        }
+        sums[i] = kernel_t::R(p, offset_targets[i], coefs.data());
     }
 
     return sums;
@@ -336,10 +333,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
         auto const center = get_box_center(max_level, i);
         auto const coef_vec = coefs.at(i);
         for (int_t j {left}; j <= right; ++j) {
-            auto const y_off = targets[j] - center;
-            for (int_t k {0}; k < p; ++k) {
-                output[j] += multiply(coef_vec[k], kernel_t::R(k, y_off));
-            }
+            output[j] += kernel_t::R(p, targets[j] - center, coef_vec.data());
         }
     }
 }

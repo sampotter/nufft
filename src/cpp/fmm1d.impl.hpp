@@ -31,19 +31,12 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
     assert(x_star < 1);
     assert(p > 0);
 #endif
-
-    vector_t<domain_t> offset_sources(sources);
-    for (auto & offset_source: offset_sources) {
-        offset_source -= x_star;
-    }
-    
     vector_t<range_t> coefs(p, 0);
     for (int_t i {0}; i < p; ++i) {
         for (int_t j {0}; j < num_sources; ++j) {
-            coefs[i] += multiply(weights[j], kernel_t::b(i, offset_sources[j]));
+            coefs[i] += multiply(weights[j], kernel_t::b(i, sources[j] - x_star));
         }
     }
-
     return coefs;
 }
 

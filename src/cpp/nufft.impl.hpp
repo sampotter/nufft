@@ -34,14 +34,6 @@ nufft::compute_P(
 
 	range_t const twopi {6.283185307179586};
 
-	// Initialize X, the uniform time domain grid:
-
-	std::vector<domain_t> X(N);
-	auto const twopi_over_N = twopi/N;
-	for (int_t i {0}; i < N; ++i) {
-		X[i] = i*twopi_over_N;
-	}
-
 	// Initialize X_per, the periodic extension of X to the periodic
 	// summation neighborhood (X_per is computed with the correct
 	// scale immediately to prevent floating point

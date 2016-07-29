@@ -285,6 +285,19 @@ BOOST_AUTO_TEST_CASE (horner_R_works) {
     BOOST_CHECK_CLOSE(expected, actual, 1e-10);
 }
 
+BOOST_AUTO_TEST_CASE (vectorized_phi_works) {
+    double y {0.351};
+    double sources[] = {-0.5, -0.2, 0.3, 0.7};
+    double weights[] = {0.1, 0.2, 0.3, 0.4};
+    vector_t<int_t> indices {0, 1, 2, 3};
+    double actual {nufft::cauchy<>::phi(y, sources, weights, indices)};
+    double expected {0};
+    for (auto & i: indices) {
+        expected += weights[i]*nufft::cauchy<>::phi(y, sources[i]);
+    }
+    BOOST_CHECK_CLOSE(expected, actual, 1e-10);
+}
+
 // Local Variables:
 // indent-tabs-mode: nil
 // End:

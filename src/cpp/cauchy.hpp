@@ -15,6 +15,10 @@ namespace nufft {
         static inline range_t phi(domain_t y, domain_t x) {
             return 1.0/(y - x);
         }
+        static range_t phi(domain_t y,
+                           domain_t const * sources,
+                           range_t const * weights,
+                           vector_t<int_t> const & indices);
                 
         static range_t R(int_t m, domain_t x);
         static range_t R(int_t p, domain_t x, range_t const * coefs);

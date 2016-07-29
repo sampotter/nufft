@@ -6,6 +6,19 @@
 
 template <class domain_t, class range_t, class int_t>
 range_t
+nufft::cauchy<domain_t, range_t, int_t>::phi(
+    domain_t y,
+    domain_t const * sources,
+    range_t const * weights,
+    vector_t<int_t> const & indices)
+{
+    range_t tmp {0};
+    for (auto const i: indices) {
+        tmp += weights[i]/(y - sources[i]);
+    }
+    return tmp;
+}
+
 template <class domain_t, class range_t, class int_t>
 range_t
 nufft::cauchy<domain_t, range_t, int_t>::R(int_t m, domain_t x)

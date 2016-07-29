@@ -322,11 +322,11 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
         }
         if (!direct_indices.empty()) {
             for (int_t j {left}; j <= right; ++j) {
-                auto const y = targets[j];
-                auto & tmp = output[j];
-                for (auto const k: direct_indices) {
-                    tmp += multiply(weights[k], kernel_t::phi(y, sources[k]));
-                }
+                output[j] += kernel_t::phi(
+                    targets[j],
+                    sources.data(),
+                    weights.data(),
+                    direct_indices);
             }
         }
 

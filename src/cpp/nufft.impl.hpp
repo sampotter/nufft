@@ -134,9 +134,6 @@ nufft::compute_P(
 	for (int_t i {0}; i < J + 2*N; ++i) {
 		Ycat[i] = scale_factor*(Ycat[i] - left);
 	}
-	// for (int_t i {0}; i < X_per_size; ++i) {
-	// 	X_per[i] = scale_factor*(X_per[i] - left);
-	// }
 #ifdef NUFFT_DEBUG
 	assert(*std::min_element(std::cbegin(Ycat), std::cend(Ycat)) >= 0);
 	assert(*std::max_element(std::cbegin(Ycat), std::cend(Ycat)) < 1.0);

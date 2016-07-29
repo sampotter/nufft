@@ -11,10 +11,12 @@ namespace nufft {
 	template <class T, std::enable_if_t<is_complex<T> {}> * = nullptr>
 	constexpr T multiply(T const & lhs, T const & rhs)
 	{
-		auto const k1 = lhs.real()*(rhs.real() + rhs.imag());
-		auto const k2 = rhs.imag()*(lhs.real() + lhs.imag());
-		auto const k3 = rhs.real()*(lhs.imag() - lhs.real());
-		return T(k1 - k2, k1 + k3);
+		auto const a = lhs.real();
+		auto const b = lhs.imag();
+		auto const c = rhs.real();
+		auto const d = rhs.imag();
+		auto const tmp = a*(c + d);
+		return T(tmp - d*(a + b), tmp + c*(b - a));
 	}
 
 	template <class T, std::enable_if_t<!is_complex<T> {}> * = nullptr>

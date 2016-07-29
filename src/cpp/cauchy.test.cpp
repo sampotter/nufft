@@ -273,6 +273,18 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
     }
 }
 
+BOOST_AUTO_TEST_CASE (horner_R_works) {
+    int p {7};
+    double coefs[] = {0.1, 0.2, 0.3, 0.4, -0.2, -0.3, -0.4};
+    double x {0.123};
+    double actual {nufft::cauchy<>::R(p, x, coefs)};
+    double expected {0};
+    for (int i {0}; i < p; ++i) {
+        expected += coefs[i]*nufft::cauchy<>::R(i, x);
+    }
+    BOOST_CHECK_CLOSE(expected, actual, 1e-10);
+}
+
 // Local Variables:
 // indent-tabs-mode: nil
 // End:

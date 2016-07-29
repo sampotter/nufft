@@ -6,9 +6,26 @@
 
 template <class domain_t, class range_t, class int_t>
 range_t
+template <class domain_t, class range_t, class int_t>
+range_t
 nufft::cauchy<domain_t, range_t, int_t>::R(int_t m, domain_t x)
 {
     return std::pow(x, m);
+}
+
+template <class domain_t, class range_t, class int_t>
+range_t
+nufft::cauchy<domain_t, range_t, int_t>::R(
+    int_t p,
+    domain_t x,
+    range_t const * coefs)
+{
+    range_t tmp {coefs[p - 1]};
+    for (int_t j = p - 2; j >= 0; --j) {
+        tmp *= x;
+        tmp += coefs[j];
+    }
+    return tmp;
 }
 
 template <class domain_t, class range_t, class int_t>

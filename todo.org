@@ -19,6 +19,9 @@ abort trap: 6
    - [ ] Test [-N/2, ..., N/2) with [0, ..., N) but for my test funcs
    - [ ] Use -⌊K/2⌋, ..., ⌈K/2⌉ instead of
    - [ ] Move timer into C++ timer wrapper for timing NUFFT C++
+   - [ ] Make sure no multiplications in nufft.impl.hpp are
+     inefficient std::complex multiplications
+   - [ ] Correct reference for [[http://www.embedded.com/design/real-time-and-performance/4007256/Digital-Signal-Processing-Tricks--Fast-multiplication-of-complex-numbers][this citation]]
 ** NUFFTs to add
    - [ ] The Julia NUFFT
    - [ ] The Airforce Research Lab (?) NUFFT

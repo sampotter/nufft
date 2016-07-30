@@ -36,5 +36,5 @@ nufft::util::zeros(int64_t num_elts)
 #endif // __NUFFT_UTIL_IMPL_HPP__
 
 // Local Variables:
-// indent-tabs-mode: p
+// indent-tabs-mode: nil
 // End:

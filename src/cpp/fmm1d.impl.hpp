@@ -147,8 +147,8 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_farfield_coefs(
     auto const max_parent_index = max_index / 2;
     
     for (int_t parent_index {0}; parent_index < max_parent_index; ++parent_index) {
-        auto workspace = util::zeros<range_t>(p); // TODO: move out of this loop
-        auto parent_box_coefs = util::zeros<range_t>(p);
+        vector_t<range_t> workspace(p, 0); // TODO: move out of loop
+        vector_t<range_t> parent_box_coefs(p, 0);
         auto const parent_center =
             get_box_center(parent_level, parent_index);
         
@@ -204,7 +204,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     validate_coefs(output_coefs); // TODO: maybe unnecessary
 #endif
 
-    auto workspace = util::zeros<range_t>(p);
+    vector_t<range_t> workspace(p, 0);
     for (int_t i {0}; i < max_key; ++i) {
         auto const center = get_box_center(level, i);
         auto const E4_neighbors = get_E4_neighbors(level, i);
@@ -216,7 +216,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
             auto const delta = center - neighbor_center;
             kernel_t::apply_SR_translation(input_coefs.at(n), workspace, delta, p);
             if (output_coefs.find(i) == std::cend(output_coefs)) {
-                output_coefs[i] = util::zeros<range_t>(p);
+                output_coefs[i] = vector_t<range_t> (p, 0);
             }
             for (int_t j {0}; j < p; ++j) {
                 output_coefs[i][j] += workspace[j];
@@ -251,7 +251,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
     verify_keys(parent_coefs, max_parent_index);
     verify_keys(child_coefs, std::pow(2, child_level));
 #endif
-    auto workspace = util::zeros<range_t>(p);
+    vector_t<range_t> workspace(p, 0);
     for (int_t i {0}; i < max_parent_index; ++i) {
         auto const parent_center = get_box_center(parent_level, i);
         auto const translate = [&parent_coefs,
@@ -265,7 +265,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
             auto const delta = child_center - parent_center;
             kernel_t::apply_RR_translation(parent_coefs.at(i), workspace, delta, p);
             if (child_coefs.find(j) == std::cend(child_coefs)) {
-                child_coefs[j] = util::zeros<range_t>(p);
+                child_coefs[j] = vector_t<range_t> (p, 0);
             }
             for (int_t k {0}; k < p; ++k) {
                 child_coefs[j][k] += workspace[k];

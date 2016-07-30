@@ -4,10 +4,10 @@
 #include <complex>
 #include <random>
 
-auto const NUM_VALUES = 1024;
-auto const NUM_NODES = 1024;
+auto const NUM_VALUES = 7198;
+auto const NUM_NODES = 7198;
 auto const NUM_TRIALS = 10;
-auto const FMM_DEPTH = 4;
+auto const FMM_DEPTH = 9;
 auto const TRUNC_NUM = 4;
 auto const NEIGHB_RAD = 3;
 
@@ -31,7 +31,8 @@ int main() {
 
 	for (int i = 0; i < NUM_TRIALS; ++i) {
 		randomize();
-		nufft::compute_P(values, nodes, NUM_VALUES, NUM_NODES, FMM_DEPTH,
-						 TRUNC_NUM, NEIGHB_RAD, output);
+		nufft::compute_P<double, double, int>(
+			values, nodes, NUM_VALUES, NUM_NODES, FMM_DEPTH,
+			TRUNC_NUM, NEIGHB_RAD, output);
 	}
 }

@@ -33,28 +33,6 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
 }
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
-nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::template vector_t<range_t>
-nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate_regular(
-    vector_t<domain_t> const & targets,
-    vector_t<range_t> const & coefs,
-    domain_t x_star,
-    int_t p)
-{
-#ifdef NUFFT_DEBUG
-    assert(0 <= x_star);
-    assert(x_star < 1);
-    assert(p > 0);
-    assert(std::size(targets) <= std::numeric_limits<int_t>::max());
-#endif
-    auto const num_targets = static_cast<int_t>(std::size(targets));
-    vector_t<range_t> sums(num_targets, 0);
-    for (int_t i {0}; i < num_targets; ++i) {
-        sums[i] = kernel_t::R(p, targets[i] - x_star, coefs.data());
-    }
-    return sums;
-}
-
-template <class kernel_t, class domain_t, class range_t, class int_t>
 typename nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::coefs_type
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_farfield_coefs(
     bookmarks<domain_t, int_t> const & source_bookmarks,

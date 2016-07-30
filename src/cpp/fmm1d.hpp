@@ -32,12 +32,6 @@ namespace nufft {
                             domain_t x_star,
                             int_t p);
 
-        static vector_t<range_t>
-        evaluate_regular(vector_t<domain_t> const & targets,
-                         vector_t<range_t> const & coefs,
-                         domain_t x_star,
-                         int_t p);
-
         static coefs_type
         get_finest_farfield_coefs(
             bookmarks<domain_t, int_t> const & source_bookmarks,

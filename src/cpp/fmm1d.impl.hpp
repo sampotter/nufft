@@ -203,8 +203,6 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     validate_coefs(input_coefs);
     validate_coefs(output_coefs); // TODO: maybe unnecessary
 #endif
-
-    vector_t<range_t> workspace(p, 0);
     for (int_t i {0}; i < max_key; ++i) {
         auto const center = get_box_center(level, i);
         auto const E4_neighbors = get_E4_neighbors(level, i);
@@ -212,15 +210,14 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
             if (input_coefs.find(n) == std::cend(input_coefs)) {
                 continue;
             }
-            auto const neighbor_center = get_box_center(level, n);
-            auto const delta = center - neighbor_center;
-            kernel_t::apply_SR_translation(input_coefs.at(n), workspace, delta, p);
             if (output_coefs.find(i) == std::cend(output_coefs)) {
                 output_coefs[i] = vector_t<range_t> (p, 0);
             }
-            for (int_t j {0}; j < p; ++j) {
-                output_coefs[i][j] += workspace[j];
-            }
+            kernel_t::apply_SR_translation(
+                input_coefs.at(n),
+                output_coefs[i],
+                center - get_box_center(level, n),
+                p);
         }
     }
 }

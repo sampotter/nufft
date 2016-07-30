@@ -12,21 +12,13 @@
 template <class kernel_t, class domain_t, class range_t, class int_t>
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::template vector_t<range_t>
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
-    vector_t<domain_t> const & sources,
-    vector_t<range_t> const & weights,
+    domain_t const * sources,
+    range_t const * weights,
+    int_t num_sources,
     domain_t x_star,
     int_t p)
 {
 #ifdef NUFFT_DEBUG
-    assert(std::size(sources) <= std::numeric_limits<int_t>::max());
-#endif
-    auto const num_sources = static_cast<int_t>(std::size(sources));
-#ifdef NUFFT_DEBUG
-    {
-        auto const num_weights = std::size(weights);
-        assert(num_weights <= std::numeric_limits<int_t>::max());
-        assert(num_sources == static_cast<int_t>(num_weights));
-    }
     assert(0 <= x_star);
     assert(x_star < 1);
     assert(p > 0);
@@ -80,41 +72,25 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_farfield_coefs(
     int_t max_level,
     int_t p)
 {
-    coefs_type coefs;
-
 #ifdef NUFFT_DEBUG
     assert(p > 0);
     assert(std::pow(2, max_level) <= std::numeric_limits<int_t>::max());
 #endif
+    coefs_type coefs;
     auto const max_index = static_cast<int_t>(std::pow(2, max_level));
-    
     for (int_t index {0}; index < max_index; ++index) {
         auto const opt_bookmark = source_bookmarks(max_level, index);
         if (!opt_bookmark) {
             continue;
         }
-
-        auto const left_index = opt_bookmark->first;
-        auto const right_index = opt_bookmark->second;
-
-        auto const sources_cbegin = std::cbegin(sources);
-        vector_t<domain_t> const box_sources(
-            sources_cbegin + left_index,
-            sources_cbegin + right_index + 1); // TODO: ugly
-
-        auto const weights_cbegin = std::cbegin(weights);
-        vector_t<range_t> const box_weights(
-            weights_cbegin + left_index,
-            weights_cbegin + right_index + 1); // TODO: ugly
-
-        auto const x_star = get_box_center(max_level, index);
-
-        auto const box_coefs = get_multipole_coefs(
-            box_sources, box_weights, x_star, p);
-
-        coefs[index] = box_coefs;
+        auto const left = opt_bookmark->first;
+        coefs[index] = get_multipole_coefs(
+            sources.data() + left,
+            weights.data() + left,
+            opt_bookmark->second - left + 1,
+            get_box_center(max_level, index),
+            p);
     }
-
     return coefs;
 }
 

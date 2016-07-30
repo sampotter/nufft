@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         -0.6047525248078208
     };
     auto const actual = fmm1d<cauchy<>>::get_multipole_coefs(
-        sources, weights, x_star, p);
+        sources.data(), weights.data(), sources.size(), x_star, p);
     
     BOOST_CHECK_EQUAL_COLLECTIONS(
         std::cbegin(actual),

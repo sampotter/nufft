@@ -26,8 +26,9 @@ namespace nufft {
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;
 
         static vector_t<range_t>
-        get_multipole_coefs(vector_t<domain_t> const & sources,
-                            vector_t<range_t> const & weights,
+        get_multipole_coefs(domain_t const * sources,
+                            range_t const * weights,
+                            int_t num_sources,
                             domain_t x_star,
                             int_t p);
 

@@ -166,7 +166,6 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
     };
 
     for (int_t i {0}; i < p; ++i) {
-        output[i] = 0;
         for (int_t j {0}; j < p; ++j) {
             output[i] += coefs[j] * deltas[j] * input[j];
         }

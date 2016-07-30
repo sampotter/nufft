@@ -44,22 +44,13 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate_regular(
     assert(0 <= x_star);
     assert(x_star < 1);
     assert(p > 0);
-#endif
-    
-    vector_t<domain_t> offset_targets(targets);
-    for (auto & offset_target: offset_targets) {
-        offset_target -= x_star;
-    }
-
-#ifdef NUFFT_DEBUG
     assert(std::size(targets) <= std::numeric_limits<int_t>::max());
 #endif
     auto const num_targets = static_cast<int_t>(std::size(targets));
     vector_t<range_t> sums(num_targets, 0);
     for (int_t i {0}; i < num_targets; ++i) {
-        sums[i] = kernel_t::R(p, offset_targets[i], coefs.data());
+        sums[i] = kernel_t::R(p, targets[i] - x_star, coefs.data());
     }
-
     return sums;
 }
 

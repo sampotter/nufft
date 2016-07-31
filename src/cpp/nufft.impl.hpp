@@ -8,6 +8,7 @@
 
 #include "cauchy.hpp"
 #include "fmm1d.hpp"
+#include "traits.hpp"
 
 template <class domain_t, class range_t, class int_t>
 nufft::nufft_error
@@ -21,6 +22,8 @@ nufft::compute_P(
 	int_t const neighborhood_radius,
 	std::complex<range_t> * const output)
 {
+	static_assert(!is_complex<domain_t> {});
+
 	// Some preliminaries:
 
 	auto const F = values;

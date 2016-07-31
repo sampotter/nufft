@@ -1,14 +1,18 @@
 #ifndef __NUFFT_HPP__
 #define __NUFFT_HPP__
 
+#include <cinttypes>
 #include <complex>
+#include <type_traits>
 
 namespace nufft {
 	enum class nufft_error: int {
 		success
 	};
 
-	template <class domain_t, class range_t, class int_t>
+	template <class domain_t = double,
+			  class range_t = double,
+			  class int_t = int64_t>
 	nufft_error compute_P(
 		std::complex<range_t> const * const values,
 		domain_t const * const nodes,

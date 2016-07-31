@@ -9,6 +9,7 @@
 
 #include "bookmarks.hpp"
 #include "index_manip.hpp"
+#include "traits.hpp"
 
 namespace nufft {
     template <class kernel_t,
@@ -16,6 +17,8 @@ namespace nufft {
               class range_t = double,
               class int_t = int64_t>
     struct fmm1d {
+        static_assert(!is_complex<domain_t> {});
+
         using index_manip_t = index_manip<domain_t, range_t, int_t>;
         static auto constexpr get_box_center = index_manip_t::get_box_center;
         static auto constexpr get_children = index_manip_t::get_children;

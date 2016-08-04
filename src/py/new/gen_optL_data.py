@@ -58,4 +58,13 @@ if __name__ == '__main__':
             print('  L = %d, t = %g (%d trials)' % (L, T[0], len(T)))
             timings[i, j] = T[0]
 
-    np.savez_compressed('optL.npz', Ks, Ls, timings)
+    with open('data_optL.dat', 'w') as f:
+        for i, K in enumerate(Ks):
+            for j, L in enumerate(Ls):
+                f.write('%d %d %g\n' % (K, L, timings[i, j]))
+            f.write('\n')
+
+    with open('data_optL_argmins.dat', 'w') as f:
+        for i, K in enumerate(Ks):
+            j = np.argmin(timings[i, :])
+            f.write('%d %d %g\n' % (K, Ls[j], timings[i, j]))

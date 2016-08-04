@@ -1,4 +1,3 @@
-import bisect
 import groundtruth
 import irt
 import nfft
@@ -7,23 +6,10 @@ import nufft
 import numpy as np
 import testfunc
 import time
+import util
 
 
 include_gt = False
-
-
-def time_adaptive(timer, ratio=0.9965, minreps=10, maxreps=100):
-    times = []
-    reps = 0
-    cond = True
-    while cond:
-        time = timer()
-        bisect.insort_left(times, time)
-        reps += 1
-        good_enough = times[0]/times[1] > ratio if reps > 1 else False
-        stop = reps >= maxreps or good_enough
-        cond = reps < minreps or not stop
-    return times
 
 
 # TODO: need to play with this a bit to figure out good parameters
@@ -42,24 +28,27 @@ def get_greengard_timing(pts, coefs):
 get_greengard_timing.ng = nufft_greengard.nufft_greengard()
 
 
-def get_nufft_timing(pts, coefs):
-    K = int(coefs.size/2)
-    Y = pts
-    L = 4
-    p = 4
-    n = 3
-    q = Y.size
-    shifted_coefs = np.fft.fftshift(coefs)
-    t0 = time.clock()
-    nufft.inufft(np.fft.ifft(shifted_coefs), K, Y, L, p, n, q)
-    return time.clock() - t0
-
-
-def get_nufft_cpp_timing(pts, coefs):
+def find_optimal_L(pts, coefs):
     F = np.fft.ifft(np.fft.fftshift(coefs))
     K = int(F.size/2)
     Y = pts
-    L = 4
+    p = 4
+    n = 3
+
+    L = 2
+    output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
+    while True:
+        t_prev = t
+        L += 1
+        output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
+        if t > t_prev:
+            return L - 1
+
+
+def get_nufft_cpp_timing(pts, coefs, L):
+    F = np.fft.ifft(np.fft.fftshift(coefs))
+    K = int(F.size/2)
+    Y = pts
     p = 4
     n = 3
     output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
@@ -78,44 +67,48 @@ def get_gt_timing(pts, coefs):
     return time.clock() - t0
 
 
-square = testfunc.SquareTestSeries()
-Ks = np.array([int(K) if K % 2 == 0 else int(K + 1)
-               for K in map(np.round, np.logspace(1, 3, 20))])
+if __name__ == '__main__':
+    square = testfunc.SquareTestSeries()
+    Ks = np.array([int(K) if K % 2 == 0 else int(K + 1)
+                   for K in map(np.round, np.logspace(1, 3, 20))])
+    num_sizes = len(Ks)
 
-num_sizes = len(Ks)
+    timing_methods = [
+        get_irt_timing,
+        get_potts_timing,
+        get_greengard_timing,
+        get_nufft_cpp_timing,
+        get_ifft_timing
+    ]
+    if include_gt:
+        timing_methods += [get_gt_timing]
+    timing_method_names = ['irt', 'potts', 'greengard', 'nufft', 'ifft']
+    if include_gt:
+        timing_method_names += ['gt']
+    num_timing_methods = len(timing_methods)
 
-timing_methods = [
-    get_irt_timing,
-    get_potts_timing,
-    get_greengard_timing,
-    get_nufft_timing,
-    get_nufft_cpp_timing,
-    get_ifft_timing
-]
-if include_gt:
-    timing_methods += [get_gt_timing]
+    timings = np.zeros((num_sizes, num_timing_methods))
+    for i, K in enumerate(Ks):
+        print('K = %d' % K)
+        coefs = square.get_coefs(K)
+        pts = np.sort(np.random.uniform(0, 2*np.pi, K))
+        for j, timing_method in enumerate(timing_methods):
+            if timing_method == get_nufft_cpp_timing:
+                L = find_optimal_L(pts, coefs)
+                times = util.time_adaptive(lambda: timing_method(pts, coefs, L))
+                print('  method: %s, time: %g (using L = %d, out of %d trials)'
+                      % (timing_method_names[j],
+                         times[0],
+                         L,
+                         len(times)))
+            else:
+                times = util.time_adaptive(lambda: timing_method(pts, coefs))
+                print('  method: %s, time: %g (out of %d trials)'
+                      % (timing_method_names[j],
+                         times[0],
+                         len(times)))
+            timings[i, j] = times[0]
 
-timing_method_names = ['irt', 'potts', 'greengard', 'nufft', 'nufft cpp',
-                       'ifft']
-if include_gt:
-    timing_method_names += ['gt']
-
-num_timing_methods = len(timing_methods)
-
-
-timings = np.zeros((num_sizes, num_timing_methods))
-
-for i, K in enumerate(Ks):
-    print('K = %d' % K)
-    coefs = square.get_coefs(K)
-    pts = np.sort(np.random.uniform(0, 2*np.pi, K))
-    for j, timing_method in enumerate(timing_methods):
-        times = time_adaptive(lambda: timing_method(pts, coefs))
-        print('  method: %s, time: %g (out of %d trials)'
-              % (timing_method_names[j],
-                 times[0],
-                 len(times)))
-        timings[i, j] = times[0]
-
-
-np.savez_compressed('timings.npz', Ks, timings)
+    for i, method_name in enumerate(timing_method_names):
+        np.savetxt('data_timings_%s.dat' % method_name,
+                   np.array([Ks, timings[:, i]]).T)

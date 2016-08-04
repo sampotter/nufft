@@ -8,6 +8,7 @@ thirdparty
 .juliahistory
 _region_*
 _*.py
+*.dat
 *.dylib
 *.npz
 *.mat

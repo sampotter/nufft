@@ -4,6 +4,8 @@
 #include <cassert>
 #include <cmath>
 
+#include "math.hpp"
+
 template <class domain_t, class range_t, class int_t>
 range_t
 nufft::cauchy<domain_t, range_t, int_t>::phi(
@@ -14,7 +16,8 @@ nufft::cauchy<domain_t, range_t, int_t>::phi(
 {
     range_t tmp {0};
     for (auto const i: indices) {
-        tmp += weights[i]/(y - sources[i]);
+        // tmp += weights[i]/(y - sources[i]);
+        add(tmp, mul(weights[i], domain_t {1}/(y - sources[i])));
     }
     return tmp;
 }
@@ -157,6 +160,9 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
         }
     };
 
+    // TODO: looks like coefs doesn't depend on input data, except for
+    // p---can we compute it more (space) efficiently, and without
+    // allocating?
     vector_t<domain_t> coefs(p, 1);
 
     auto const update_coefs = [&coefs, p] () {

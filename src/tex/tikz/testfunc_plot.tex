@@ -1,0 +1,63 @@
+\begin{tikzpicture}
+  \pgfplotstableread{../../py/new/data_testfunc_tri.dat}\tritable
+  \begin{axis}[
+    title=Triangle,
+    xmin=0,
+    xmax=6.28318530718]
+    \addplot+[smooth, mark=none] table[x=x, y=K4] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K5] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K6] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K7] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K8] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K9] {\tritable};
+    \addplot+[smooth, mark=none] table[x=x, y=K10] {\tritable};
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \pgfplotstableread{../../py/new/data_testfunc_square.dat}\squaretable
+  \begin{axis}[
+    title=Square,
+    xmin=0,
+    xmax=6.28318530718,
+    legend entries={$K = 4$, $K = 5$, $K = 6$, $K = 7$, $K = 8$,
+      $K = 9$, $K = 10$},
+    legend style={legend pos=north east}]
+    \addplot+[smooth, mark=none] table[x=x, y=K4] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K5] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K6] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K7] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K8] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K9] {\squaretable};
+    \addplot+[smooth, mark=none] table[x=x, y=K10] {\squaretable};
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \pgfplotstableread{../../py/new/data_testfunc_semi.dat}\semitable
+  \begin{axis}[
+    title=Semicircle,
+    xmin=0,
+    xmax=6.28318530718]
+    \addplot+[smooth, mark=none] table[x=x, y=K4] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K5] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K6] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K7] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K8] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K9] {\semitable};
+    \addplot+[smooth, mark=none] table[x=x, y=K10] {\semitable};
+  \end{axis}
+\end{tikzpicture}
+\begin{tikzpicture}
+  \pgfplotstableread{../../py/new/data_testfunc_saw.dat}\sawtable
+  \begin{axis}[
+    title=Sawtooth,
+    xmin=0,
+    xmax=6.28318530718]
+    \addplot+[smooth, mark=none] table[x=x, y=K4] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K5] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K6] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K7] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K8] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K9] {\sawtable};
+    \addplot+[smooth, mark=none] table[x=x, y=K10] {\sawtable};
+  \end{axis}
+\end{tikzpicture}

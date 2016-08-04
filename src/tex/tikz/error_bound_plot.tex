@@ -1,0 +1,12 @@
+\begin{tikzpicture}
+  \begin{axis}[
+    zmode=log,
+    view/az=150,
+    xlabel={$n$},
+    ylabel={$p$},
+    zlabel={Error}]
+    \addplot3[surf] file {../../py/new/data_error_bound.dat};
+    \addplot3+[only marks] file {../../py/new/data_error_bound_thresholds.dat};
+  \end{axis}
+\end{tikzpicture}
+

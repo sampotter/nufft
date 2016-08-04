@@ -87,8 +87,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_farfield_coefs(
 #endif
 
     coefs_type parent_coefs;
-    decltype(level) parent_level {level - 1};
-
+    auto const parent_level {level - 1};
     auto const max_parent_index = max_index / 2;
     
     for (int_t parent_index {0}; parent_index < max_parent_index; ++parent_index) {

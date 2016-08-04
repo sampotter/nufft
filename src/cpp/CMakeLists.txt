@@ -7,6 +7,8 @@ set (CMAKE_CXX_FLAGS_RELEASE "-O3")
 set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -g")
 
 find_package (Boost)
+find_package (Armadillo REQUIRED)
+include_directories ({$ARMADILLO_INCLUDE_DIRS})
 
 add_executable (bookmarks.test bookmarks.test.cpp bookmarks.hpp
   bookmarks.impl.hpp)
@@ -20,6 +22,7 @@ add_executable (fmm1d.test fmm1d.test.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
 add_executable (nufft.test nufft.test.cpp nufft.hpp nufft.impl.hpp nufft.cpp
   fmm1d.hpp fmm1d.impl.hpp cauchy.hpp cauchy.impl.hpp index_manip.hpp
   index_manip.impl.hpp bookmarks.hpp bookmarks.impl.hpp)
+target_link_libraries (nufft.test ${ARMADILLO_LIBRARIES})
 
 add_executable (fmm1d.perf fmm1d.perf.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
   cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
@@ -27,6 +30,7 @@ add_executable (fmm1d.perf fmm1d.perf.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
 add_executable (nufft.perf nufft.perf.cpp nufft.hpp nufft.impl.hpp nufft.cpp
   cauchy.hpp cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
   bookmarks.impl.hpp)
+target_link_libraries (nufft.perf ${ARMADILLO_LIBRARIES})
 
 add_library (fmm SHARED fmm.hpp fmm.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
   cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
@@ -34,6 +38,7 @@ add_library (fmm SHARED fmm.hpp fmm.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
 add_library (nufft SHARED nufft.hpp nufft.impl.hpp nufft.cpp cauchy.hpp
   cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
   bookmarks.impl.hpp)
+target_link_libraries (nufft ${ARMADILLO_LIBRARIES})
 
 enable_testing ()
 

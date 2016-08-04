@@ -340,6 +340,26 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
     evaluate(src_bookmarks, trg_bookmarks, target_coefs[max_level],
              output, sources, targets, weights, max_level, p);
 
+    // TODO: factor this out as a templatized algorithm for later use
+    // and testing
+    {
+        auto const M = std::size(sources);
+        auto const N = std::size(targets);
+        typename std::remove_const<decltype(M)>::type i {0};
+        typename std::remove_const<decltype(N)>::type j {0};
+        // TODO: we can remove a few checks in here for a bit of speed
+        while (i < M && j < N) {
+            while (i < M && j < N && sources[i] < targets[j]) ++i;
+            if (i < M && j < N && sources[i] == targets[j]) {
+                output[j++] = weights[i++];
+            }
+            while (i < M && j < N && targets[j] < sources[i]) ++j;
+            if (i < M && j < N && sources[i] == targets[j]) {
+                output[j++] = weights[i++];
+            }
+        }
+    }
+
     return output;
 }
 

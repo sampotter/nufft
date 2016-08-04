@@ -3,7 +3,6 @@
 
 #include <algorithm>
 #include <cmath>
-#include <random>
 #include <type_traits>
 
 #include "cauchy.hpp"
@@ -85,25 +84,12 @@ nufft::compute_P(
 	// Create array of checkpoints and their periodic offsets inside
 	// the scaled target domain.
 
-	std::vector<domain_t> Yc(2*N);
-	std::generate(
-		std::begin(Yc) + N,
-		std::end(Yc),
-		[n, num_cells_recip] () {
-			static auto const a = n*num_cells_recip;
-			static auto const b = (n + 1)*num_cells_recip;
-			static std::random_device dev {};
-			static std::mt19937 gen {dev()};
-			static std::uniform_real_distribution<domain_t> dist {a, b};
-			return dist(gen);
-		});
-	std::transform(
-		std::begin(Yc) + N,
-		std::end(Yc),
-		std::begin(Yc),
-		[num_cells_recip] (domain_t const & y) {
-			return y - num_cells_recip;
-		});
+	auto const num_cps = N;
+
+	std::vector<domain_t> Yc(2*num_cps);
+	for (int_t i = 0; i < 2*num_cps; ++i) {
+		Yc[i] = num_cells_recip*(n + (i + 0.5)/num_cps);
+	}
 #ifdef NUFFT_DEBUG
 	assert(std::is_sorted(std::cbegin(Y), std::cend(Y)));
 #endif
@@ -124,8 +110,8 @@ nufft::compute_P(
 		nufft::cauchy<domain_t, std::complex<range_t>, int_t>,
 		domain_t,
 		std::complex<range_t>,
-		int_t>::fmm(X_per, Y, Fas_per, L, p);
-	for (int_t i {0}; i < J; ++i) {
+		int_t>::fmm(X_per, Yc, Fas_per, L, p);
+	for (int_t i {0}; i < 2*num_cps; ++i) {
 		Vc[i] *= scale_factor;
 	}
 

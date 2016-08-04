@@ -5,6 +5,8 @@
 #include <cmath>
 #include <type_traits>
 
+#include <armadillo>
+
 #include "cauchy.hpp"
 #include "fmm1d.hpp"
 #include "traits.hpp"
@@ -115,16 +117,91 @@ nufft::compute_P(
 		Vc[i] *= scale_factor;
 	}
 
-	// TODO: compute phifar.
+	// Create Phi vector (full of phinear differences) for least
+	// squares collocation.
 
-	// TODO: fix output.
+	std::vector<std::complex<range_t>> Phi(num_cps);
+	for (int_t i {0}; i < num_cps; ++i) {
+		Phi[i] = Vc[i + num_cps] - Vc[i];
+	}
 
-	// TODO: finish interpolation.
+	// Allocate and populate fitting matrix R for collocation.
 
-	range_t const N_recip {1.0/static_cast<range_t>(N)};
+	std::vector<std::complex<range_t>> R(num_cps*p);
+	{
+		auto const pi = twopi/2;
+		auto const transform = [&] (domain_t const y) {
+			return twopi*(num_cells*y - n);
+		};
+		for (int_t l {0}; l < num_cps; ++l) {
+			for (int_t m {0}; m < p; ++m) {
+				R[l*p + m] = std::pow(transform(Yc[l + num_cps]) - pi, m);
+				R[l*p + m] -= std::pow(transform(Yc[l]) - pi, m);
+			}
+		}
+	}
+
+	// Compute coefficients C[1], C[2], ..., C[p-1] using R and
+	// Phi. Following that, compute C[0] using the "mean difference"
+	// method.
+	//
+	// TODO: For now, this uses the Armadillo matrix library. In the
+	// future, it should use a bespoke method that takes advantage of
+	// the problem structure.
+
+	std::vector<std::complex<range_t>> C(p, 0);
+	{
+		using namespace arma;
+
+		cx_mat R_mat(num_cps, p - 1);
+		for (int_t j = 0; j < p - 1; ++j) {
+			for (int_t i = 0; i < num_cps; ++i) {
+				R_mat(i, j) = R[i*p + j + 1];
+			}
+		}
+
+		cx_mat Phi_mat(num_cps, 1);
+		for (int_t i = 0; i < num_cps; ++i) {
+			Phi_mat(i) = Phi[i];
+		}
+
+		cx_mat const C_mat = pinv(R_mat)*Phi_mat;
+		for (int_t i = 1; i < p; ++i) {
+			C[i] = C_mat(i - 1);
+		}
+	}
+	{
+		std::complex<range_t> c0;
+		for (int_t i {0}; i < N; ++i) {
+			c0 += Vc[i];
+		}
+		C[0] = -c0/range_t(N);
+	}
+
+	// This lambda evaluates the phifar polynomial using the
+	// precomputed coefficients C[m].
+	//
+	// TODO: Modify this to use Horner's method, if that ends up being
+	// the fastest way to do this sort of thing.
+	//
+	// TODO: it may be good to just templatize a polynomial evaluation
+	// algorithm so that we can select the best one at compile time
+	// further on.
+
+	auto const phifar = [&] (domain_t const y) {
+		std::complex<range_t> tmp {0};
+		for (int_t m = 0; m < p; ++m) {
+			tmp += C[m]*std::pow(y, m);
+		}
+		return tmp;
+	};
+
+	// Finally, we apply the formula that finishes and computes the
+	// actual interpolated values.
+
 	for (int_t i {0}; i < J; ++i) {
-		auto const theta = K*nodes[i];
-		output[i] = N_recip*(-Fas_sum*std::cos(theta) + 2*std::sin(theta)*V[i]);
+		auto const node = nodes[i];
+		output[i] = std::sin(K*node)*(phifar(node) + V[i])/K;
 	}
 
 	return nufft_error::success;

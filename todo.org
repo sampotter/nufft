@@ -1,27 +1,47 @@
 * Todo
 ** Immediate todo
-   - [ ] Figure this bug out:
-#+BEGIN_SRC:
-K = 380
-  method: irt, time: 0.0176377 (out of 100 trials)
-  method: potts, time: 0.000340558 (out of 10 trials)
-  method: greengard, time: 0.000290388 (out of 28 trials)
-  method: nufft, time: 0.079888 (out of 14 trials)
-Assertion failed: (*std::min_element(std::cbegin(X_per), std::cend(X_per)) >= 0), function compute_P, file ../../nufft.impl.hpp, line 140.
-abort trap: 6
-#+END_SRC
-   - [ ] Generate plots using tikz
+   - [X] Fix error plots 
+   - [X] Add collocation to C++
+	 - [X] Add c0
+	 - [X] Add cm
+	   - [X] Try p-sized C instead of (p+1)-sized C in nufft.impl.hpp
+	   - [X] Try num_cps checkpoints... k
+	   - [X] Get it to work
+   - [ ] Check stuff in
+   - [ ] Print drafts and collect thoughts
+   - [ ] Get rid of K parameter
+   - [ ] Write up why checkpoint method works (i.e. related to Nyquist
+     and mean of bandlimited function and why using these particular
+     points makes the most sense)
+   - [ ] Find fast way to merge checkpoints into target points
+	 - and then make sure timings are improved
+   - [ ] remove ~num_cps~
+   - [ ] Make NUFFT use correct L
+   - [ ] Make note about how points in numerical tests were chosen:
+     i.e. uniformy distributed on [0, 2pi).
    - [ ] Add references in paper to other definitions (i.e. (38) in
      Fessler)
 	 - [ ] Rewrite section to use IDFT consistent with (38)
+   - [ ] Read up on how the Greengard method works and hand-wave about
+     why we don't need to compare with it
+   - [ ] Make sure all the libraries I'm comparing with are built the
+     same:
+	 - [ ] Singlethreaded
+	 - [ ] Same compiler flags
+	 - [ ] Build Greengard library myself for timing purposes
    - [ ] Add reference to that sinc interpolation/bandlimited note!
    - [ ] elpy
    - [ ] Test [-N/2, ..., N/2) with [0, ..., N) but for my test funcs
    - [ ] Use -⌊K/2⌋, ..., ⌈K/2⌉ instead of
-   - [ ] Move timer into C++ timer wrapper for timing NUFFT C++
+   - [X] Move timer into C++ timer wrapper for timing NUFFT C++
    - [ ] Make sure no multiplications in nufft.impl.hpp are
      inefficient std::complex multiplications
    - [ ] Correct reference for [[http://www.embedded.com/design/real-time-and-performance/4007256/Digital-Signal-Processing-Tricks--Fast-multiplication-of-complex-numbers][this citation]]
+   - [ ] Figure out why we're getting weird errors with NFFT
+   - [ ] Get rid of old Python dir
+   - [ ] Find journals to submit to
+	 - [ ] Get LaTeX templates---deal with all that...
+   - [ ] Get Makefile to rebuild all of this plotting stuff correctly
 ** NUFFTs to add
    - [ ] The Julia NUFFT
    - [ ] The Airforce Research Lab (?) NUFFT
@@ -29,20 +49,41 @@ abort trap: 6
 ** NUFFT
    - [ ] Make Python NUFFT use complex numbers with its
      FMM... (weights and output values)
-   - [ ] Add C++ NUFFT to nufft.py
+   - [X] Add C++ NUFFT to nufft.py
    - [ ] Add least squares collocation to C++ NUFFT
    - [ ] Get C++ unit tests working
    - [ ] Add unit test for C++ NUFFT in nufft.py
    - [ ] Figure out what the invalid value in np.multiply is
    - [ ] Get FMM to use new c0 estimation method
    - [ ] Change least squares to upper triangular approach
+   - [ ] Another optimization to try:
+	 - Using two FMMs may be slower. To get around this, here are two
+       ideas:
+	   - Choose optimal L separately for nodes and checkpoints
+	   - Try this algorithm:
+		 1. Create checkpoints in sorted order
+		 2. Iterate over nodes, insert checkpoints
+		 3. Use a stable sort to unsort (i.e. let nodes = 0 and cps =
+            1 or something like this)
 ** Plots
-   - [ ] Plots comparing checkpoint methods
-   - [ ] Time vs. problem size vs. method (fixed error)
-   - [ ] Error vs. problem size vs. method (fixed time)
-   - [ ] Time/error vs. problem size... where number of source/target
-     points are alternatingly fixed
-   - [ ] Correct digits vs. radians vs. method (fixed... what?)
+   - [X] Remove greengard from error plots
+   - [ ] Potts' error vs bandlimit to figure out what the
+     weirdness is all about
+	 - [ ] For different test functions
+   - [X] Time vs. problem size vs. method (fixed error)
+   - [X] Error vs. problem size vs. method (fixed time)
+	 - [X] ℓ∞
+	 - [X] ℓ₂
+   - [ ] Plot of error bound in terms of L and p vs plot of actual
+     error in terms of L and p (use scatter plot markers for some kind
+     of threshold... e.g. choice of L for each p guaranteeing some
+     error threshold)
+   - [-] Correct digits vs. radians vs. method (fixed... what?)
+	 - [X] It looks like this actually varies fairly substantially for
+       different test series—so, include plots for different test
+       series!
+	 - [ ] Fix xticks
+   - [X] Problem size vs. optimal L (3D plot?)
 ** Analysis
    - [ ] Figure out optimal P-by-P fitting matrix for upper triangular
      approach using explicit forms that we have...
@@ -143,9 +184,9 @@ abort trap: 6
    	 - [ ] SSE/SIMD?
    	 - [ ] use a heap for the index finder?
 **** Implementation-specific
-	 - [ ] Coalesce X and X_per (i.e. X is contained in X_per, so it's
+	 - [X] Coalesce X and X_per (i.e. X is contained in X_per, so it's
        redundant)
-	 - [ ] Also redundant: computing X_per and then scaling X_per---we
+	 - [X] Also redundant: computing X_per and then scaling X_per---we
        can compute it directly.
 	 - [ ] Look into whether or not computing values of X_per and
        Fas_per on the fly would be more efficient than storing them
@@ -160,6 +201,12 @@ abort trap: 6
          there" as a nonsense value---i.e. if we require first <=
          second, then choosing some value (e.g. (1, 0)) s.t. first >
          second would encode "not there".
+     - [ ] Add more SFINAE overloads for addition and multiplication
+       (accumulation-style)
+     - [ ] Use SFINAE overloads throughout cauchy.impl.hpp
+     - [ ] Try [[http://stackoverflow.com/questions/4638473/how-to-powreal-real-in-x86][this answer]] out in cauchy.impl.hpp—will need to figure
+       out a way to conditionally compile code depending on if the
+       instruction set is X86
 **** Future optimizations
 	 - [ ] Compute checkpoint FMM directly if there are few enough checkpoints?
 	 - [ ] We could also use a different FMM (i.e. in terms of

@@ -47,7 +47,7 @@ end
             return
         else:
             os.remove(filename)
-            return np.array(out['Y']), out['t']
+            return np.array(out['Y']).T[0], out['t']
 
     def inufft(self, interp_pts, coefs, N, J, K):
         '''This method uses the nufft method to compute the inufft. To get the

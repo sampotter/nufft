@@ -41,4 +41,4 @@ end
             return
         else:
             _os.remove(filename)
-            return _np.array(out['Y']), out['t']
+            return _np.array(out['Y']).T[0], out['t']

@@ -1250,3 +1250,47 @@ BOOST_AUTO_TEST_CASE (square_K380) {
 	compute_P_ddi(values, nodes, num_values, num_nodes, L, p, n,
 				  reinterpret_cast<double *>(output));
 }
+
+BOOST_AUTO_TEST_CASE (repeated_calls_work) {
+	double values[] = {
+		0.00000000e+00,
+		+0.0127324,
+		1.15203235e-01,
+		-0.0127324,
+		9.61458957e-02,
+		+0.0127324,
+		9.61458957e-02,
+		-0.0127324,
+		1.15203235e-01,
+		+0.0127324,
+		6.10622664e-17,
+		-0.0127324,
+		-1.15203235e-01,
+		+0.0127324,
+		-9.61458957e-02,
+		-0.0127324,
+		-9.61458957e-02,
+		+0.0127324,
+		-1.15203235e-01,
+		-0.0127324
+	};
+	double nodes[] = {
+		0.38590212,
+		1.08129607,
+		2.47813649,
+		2.88008487,
+		3.04224638,
+		3.90145334,
+		4.2206729,
+		5.05467757,
+		5.61937317,
+		6.16711612
+	};
+	int L = 4;
+	int p = 4;
+	int n = 3;
+	double output[20];
+	for (int i = 0; i < 100; ++i) {
+		compute_P_ddi(values, nodes, 10, 10, L, p, n, output);
+	}
+}

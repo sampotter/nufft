@@ -1294,3 +1294,25 @@ BOOST_AUTO_TEST_CASE (repeated_calls_work) {
 		compute_P_ddi(values, nodes, 10, 10, L, p, n, output);
 	}
 }
+
+BOOST_AUTO_TEST_CASE (sawtooth_coefs) {
+	double nodes[] = {
+		0.0, 0.78539816, 1.57079633, 2.35619449, 3.14159265, 3.92699082,
+		4.71238898, 5.49778714
+	};
+	double values[] = {
+		0.5, 0.0,
+		0.04073962, 0.0,
+		0.28779341, 0.0,
+		0.3590495, 0.0,
+		0.5, 0.0,
+		0.6409505, 0.0,
+		0.71220659, 0.0,
+		0.95926038, 0.0
+	};
+	int L = 4;
+	int p = 3;
+	int n = 3;
+	double output[16];
+	compute_P_ddi(values, nodes, 8, 8, L, p, n, output);
+}

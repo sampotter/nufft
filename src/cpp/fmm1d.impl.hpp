@@ -6,7 +6,7 @@
 #endif
 
 #include "index_manip.hpp"
-#include "multiply.hpp"
+#include "math.hpp"
 #include "util.hpp"
 
 template <class kernel_t, class domain_t, class range_t, class int_t>

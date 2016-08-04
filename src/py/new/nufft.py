@@ -163,7 +163,7 @@ def _get_phifar(X, Y, Yc, Yc_tilde, F, K, f, p, n, q):
 def _finish_interpolation(Y, F, phi, K, N, Fas_sum):
     '''This function takes care of the last couple steps: it modulates the
     result by the sine-based factor and sets any values that were too
-    close source points to the corresponding weight (i.e. function
+    close to source points to the corresponding weight (i.e. function
     value).
 
     '''

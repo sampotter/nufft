@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+  \begin{loglogaxis}[
+    xlabel={$K$},
+    ylabel={Time (s.)},
+    legend entries={Greengard, IRT, NUFFT, NFFT, IFFT},
+    legend style={
+      at={(1.03, 0.5)},
+      anchor=west
+    }]
+    \addplot table {../../py/new/data_timings_greengard.dat};
+    \addplot table {../../py/new/data_timings_irt.dat};
+    \addplot table {../../py/new/data_timings_nufft.dat};
+    \addplot table {../../py/new/data_timings_potts.dat};
+    \addplot table {../../py/new/data_timings_ifft.dat};
+  \end{loglogaxis}
+\end{tikzpicture}

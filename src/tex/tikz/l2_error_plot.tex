@@ -1,0 +1,16 @@
+\begin{tikzpicture}
+  \begin{loglogaxis}[
+    title={$\ell_2$ Error},
+    xlabel={$K$},
+    ylabel={Error},
+    legend entries={Greengard, IRT, NUFFT, NFFT},
+    legend style={
+      at={(1.03, 0.5)},
+      anchor=west
+    }]
+    \addplot table {../../py/new/data_l2_error_greengard.dat};
+    \addplot table {../../py/new/data_l2_error_irt.dat};
+    \addplot table {../../py/new/data_l2_error_nufft.dat};
+    \addplot table {../../py/new/data_l2_error_potts.dat};
+  \end{loglogaxis}
+\end{tikzpicture}

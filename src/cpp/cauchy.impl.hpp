@@ -16,7 +16,6 @@ nufft::cauchy<domain_t, range_t, int_t>::phi(
 {
     range_t tmp {0};
     for (auto const i: indices) {
-        // tmp += weights[i]/(y - sources[i]);
         add(tmp, mul(weights[i], domain_t {1}/(y - sources[i])));
     }
     return tmp;

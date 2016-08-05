@@ -23,7 +23,6 @@ namespace nufft {
         static auto constexpr get_box_center = index_manip_t::get_box_center;
         static auto constexpr get_children = index_manip_t::get_children;
         static auto constexpr get_E4_neighbors = index_manip_t::get_E4_neighbors;
-        static auto constexpr get_E2_neighbors = index_manip_t::get_E2_neighbors;
 
         template <class T> using vector_t = std::vector<T>;
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;

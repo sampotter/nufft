@@ -12,7 +12,6 @@ using index_manip_t = nufft::index_manip<>;
 auto constexpr get_parent = index_manip_t::get_parent;
 auto constexpr get_children = index_manip_t::get_children;
 auto constexpr get_sibling = index_manip_t::get_sibling;
-auto constexpr get_E2_neighbors = index_manip_t::get_E2_neighbors;
 auto constexpr get_E4_neighbors = index_manip_t::get_E4_neighbors;
 auto constexpr get_box_index = index_manip_t::get_box_index;
 auto constexpr get_box_center = index_manip_t::get_box_center;
@@ -62,32 +61,6 @@ BOOST_AUTO_TEST_CASE (get_sibling_works) {
     BOOST_TEST(get_sibling(5) == 4);
     BOOST_TEST(get_sibling(6) == 7);
     BOOST_TEST(get_sibling(7) == 6);
-}
-
-BOOST_AUTO_TEST_CASE (get_E2_neighbors_works) {
-    auto const compare = [] (int_t level,
-                             int_t index,
-                             vector_t<int_t> other) {
-        auto const N = get_E2_neighbors(level, index);
-        BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(N), std::cend(N),
-                                      std::cbegin(other), std::cend(other));
-    };
-
-    compare(0, 0, {0});
-    compare(1, 0, {0, 1});
-    compare(1, 1, {0, 1});
-    compare(2, 0, {0, 1});
-    compare(2, 1, {0, 1, 2});
-    compare(2, 2, {1, 2, 3});
-    compare(2, 3, {2, 3});
-    compare(3, 0, {0, 1});
-    compare(3, 1, {0, 1, 2});
-    compare(3, 2, {1, 2, 3});
-    compare(3, 3, {2, 3, 4});
-    compare(3, 4, {3, 4, 5});
-    compare(3, 5, {4, 5, 6});
-    compare(3, 6, {5, 6, 7});
-    compare(3, 7, {6, 7});
 }
 
 BOOST_AUTO_TEST_CASE (get_E4_neighbors_works) {

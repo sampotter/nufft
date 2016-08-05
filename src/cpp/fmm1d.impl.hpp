@@ -1,6 +1,8 @@
 #ifndef __NUFFT_FMM1D_IMPL_HPP__
 #define __NUFFT_FMM1D_IMPL_HPP__
 
+#include <algorithm>
+
 #ifdef NUFFT_DEBUG
 #    include <boost/range/adaptor/map.hpp>
 #endif
@@ -258,7 +260,9 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
 
         // TODO: this can very likely be greatly simplified
         vector_t<int_t> direct_indices;
-        for (auto const j: get_E2_neighbors(max_level, i)) {
+        for (int_t j {std::max(int_t {0}, i - 1)};
+             j < std::min(static_cast<int_t>(max_index), i + 2);
+             ++j) {
             auto const opt = source_bookmarks(max_level, j);
             if (!opt) {
                 continue;

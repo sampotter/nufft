@@ -37,34 +37,6 @@ nufft::index_manip<domain_t, range_t, int_t>::get_sibling(int_t index)
 }
 
 template <class domain_t, class range_t, class int_t>
-nufft::index_manip<domain_t, range_t, int_t>::vector_t<int_t>
-nufft::index_manip<domain_t, range_t, int_t>::get_E2_neighbors(
-    int_t level,
-    int_t index)
-{
-    auto const max_index = std::pow(2, level);
-#if DEBUG
-    assert(index >= 0);
-    assert(index < max_index);
-#endif
-    vector_t<int_t> neighbors {};
-    {
-        auto const left_index = index - 1;
-        if (left_index >= 0) {
-            neighbors.push_back(left_index);
-        }
-    }
-    neighbors.push_back(index);
-    {
-        auto const right_index = index + 1;
-        if (right_index < max_index) {
-            neighbors.push_back(right_index);
-        }
-    }
-    return neighbors;
-}
-
-template <class domain_t, class range_t, class int_t>
 void
 nufft::index_manip<domain_t, range_t, int_t>::get_E4_neighbors(
     int_t index,

@@ -18,8 +18,6 @@ namespace nufft {
     
         static int_t get_sibling(int_t index);
     
-        static vector_t<int_t> get_E2_neighbors(int_t level, int_t index);
-    
         static void get_E4_neighbors(int_t index, int_t * neighbors);
     
         static int_t get_box_index(domain_t elt, int_t level);

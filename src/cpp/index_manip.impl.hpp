@@ -65,34 +65,23 @@ nufft::index_manip<domain_t, range_t, int_t>::get_E2_neighbors(
 }
 
 template <class domain_t, class range_t, class int_t>
-nufft::index_manip<domain_t, range_t, int_t>::vector_t<int_t>
+void
 nufft::index_manip<domain_t, range_t, int_t>::get_E4_neighbors(
-    int_t level,
-    int_t index)
+    int_t index,
+    int_t * neighbors)
 {
 #if DEBUG
-    assert(level >= 2);
     assert(index >= 0);
-    assert(index < std::pow(2, level));
 #endif
-
-    vector_t<int_t> neighbors;
-    auto const parent_neighbors = get_E2_neighbors(level - 1, get_parent(index));
-    for (auto const neighbor: parent_neighbors) {
-        auto const children = get_children(neighbor);
-        neighbors.push_back(children.first);
-        neighbors.push_back(children.second);
+    if (index % 2 == 0) {
+        neighbors[0] = index - 2;
+        neighbors[1] = index + 2;
+        neighbors[2] = index + 3;
+    } else {
+        neighbors[0] = index - 3;
+        neighbors[1] = index - 2;
+        neighbors[2] = index + 2;
     }
-
-    auto const E2_neighbors = get_E2_neighbors(level, index);
-    vector_t<int_t> E4_neighbors;
-    std::set_difference(
-        std::cbegin(neighbors),
-        std::cend(neighbors),
-        std::cbegin(E2_neighbors),
-        std::cend(E2_neighbors),
-        std::back_inserter(E4_neighbors));
-    return E4_neighbors;
 }
 
 template <class domain_t, class range_t, class int_t>

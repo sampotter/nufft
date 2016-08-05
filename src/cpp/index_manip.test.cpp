@@ -91,26 +91,28 @@ BOOST_AUTO_TEST_CASE (get_E2_neighbors_works) {
 }
 
 BOOST_AUTO_TEST_CASE (get_E4_neighbors_works) {
-    auto const compare = [] (int_t level,
-                             int_t index,
-                             vector_t<int_t> other) {
-        auto const N = get_E4_neighbors(level, index);
-        BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(N), std::cend(N),
+    auto const compare = [] (int_t index, vector_t<int_t> other) {
+        int_t N[3];
+        get_E4_neighbors(index, N);
+        BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(N), std::cbegin(N) + 3,
                                       std::cbegin(other), std::cend(other));
     };
 
-    compare(2, 0, {2, 3});
-    compare(2, 1, {3});
-    compare(2, 2, {0});
-    compare(2, 3, {0, 1});
-    compare(3, 0, {2, 3});
-    compare(3, 1, {3});
-    compare(3, 2, {0, 4, 5});
-    compare(3, 3, {0, 1, 5});
-    compare(3, 4, {2, 6, 7});
-    compare(3, 5, {2, 3, 7});
-    compare(3, 6, {4});
-    compare(3, 7, {4, 5});
+    // level = 2
+    compare(0, {-2, 2, 3});
+    compare(1, {-2, -1, 3});
+    compare(2, {0, 4, 5});
+    compare(3, {0, 1, 5});
+
+    // level = 3
+    compare(0, {-2, 2, 3});
+    compare(1, {-2, -1, 3});
+    compare(2, {0, 4, 5});
+    compare(3, {0, 1, 5});
+    compare(4, {2, 6, 7});
+    compare(5, {2, 3, 7});
+    compare(6, {4, 8, 9});
+    compare(7, {4, 5, 9});
 }
 
 BOOST_AUTO_TEST_CASE (get_box_index_works) {

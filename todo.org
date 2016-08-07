@@ -1,15 +1,8 @@
 * Todo
 ** Immediate todo
-   - [ ] Remove crossed out TODO items from paper
-   - [ ] Remove checkpoint distribution section
-   - [ ] Remove error analysis section
-   - [ ] Use printable color palette
-   - [ ] FMM plot
-	 - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
-	 - [ ] Label:
-	   - [ ] Translation operators
-	   - [ ] Direct summation bins
-	   - [ ] Far summation bins
+   - [X] Remove crossed out TODO items from paper
+   - [X] Remove checkpoint distribution section
+   - [X] Remove error analysis section
    - [ ] Use DSP notation for frequencies (better)
    - [ ] Numerical results section
 	 - [ ] Explanation of test functions
@@ -60,11 +53,19 @@
    - [ ] Prove things in appendix
    - [ ] Replace square or triangle with some complex test
      function? (check Fourier book)
+   - [ ] FMM plot
+	 - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
+	 - [ ] Label:
+	   - [ ] Translation operators
+	   - [ ] Direct summation bins
+	   - [ ] Far summation bins
 ** Next todo
    - [ ] Figure out if we can analytically evaluate c0
 	 - [ ] Debug the analytic evaluation
 	 - [ ] Write it up
    - [ ] Get rid of K parameter
+   - [ ] Figure out if we're missing out on anything by not using
+     autotools---can CMake deduce the same flags for optimization?
    - [ ] Remove use of boost::optional
    - [ ] Make bookmarks_t a template argument
    - [ ] Make "linspace bookmarks" for linearly spaced sources

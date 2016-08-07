@@ -20,26 +20,6 @@ poorly conditioned fitting matrix. As our matrix decomposition
 requires us to fix $\persumindex$ for each $\phiargcp_\cpindex$, we simply let
 $\persumindex = \pm 1$.
 
-\begin{itemize}
-\item \TODO\ add section that gets into the condition number of the
-  fitting matrix, and talks about how to choose checkpoints based off
-  of this.
-\item \TODO\ add figure of wacky interpolated polynomials that are all
-  screwed up.
-\item \TODO\ compute actual determinant and do a little smarter
-  analysis---determinant of $\uppertrifactor$ is just $\truncnum!$.
-\item \TODO\ it's probably possible to bound the determinant (and also
-  $\kappa$) by using the above two bits. Don't forget about inverse
-  vs. normal matrix\ldots
-\item \TODO\ does replacing $y_l$ with $z_l$ improve the condition
-  number?
-\item \TODO\ This might be a little wrong\ldots Determinants don't really
-  seem to be related to the condition number. Look into some
-  references for this.
-\item \TODO\ Add plot of $\log_{10}(\kappa(\m{R}))$ (approximation of
-  number of digits lost).
-\end{itemize}
-
 %%% Local Variables:
 %%% mode: latex
 %%% TeX-master: "../paper.tex"

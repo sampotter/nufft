@@ -2,16 +2,36 @@
 ** Immediate todo
    - [ ] Remove crossed out TODO items from paper
    - [ ] Remove checkpoint distribution section
+   - [ ] Remove error analysis section
    - [ ] Use printable color palette
-   - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
+   - [ ] FMM plot
+	 - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
+	 - [ ] Label:
+	   - [ ] Translation operators
+	   - [ ] Direct summation bins
+	   - [ ] Far summation bins
    - [ ] Use DSP notation for frequencies (better)
    - [ ] Numerical results section
 	 - [ ] Explanation of test functions
 	 - [ ] Add formulae for test functions
 	 - [ ] Compare linf error plots (point out different regimes)
+	 - [ ] Reference methods that we compare with
+	 - [ ] Discuss timing results
+	 - [ ] Discuss optimal L results
    - [ ] Figure out why we shouldn't compare w/ Greengard
-   - [ ] Add sinc/Dirichlet kernel formulation of interpolation
-     problem
+   - [ ] Conclusion
+	 - [ ] Add a summary of results
+	 - [ ] Future work:
+	   - [ ] Constant-Q transform
+	   - [ ] Stencil for adaptive FMM/FMRI
+	   - [ ] Qi Hu's approach to heterogeneous FMM
+	   - [ ] Chebyshev basis instead of monomial basis
+		 - [ ] Find reference
+	   - [ ] Multiple dimensions
+   - [ ] NUFFT section
+	 - [ ] Add sinc/Dirichlet kernel formulation of interpolation
+       problem
+	 - [ ] Incorporate "DFT frequency sets" terminology
    - [ ] Add periodic summation necessary conditions to paper
 	 - [ ] Try and simplify error bound
 	 - [ ] Move 3D plot in with these guys and point to it
@@ -20,7 +40,14 @@
 	 - [ ] Do NUFFT complexity
    - [ ] Add analytic approach to evaluating c0
    - [ ] Computing of c_m, m > 0
-	 - [ ] Try approach detailed in edited paper
+	 - [ ] Try this approach: since inverting V is a poly. fitting
+       problem on [-pi, pi], we could use the corresponding Chebyshev
+       nodes to fit our polynomial. This would require evaluating
+       phinear at these nodes, but this isn't much overhead---we could
+       probably design a sort/unsort to deal with this relatively
+       easily. Need to bear in mind where we're actually evaluating
+       phinear (should be something like pi*chebnode + pi---verify in
+       Mathematica).
 	 - [ ] Add plot comparing different approaches. Specifically, if
        the previous approach works and solves our problems, plot on a
        log axis w/ domain [0, 2pi), abs diff between ground truth and

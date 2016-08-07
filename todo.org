@@ -1,5 +1,48 @@
 * Todo
 ** Immediate todo
+   - [ ] Remove crossed out TODO items from paper
+   - [ ] Remove checkpoint distribution section
+   - [ ] Use printable color palette
+   - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
+   - [ ] Use DSP notation for frequencies (better)
+   - [ ] Numerical results section
+	 - [ ] Explanation of test functions
+	 - [ ] Add formulae for test functions
+	 - [ ] Compare linf error plots (point out different regimes)
+   - [ ] Figure out why we shouldn't compare w/ Greengard
+   - [ ] Add sinc/Dirichlet kernel formulation of interpolation
+     problem
+   - [ ] Add periodic summation necessary conditions to paper
+	 - [ ] Try and simplify error bound
+	 - [ ] Move 3D plot in with these guys and point to it
+   - [ ] Complexity analysis
+	 - [ ] Edit and add FMM complexity from writeup
+	 - [ ] Do NUFFT complexity
+   - [ ] Add analytic approach to evaluating c0
+   - [ ] Computing of c_m, m > 0
+	 - [ ] Try approach detailed in edited paper
+	 - [ ] Add plot comparing different approaches. Specifically, if
+       the previous approach works and solves our problems, plot on a
+       log axis w/ domain [0, 2pi), abs diff between ground truth and
+       (for fixed n, e.g. n = 4):
+	   - [ ] The approach
+	   - [ ] Least squares fitting as suggested in paper, with nodes
+         drawn from each of the individual radial neighborhood cells
+	   - [ ] Coefficients computed using Remez algorithm
+	 - [ ] Make note about why Remez algorithm is unsuitable
+   - [ ] Prove things in appendix
+   - [ ] Replace square or triangle with some complex test
+     function? (check Fourier book)
+** Next todo
+   - [ ] Figure out if we can analytically evaluate c0
+	 - [ ] Debug the analytic evaluation
+	 - [ ] Write it up
+   - [ ] Get rid of K parameter
+   - [ ] Remove use of boost::optional
+   - [ ] Make bookmarks_t a template argument
+   - [ ] Make "linspace bookmarks" for linearly spaced sources
+	 - N.B.: could use this for evaluating the checkpoints,
+       too... might be worth looking into
    - [X] Fix error plots 
    - [X] Add collocation to C++
 	 - [X] Add c0
@@ -7,15 +50,13 @@
 	   - [X] Try p-sized C instead of (p+1)-sized C in nufft.impl.hpp
 	   - [X] Try num_cps checkpoints... k
 	   - [X] Get it to work
-   - [ ] Check stuff in
-   - [ ] Print drafts and collect thoughts
-   - [ ] Get rid of K parameter
-   - [ ] Write up why checkpoint method works (i.e. related to Nyquist
+   - [X] Check stuff in
+   - [X] Print drafts and collect thoughts
+   - [X] Write up why checkpoint method works (i.e. related to Nyquist
      and mean of bandlimited function and why using these particular
      points makes the most sense)
    - [ ] Find fast way to merge checkpoints into target points
 	 - and then make sure timings are improved
-   - [ ] remove ~num_cps~
    - [ ] Make NUFFT use correct L
    - [ ] Make note about how points in numerical tests were chosen:
      i.e. uniformy distributed on [0, 2pi).

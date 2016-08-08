@@ -1,5 +1,55 @@
 \section{Future Work}
 
+In this work, we extend and further develop an existing method for
+computing the nonuniform FFT, as originally analyzed
+in~\cite{Dutt95fastfourierII}. In the original analysis, the method is
+mostly passed over in favor of the algorithms derived
+in~\cite{dutt-rokhlin-nufft-I}. As demonstrated by the highly
+successful NUFFT library, those methods are indeed useful and
+powerful. Our work applies results derived in~\cite{periodic-sums} to
+make the method presented in~\cite{Dutt95fastfourierII} significantly
+more precise, for negligible added runtime cost (in asymptotic terms,
+but also in terms of a real implementation). The work establishes the
+viability of the FMM as applied to the nonuniform FFT, laying the
+ground for future developments. In particular, as the core of the
+algorithm makes use of a generic 1D FMM, any improvements to such an
+FMM could profitably be exploited by the NUFFT.\@ Such improvements
+may be application dependent.
+
+Due to the low communication costs of the FMM, it is well-suited to
+parallel implementation, and parallel CPU, GPU~\cite{gumerov2008fast},
+heterogeneous CPU/GPU~\cite{qi-hu-thesis}, and distributed
+implementations exist and have been investigated to varying
+degrees. Our initial implementation was single-threaded and
+comparisons were done with other libraries that were compiled to run
+in a single thread.
+
+With respect to parallel implementations of the FMM, most development
+has been around ``uniform'' FMMs---those whose underlying translation
+trees are computed to a uniform depth. Research has gone into
+so-called adaptive FMMs (e.g.~\cite{fmm-helmholtz, adaptive-fmm}), but
+parallel adaptive FMMs have not been research as intensively, due to
+the recursive nature of the adaptive FMM.\@ However, as many
+applications of the nonuniform FFT involve fixed sets of target
+points, precomputation of the translation trees of adaptive FMMs may
+prove to be a good match for the parallel nonuniform FFT.\@ Some
+examples of such applications include non-Cartesian MRI, which employs
+nonuniform grids in order to speed scanning patterns. Other such
+applications exist---in audio signal processing, the constant-$Q$
+transform requires a fixed, logarithmic grid of target points for a
+given frequency ratio~\cite{constant-q}.
+
+Finally, the strategy of our implementation is to take advantage of
+the well-developed and existing research surrounding the FMM.\@ Common
+kernels have been researched intensively, and the Cauchy kernel is no
+exception. While our implementation takes advantage of the
+straightforward (but perhaps somewhat na\"{\i}ve) $R$-expansions and
+$S$-expansions that come by way of the Taylor series expansion of the
+Cauchy kernel, other methods will be investigated---for instance, a
+Chebyshev expansion-based approach is presented in~\cite{dutt1996fast}
+which has tighter error bounds.
+
+
 % Local Variables:
 % TeX-master: "../paper.tex"
 % indent-tabs-mode: nil

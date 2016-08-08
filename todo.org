@@ -3,35 +3,36 @@
    - [X] Remove crossed out TODO items from paper
    - [X] Remove checkpoint distribution section
    - [X] Remove error analysis section
-   - [ ] Use DSP notation for frequencies (better)
-   - [ ] Numerical results section
-	 - [ ] Explanation of test functions
-	 - [ ] Add formulae for test functions
-	 - [ ] Compare linf error plots (point out different regimes)
-	 - [ ] Reference methods that we compare with
-	 - [ ] Discuss timing results
-	 - [ ] Discuss optimal L results
-   - [ ] Figure out why we shouldn't compare w/ Greengard
-   - [ ] Conclusion
-	 - [ ] Add a summary of results
-	 - [ ] Future work:
-	   - [ ] Constant-Q transform
-	   - [ ] Stencil for adaptive FMM/FMRI
-	   - [ ] Qi Hu's approach to heterogeneous FMM
-	   - [ ] Chebyshev basis instead of monomial basis
-		 - [ ] Find reference
-	   - [ ] Multiple dimensions
-   - [ ] NUFFT section
-	 - [ ] Add sinc/Dirichlet kernel formulation of interpolation
+   - [X] Numerical results section
+	 - [X] Explanation of test functions
+	 - [X] Add formulae for test functions
+	 - [X] Compare linf error plots (point out different regimes)
+	 - [X] Reference methods that we compare with
+	 - [X] Discuss timing results
+   - [X] Figure out why we shouldn't compare w/ Greengard
+   - [X] Conclusion
+	 - [X] Add a summary of results
+	 - [X] Future work:
+	   - [X] Constant-Q transform
+	   - [X] Stencil for adaptive FMM/FMRI
+	   - [X] Qi Hu's approach to heterogeneous FMM
+	   - [X] Chebyshev basis instead of monomial basis
+		 - [X] Find reference
+	   - [X] Multiple dimensions
+   - [X] NUFFT section
+	 - [X] Change summation limits to use macro
+	 - [X] Add sinc/Dirichlet kernel formulation of interpolation
        problem
-	 - [ ] Incorporate "DFT frequency sets" terminology
-   - [ ] Add periodic summation necessary conditions to paper
-	 - [ ] Try and simplify error bound
-	 - [ ] Move 3D plot in with these guys and point to it
+   - [ ] Add analytic approach to evaluating c0
+   - [-] Add periodic summation necessary conditions to paper
+	 - [ ] Try and simplify error bound (both the expression and the
+       derivation)
+	 - [ ] Write it up
+	 - [X] Move 3D plot in with these guys and point to it
    - [ ] Complexity analysis
 	 - [ ] Edit and add FMM complexity from writeup
 	 - [ ] Do NUFFT complexity
-   - [ ] Add analytic approach to evaluating c0
+     - [ ] Discuss optimal L results
    - [ ] Computing of c_m, m > 0
 	 - [ ] Try this approach: since inverting V is a poly. fitting
        problem on [-pi, pi], we could use the corresponding Chebyshev

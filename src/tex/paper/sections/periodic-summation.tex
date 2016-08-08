@@ -98,6 +98,44 @@ arises---this is addressed in the corresponding section. The resulting
 submatrix can be dealt with by making use of a convenient matrix
 decomposition, also addressed in a later section.
 
+\subsection*{Necessary Conditions}
+
+The periodic summation method does not converge if a few basic
+necessary conditions are not met. In particular, when we compute
+$\phifar$, we approximate it by:
+\begin{align}
+  \label{eq:phifar-approx}
+  \phifar(\phiarg) = \phifarerror{} + \sum_{\powerindex=0}^{\truncnum-1} \ccoef{\powerindex} R_\powerindex(\phiarg - \pi),
+\end{align}
+where the error term is given by:
+\begin{align}
+  \label{eq:phifar-error}
+  \phifarerror \defd \sum_{\powerindex=\truncnum}^{\infty} \ccoef{\powerindex} R_\powerindex(\phiarg - \pi).
+\end{align}
+Then, for the method to converge, we require $\phifarerror$ and each
+$\ccoef{\powerindex}$ to converge.
+
+To show that the coefficients $\ccoef{\powerindex}$ converge, we
+consider the cases $m = 0$ and $m > 0$ separately. For $m = 0$, we
+observe that:
+\begin{align*}
+  \ccoef{0} = \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{2(\pi - \unifpt{\unifptindex})}{{(\unifpt{\unifptindex} - \pi)}^2 - 4\pi^2\persumindex^2} = \frac{1}{2\pi^2} \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \cdot {(\unifpt{\unifptindex} - \pi)} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{1}{\persumindex^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2}.
+\end{align*}
+We can see that this quantity is finite by an application of the
+integral test. Specifically, we have:
+\begin{align*}
+  \int_{\neighborhoodradius+1}^\infty \frac{dt}{t^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2} = \frac{2\pi}{\unifpt{\unifptindex}} \arctanh \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi(\neighborhoodradius+1)}},
+\end{align*}
+when:
+\begin{align*}
+  \parens{\frac{\unifpt{\unifptindex}-\pi}{2\pi}}^2 \leq {(\neighborhoodradius+1)}^2,
+\end{align*}
+which is the case, since $n \in \N$ and
+$0 \leq \unifpt{\unifptindex} < 2\pi$ for
+$k = 0, \hdots, \bandlimit-1$. For $\ccoef{\powerindex}$ where
+$\powerindex > 0$, we can see that the coefficient is finite by again
+applying the integral test and evaluating the corresponding integral.
+
 \begin{figure}[h]
   \centering
   \input{../tikz/error_bound_plot.tex}

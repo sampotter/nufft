@@ -77,7 +77,7 @@ class TriangleTestSeries(TestSeries):
         if k % 2 == 0:
             return 0j
         else:
-            return -(4j*(-1)**((k - 1)/2))/(4*(_np.pi**2)*(k**2))
+            return -(1j*(-1)**((k - 1)/2))/((_np.pi**2)*(k**2))
 
 
 class SemicircleTestSeries(TestSeries):

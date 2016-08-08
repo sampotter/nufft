@@ -5,12 +5,7 @@
     view/az=-30,
     xlabel={$K$},
     ylabel={$L$},
-    zlabel={Time (s)},
-    legend entries={NUFFT Runtime, Optimum},
-    legend style={
-      at={(1.03, 0.5)},
-      anchor=west
-    }]
+    zlabel={Time (s)}]
     \addplot3[surf] file {../../py/new/data_optL.dat};
     \addplot3+[only marks] file {../../py/new/data_optL_argmins.dat};
   \end{axis}

@@ -18,7 +18,7 @@ interested in computing the part of (\ref{eq:per-interp-cot-kernel})
 which matches this description---namely, we define:
 \begin{align}
   \label{eq:phi}
-  \phi(\phiarg{}) \defd \sum_{\persumindex{}=-\infty}^\infty \sum_{\unifptindex{}=0}^{\bandlimit{}-1} \frac{{(-1)}^{\unifptindex{}}\unifval{\unifptindex{}}}{\phiarg{} - \unifpt{\unifptindex{}} - 2\pi{}\persumindex{}},
+  \phi(\phiarg{}) \defd \sum_{\persumindex{}=-\infty}^\infty \dftsum{\unifptindex{}} \frac{{(-1)}^{\unifptindex{}}\unifval{\unifptindex{}}}{\phiarg{} - \unifpt{\unifptindex{}} - 2\pi{}\persumindex{}},
 \end{align}
 where we have ingored the constant factor. Next, in order to apply the
 method, we select some region of interest, a larger neighborhood which
@@ -32,8 +32,8 @@ an integer ``neighborhood radius'' and define:
 \end{align}
 Then, letting:
 \begin{align}
-  \phinear(\phiarg) &\defd \sum_{\persumindex\in\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phinear} \\
-  \phifar(\phiarg) &\defd \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phifar}
+  \phinear(\phiarg) &\defd \sum_{\persumindex\in\persumdomain}\dftsum{\unifptindex{}} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phinear} \\
+  \phifar(\phiarg) &\defd \sum_{\persumindex\notin\persumdomain}\dftsum{\unifptindex{}} \frac{{(-1)}^\unifptindex\unifval{\unifptindex}}{\phiarg-\unifpt{\unifptindex}-2\pi\persumindex}, \label{eq:phifar}
 \end{align}
 we can decompose $\phi$ as:
 \begin{align}
@@ -45,18 +45,18 @@ With $\xstar = \pi$, we have that when $\phiarg$ satisfies
 $0 \leq \phiarg < 2\pi$, the $R$-factorization:
 \begin{align}
   \label{eq:phifar-R-factorization}
-  \frac{1}{\phiarg - \unifpt{\unifptindex} - 2\pi\persumindex} = \sum_{m=0}^{\infty}a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi)R_m(\phiarg - \pi)
+  \frac{1}{\phiarg - \unifpt{\unifptindex} - 2\pi\persumindex} = \sum_{\powerindex{}=0}^{\infty}a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi)R_m(\phiarg - \pi)
 \end{align}
 is valid. Making use of (\ref{eq:phifar-R-factorization}), we can
 define, for each $m = 0, 1, \hdots$:
 \begin{align}
   \label{eq:phifar-over-R-coefs}
-  \persumcoef{m} \defd \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} {(-1)}^\unifptindex \unifval{\unifptindex} a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi),
+  \persumcoef{m} \defd \sum_{\persumindex\notin\persumdomain}\dftsum{\unifptindex{}} {(-1)}^\unifptindex \unifval{\unifptindex} a_m(\unifpt{\unifptindex} + 2\pi\persumindex, \pi),
 \end{align}
 which allows us to define:
 \begin{align}
   \label{eq:phifar-over-R}
-  \phifar(\phiarg) = \sum_{m=0}^\infty \persumcoef{m} R_m(\phiarg - \pi).
+  \phifar(\phiarg) = \sum_{\powerindex=0}^\infty \persumcoef{m} R_m(\phiarg - \pi).
 \end{align}
 Reexpressing $\phifar$ in terms of the $R_m$ basis functions of the
 $R$-factorization is the crucial step that enables the method.
@@ -71,7 +71,7 @@ satisfies $0 \leq \phiargcp < 2\pi$. Since
 $\phi(\phiarg) = \phi(\phiargcp)$, we have:
 \begin{align}
   \label{eq:phinear-minus-phinear}
-  \phinear(\phiarg) - \phinear(\phiargcp) = \phifar(\phiargcp) - \phifar(\phiarg) = \sum_{m=0}^\infty \persumcoef{m}(R_m(\phiarg - \pi) - R_m(\phiargcp - \pi)).
+  \phinear(\phiarg) - \phinear(\phiargcp) = \phifar(\phiargcp) - \phifar(\phiarg) = \sum_{\powerindex=0}^\infty \persumcoef{m}(R_m(\phiarg - \pi) - R_m(\phiargcp - \pi)).
 \end{align}
 Fixing $\numcps\in\N$, we let
 $\phiarg_0, \hdots, \phiarg_{\numcps - 1}$ and

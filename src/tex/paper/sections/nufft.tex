@@ -8,7 +8,7 @@ $\unifval{\unifptindex{}} = \bandfunc(\unifpt{\unifptindex{}})$, then
 the DFT of $\unifval{0}, \hdots, \unifval{\bandlimit{} - 1}$ is given
 by:
 \begin{align}\label{eq:dft}
-  \unifdft{\unifdftindex{}} = \sum_{\unifptindex{}=0}^{\bandlimit{}-1} \unifval{\unifptindex{}} e^{-2\pi{}i\unifptindex{}\unifdftindex{}/\bandlimit{}}
+  \unifdft{\unifdftindex{}} = \dftsum{\unifptindex{}} \unifval{\unifptindex{}} e^{-2\pi{}i\unifptindex{}\unifdftindex{}/\bandlimit{}}
 \end{align}
 for $\unifdftindex{} \suchthat 0 \leq \unifdftindex{} <
 \bandlimit{}$. The $\unifval{\unifptindex{}}$'s and
@@ -23,24 +23,25 @@ The inverse DFT formula leads us to interpret the DFT coefficients
 $\unifdft{0}, \hdots, \unifdft{\bandlimit{}-1}$ as the coefficients of
 a trigonometric polynomial:
 \begin{align}\label{eq:idft-polynomial}
-  \bandfunc(x) = \sum_{\unifdftindex{}=-\bandlimit{}/2+1}^{\bandlimit{}/2-1} \unifdft{\unifdftindex{}} e^{i\unifdftindex{}x}
+  \bandfunc(x) = \idftsum{\unifptindex{}} \unifdft{\unifdftindex{}} e^{i\unifdftindex{}x}
 \end{align}
 If, for $\arbptindex{} \suchthat 0 \leq \arbptindex{} < \numarbpts{}$, we define
 $\arbpt{\arbptindex{}} \suchthat 0 \leq \arbpt{\arbptindex{}} < 2\pi$, then combining
 (\ref{eq:dft}) with (\ref{eq:idft-polynomial}) evaluated at each
 $\arbpt{\arbptindex{}}$ yields:
 \begin{align}\label{eq:first-interpolation}
-  \arbval{\arbptindex{}} \defd \bandfunc(\arbpt{\arbptindex{}}) = \frac{1}{\bandlimit{}} \sum_{\unifptindex{}=0}^{\bandlimit{}-1} \parens{\sum_{\unifdftindex{}=-\bandlimit{}/2+1}^{\bandlimit{}/2-1} e^{i\unifdftindex{}(\arbpt{\arbptindex{}} - \unifpt{\unifptindex{}})}} \unifval{\unifptindex{}}.
+  \arbval{\arbptindex{}} \defd \bandfunc(\arbpt{\arbptindex{}}) = \frac{1}{\bandlimit{}} \dftsum{\unifptindex{}} \parens{\idftsum{\unifdftindex{}} e^{i\unifdftindex{}(\arbpt{\arbptindex{}} - \unifpt{\unifptindex{}})}} \unifval{\unifptindex{}}.
 \end{align}
-It is readily shown that this expression can be manipulated further to
-yield:
+It is well-known and readily demonstrated that this expression can be
+manipulated further to yield:
 \begin{align}\label{eq:per-interp-cot-kernel}
-  \arbval{\arbptindex{}} = \frac{\sin(\bandlimit{}\arbpt{\arbptindex{}}/2)}{\bandlimit{}} \sum_{\persumindex{}=-\infty}^\infty \sum_{\unifptindex{}=0}^{\bandlimit{}-1} \frac{{(-1)}^{\unifptindex{}}\unifval{\unifptindex{}}}{\arbpt{\arbptindex{}} - \unifpt{\unifptindex{}} - 2\pi{}\persumindex{}}.
+  \arbval{\arbptindex{}} = \frac{\sin(\bandlimit{}\arbpt{\arbptindex{}}/2)}{\bandlimit{}} \sum_{\persumindex{}=-\infty}^\infty \dftsum{\unifptindex{}} \frac{{(-1)}^{\unifptindex{}}\unifval{\unifptindex{}}}{\arbpt{\arbptindex{}} - \unifpt{\unifptindex{}} - 2\pi{}\persumindex{}}.
 \end{align}
-A proof of this can be found in the appendix.
+A derivation of this fact can be found, for example,
+in~\cite{sinc-interpolation, Dutt95fastfourierII}.
 
-Equation (\ref{eq:per-interp-cot-kernel}) allows us to consider the
-interpolation as a linear operator applied to the values of a fourier
+Equation (\ref{eq:per-interp-cot-kernel}) allows us to view the
+interpolation as a linear operator applied to the values of a Fourier
 series at equispaced points. We can define this operator
 $\interpop\in\R^{\numarbpts\times\bandlimit}$ by:
 \begin{align}
@@ -82,7 +83,7 @@ and $\ifft$. As it happens, each of
 computed sufficiently fast. Writing:
 \begin{align}
   \label{eq:log-sin}
-  \log(\ccoef{\arbptindex}) = \sum_{\arbptindex=0}^{\bandlimit-1} \log\circ\sin\parens{\frac{\arbpt{\arbptindex}-\unifpt{\unifptindex}}{2}},
+  \log(\ccoef{\arbptindex}) = \dftsum{\arbptindex{}} \log\circ\sin\parens{\frac{\arbpt{\arbptindex}-\unifpt{\unifptindex}}{2}},
 \end{align}
 and similarly for $\dcoef{\unifptindex}$, allows the FMM for the
 $\log\circ\sin$ kernel to be applied so that these coefficients may be

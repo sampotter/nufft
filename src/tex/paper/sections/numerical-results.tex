@@ -1,10 +1,60 @@
 \section{Numerical Results}
 
+To evaluate our method, we chose several real-valued bandlimited test
+functions to use in comparisons made with existing software libraries
+that can be used to solve the same problem. We chose four, well-known
+and canonical trigonometric series: the triangle, square, semicircle,
+and saw waves. For a given bandlimit $\bandlimit{}$, approximations to
+each of these are given by:
+\begin{align}
+  \tri(x) &= \idftsum{\unifptindex} e^{i\unifptindex\unifpt{}} \cdot \begin{cases}  0 & \mbox{if } \unifptindex{} \mbox{ mod } 2 \equiv 0 \\ \frac{i{(-1)}^{(\unifptindex{}+1)/2}}{\pi{}^2\unifptindex{}^2} & \mbox{otherwise} \end{cases} \ \label{eq:triangle} \\
+  \sqr(x) &= \idftsum{\unifptindex} e^{i\unifptindex\unifpt{}} \cdot \begin{cases} 0 & \mbox{if } \unifptindex{} \mbox{ mod } 2 \equiv 0 \\ \frac{-2i}{\pi{}\unifptindex{}} & \mbox{otherwise} \end{cases} \label{eq:square} \\
+  \semi(x) &= \idftsum{\unifptindex} e^{i\unifptindex\unifpt{}} \cdot \begin{cases} \nicefrac{\pi^2}{4} & \mbox{if } \unifptindex{} = 0 \\ \frac{\pi{}{(-1)}^\unifptindex{} J_1(\pi{}\unifptindex{})}{2\unifptindex{}} & \mbox{otherwise} \end{cases} \label{eq:semicircle} \\
+  \saw(x) &= \idftsum{\unifptindex} e^{i\unifptindex\unifpt{}} \cdot \begin{cases} 0 & \mbox{if } k = 0 \\ \frac{i{(-1)}^\unifptindex}{\pi\unifptindex} & \mbox{otherwise} \end{cases} \label{eq:sawtooth}
+\end{align}
+where $J_1$ is a Bessel function of the first kind. Plots of several approximations of these trigonometric series are included for reference (see Figure~\ref{fig:testfunc}).
+
+The software libraries used in comparisons include
+NFFT3~\cite{using-nfft3}, NUFFT~\cite{accelerating-nufft,
+  type3-nufft-apps}, and IRT~\cite{Fessler:2003dz}. The first library
+consists of a large suite of methods which have a similar flavor as to
+the nonuniform FFT.\@ The second library is a highly optimized library
+based on analysis of the nonuniform FFT initially carried out
+in~\cite{dutt-rokhlin-nufft-I}, and refined
+in~\cite{accelerating-nufft, type3-nufft-apps} and in other articles
+by the same authors. The third library represents a separate approach
+based on min-max interpolation.
+
+\begin{figure}[h]
+  \centering
+  \input{../tikz/testfunc_plot.tex}
+  \caption{test}\label{fig:testfunc}
+\end{figure}
+
+Our first numerical test consists of---for a varying choice of
+bandlimit $\bandlimit$---evaluating the nonuniform DFT directly from
+(\ref{eq:first-interpolation}), using each of the implementation
+provided by each library and Algorithm 2 to evaluate the nonuniform
+DFT, and plotting the corresponding $\ell_\infty$ error between each
+result and the groundtruth result evaluated using
+(\ref{eq:first-interpolation}) (see Figure~\ref{fig:linf-error}). The
+evaluation points for each experiment were chosen uniformly at random
+from the interval $[0, 2\pi)$. The algorithm used in the NUFFT library
+involves a fast Gaussian gridding approach, and the interface provides
+an error parameter which is gauranteed to be attained (with machine
+epsilon being the default). Because of this, we did not include it in
+this test.
+
 \begin{figure}[h]
   \centering
   \input{../tikz/linf_error_plot.tex}
   \caption{test}\label{fig:linf-error}
 \end{figure}
+
+The next test was a comparison of the runtimes of the different
+algorithms for the same choice of parameters as in the first
+experiment (Figure~\ref{fig:timings}). As a baseline, we included
+timings of the inverse FFT, as provided by Python's numpy library.
 
 \begin{figure}[h]
   \centering
@@ -12,6 +62,31 @@
   \caption{test}\label{fig:timings}
 \end{figure}
 
+Our timing test confirms our basic hypotheses regarding the speed of
+the algorithm. As with all FMM-based algorithm, the scaling of the
+algorithm is such that beyond a certain point, the algorithm ``breaks
+even'' and is beaten by a direct method. However, for problem sizes
+below this threshold, we see substantial speedups.
+
+The error plots are more intriguing. Although Algorithm 2 cannot
+compete with the implementation provided by NUFFT without appealing to
+a high truncation number $\truncnum$ and neighborhood radius
+$\neighborhoodradius$, for reasonably small values, the algorithm
+attains the same performance as the highly-tuned NFFT and soundly
+outperforms what is provided by IRT.\@ Of particular importance, we
+can see that for our choice of test functions, IRT and NUFFT exhibit
+different accuracy regimes. In particular, we can see that for $\tri$
+and $\sqr$, both Algorithm 2 and NFFT are significantly more accurate
+than IRT, and that for some problem sizes NFFT attains machine
+precision, and for others NFFT and Algorithm 2 are nearly as accurate
+as one another. However, $\semi$ and $\saw$ provide exceptions to this
+rule: in the $\semi$ test, NFFT and IRT perform equally poorly, with
+Algorithm 2 providing much more accurate results; on the other hand,
+the $\saw$ test sees NFFT computing results exactly as accurate as
+NFFT.\@ Overall, throughout all of the tests, Algorithm 2 does not
+surprising provide machine precision, as NFFT occasionally seems to,
+but does provide consistently more accurate results than either NFFT
+or IRT.\@
 
 \begin{figure}[h]
   \centering
@@ -23,12 +98,6 @@
   \centering
   \input{../tikz/error_bound_plot.tex}
   \caption{test}\label{fig:errorbound}
-\end{figure}
-
-\begin{figure}[h]
-  \centering
-  \input{../tikz/testfunc_plot.tex}
-  \caption{test}\label{fig:testfunc}
 \end{figure}
 
 % Local Variables:

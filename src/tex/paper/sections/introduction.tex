@@ -15,13 +15,13 @@ problems since.
 A limitation of the real FFT is that its domain consists of real
 vectors whose components are assumed to correspond to equally spaced
 samples of some underlying continuous signal; likewise, the range is
-comprised of coefficients of equally spaced \TODO{}INTEGER?\ frequency
-components. When presented with a nonuniformly sampled input signal or
-when one's goal is to determine the strength of frequency components
-which are unequally spaced, the usual FFT is of no use without
-interpolating before or after the transform. A variety of methods have
-been introduced to formalize an approach to computing such a
-nonuniform DFT or FFT~\cite{Dutt95fastfourierII,Keiner06nfft3.0}.
+comprised of coefficients of equally spaced frequency components. When
+presented with a nonuniformly sampled input signal or when one's goal
+is to determine the strength of frequency components which are
+unequally spaced, the usual FFT is of no use without interpolating
+before or after the transform. A variety of methods have been
+introduced to formalize an approach to computing such a nonuniform DFT
+or FFT.\@
 
 In this work, we extend a method for computing the nonuniform FFT
 which makes use of the fast multipole method

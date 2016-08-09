@@ -9,7 +9,7 @@ radial basis function of a certain dimensionality. In this work, we
 provide an optimized one-dimensional FMM for the Cauchy kernel:
 \begin{align}
   \label{eq:cauchy-kernel}
-  \Phi(y, x) = \frac{1}{y - x}.
+  \cauchy(y, x) = \frac{1}{y - x}.
 \end{align}
 Implementing an FMM requires the derivation of regular and singular
 factorizations the kernel function (so-called $S$-factorizations and
@@ -19,16 +19,16 @@ singular-to-regular, and regular-to-regular translation
 operators~\cite{fmm-helmholtz}.
 
 The $R$ and $S$-factorizations of the Cauchy kernel are derived in a
-straightforward manner from the Taylor expansion of $\Phi$. For the
+straightforward manner from the Taylor expansion of $\cauchy$. For the
 $S$-factorization, we fix $x, y$, and
 $\xstar \suchthat \abs{x-\xstar} < \abs{y-\xstar}$ and define
 $b_m(x, \xstar) = {(x - \xstar)}^m$ and
 $S_m(y - \xstar) = {(y - \xstar)}^{-m-1}$. The point $\xstar$ is
 referred to as the expansion center. Then, the $S$-factorization of
-$\Phi$ is given by:
+$\cauchy$ is given by:
 \begin{align}
   \label{eq:S-factorization}
-  \Phi(y, x) = \sum_{m=0}^\infty b_m(x, \xstar) S_m(y - \xstar).
+  \cauchy(y, x) = \sum_{m=0}^\infty b_m(x, \xstar) S_m(y - \xstar).
 \end{align}
 Very similarly, for the $R$-factorization, we fix $x, y$, and
 $\xstar \suchthat \abs{y - \xstar} < \abs{x - \xstar}$ and define
@@ -36,9 +36,9 @@ $a_m(x, \xstar) = -{(x - \xstar)}^{-m-1}$ and
 $R_m{(y - \xstar)}^m = {(y - \xstar)}^m$, giving us:
 \begin{align}
   \label{eq:R-factorization}
-  \Phi(y, x) = \sum_{m=0}^\infty a_m(x, \xstar) R_m(y - \xstar).
+  \cauchy(y, x) = \sum_{m=0}^\infty a_m(x, \xstar) R_m(y - \xstar).
 \end{align}
-These expansions of $\Phi$ are used in the implementation of our FMM,
+These expansions of $\cauchy$ are used in the implementation of our FMM,
 as well as in our discussion of error bounds.
 
 The FMM involves evaluating a function which is comprised of a sum of

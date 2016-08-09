@@ -80,12 +80,57 @@ and:
 \end{align}
 respectively.
 
-\begin{figure}[h]
-  \centering
-  \input{../tikz/fmm.tex}
-  \caption{an illustration of the translation phases of the
-    one-dimensional FMM.}\label{fig:fmm}
-\end{figure}
+\subsection*{Error Analysis}
+
+\begin{lemma}\label{lemma:S-error}
+  With $\xstar\in\R$, and $x, y, r, R \in \R$ such that:
+  \begin{align}
+    \label{eq:S-error-condition}
+    |x - \xstar| < r < R < |y - \xstar|,
+  \end{align}
+  approximating $\cauchy(y, x)$ with a $\truncnum$ term $S$-expansion
+  is bounded by:
+  \begin{align*}
+    |\Serror| < \frac{1}{R-r} \parens{\frac{r}{R}}^\truncnum.
+  \end{align*}
+\end{lemma}
+
+\begin{proof}
+  The $\truncnum$ term $S$-expansion of $\cauchy(y, x)$ can be
+  written:
+  \begin{align}
+    \label{eq:S-expansion}
+    \cauchy(y, x) = \Serror + \frac{1}{y - \xstar} \sum_{\powerindex=0}^{\truncnum-1} \parens{\frac{x - \xstar}{y - \xstar}}^\powerindex,
+  \end{align}
+  where $\Serror$ is evaluated to be:
+  \begin{align}
+    \label{eq:S-error}
+    \Serror = \frac{1}{y - x} \parens{\frac{x - \xstar}{y - \xstar}}^\truncnum,
+  \end{align}
+  by evaluating the corresponding geometric series and invoking
+  (\ref{eq:S-error-condition}). Making use of (\ref{eq:S-error}) lets
+  us bound:
+  \begin{align}
+    \label{eq:S-error-bound}
+    |\Serror| = |x - y|^{-1} \abs{\frac{x - \xstar}{y - \xstar}}^\truncnum < \frac{1}{R - r} \parens{\frac{r}{R}}^\truncnum,
+  \end{align}
+  where the inequality follows from (\ref{eq:S-error-condition}).
+\end{proof}
+
+\begin{lemma}
+  \label{lemma:SS-error}
+  \TODO\ $SSmat$ reexpansion error.
+\end{lemma}
+
+\begin{lemma}
+  \label{lemma:SR-error}
+  \TODO\ $\SRmat$ reexpansion error.
+\end{lemma}
+
+\begin{lemma}
+  \label{lemma:RR-error}
+  \TODO\ $\RRmat$ reexpansion error.
+\end{lemma}
 
 % Local Variables:
 % TeX-master: "../paper.tex"

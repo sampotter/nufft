@@ -23,11 +23,13 @@
 	 - [X] Change summation limits to use macro
 	 - [X] Add sinc/Dirichlet kernel formulation of interpolation
        problem
-   - [ ] Add analytic approach to evaluating c0
-   - [-] Add periodic summation necessary conditions to paper
-	 - [ ] Try and simplify error bound (both the expression and the
+   - [X] Add analytic approach to evaluating c0
+	 - [X] To implementation; get it working
+	 - [X] To writeup
+   - [X] Add periodic summation necessary conditions to paper
+	 - [X] Try and simplify error bound (both the expression and the
        derivation)
-	 - [ ] Write it up
+	 - [X] Write it up
 	 - [X] Move 3D plot in with these guys and point to it
    - [ ] Complexity analysis
 	 - [ ] Edit and add FMM complexity from writeup
@@ -54,7 +56,12 @@
    - [ ] Prove things in appendix
    - [ ] Replace square or triangle with some complex test
      function? (check Fourier book)
+   - [ ] Optimize c0 implementation
+	 - [ ] derive
+	 - [ ] implement
+	 - [ ] writeup
    - [ ] FMM plot
+	 - [ ] Remove dot-dot-dots on either side of the graphic.
 	 - [ ] Redo style of FMM TikZ plot using pgfplot colors/design
 	 - [ ] Label:
 	   - [ ] Translation operators

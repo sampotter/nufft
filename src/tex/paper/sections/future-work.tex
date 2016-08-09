@@ -14,7 +14,10 @@ viability of the FMM as applied to the nonuniform FFT, laying the
 ground for future developments. In particular, as the core of the
 algorithm makes use of a generic 1D FMM, any improvements to such an
 FMM could profitably be exploited by the NUFFT.\@ Such improvements
-may be application dependent.
+may be application dependent. Additionally, the FMM implementation
+used in our numerical experiments did not take advantage of the
+structure of the target points---doing so could reduce the number of
+translations required by the algorithm significantly.
 
 Due to the low communication costs of the FMM, it is well-suited to
 parallel implementation, and parallel CPU, GPU~\cite{gumerov2008fast},

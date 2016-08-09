@@ -11,13 +11,12 @@ namespace nufft {
 		class S,
 		class T,
 		std::enable_if_t<is_complex<S> {} && !is_complex<T> {}> * = nullptr>
-	constexpr S mul(S const & lhs, T const & rhs)
+    constexpr S mul(S const & lhs, T const & rhs)
 	{
 		using field_t = typename get_underlying_field<S>::type;
-		S tmp = lhs;
-		reinterpret_cast<field_t *>(&tmp)[0] *= rhs;
-		reinterpret_cast<field_t *>(&tmp)[1] *= rhs;
-		return tmp;
+		return std::complex<field_t>(
+			reinterpret_cast<field_t const *>(&lhs)[0] * rhs,
+			reinterpret_cast<field_t const *>(&lhs)[1] * rhs);
 	}
 
 	template <

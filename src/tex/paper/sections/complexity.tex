@@ -1,5 +1,91 @@
 \section{Complexity}
 
+In this section, we come up with a rough estimate of the cost of the
+MLFMM and an asymptotic estimate of its cost. The FMM used in our
+implementation consists of several different parts, which can be
+considered independently:
+\begin{itemize}
+\item The $\SSmat$, $\SRmat$, and $\RRmat$ translations.
+\item The construction of $S$ factorizations for the finest boxes.
+\item Direct evaluation.
+\item Indirect evaluation.
+\end{itemize}
+We will consider each of these items in turn. Important quantities
+related to the algorithm are as follows:
+\begin{center}
+  \begin{tabular}{cl}
+    $\fmmdepth$ & The maximum FMM depth. \\
+    $\bandlimit$ & The bandlimit of the function $\bandfunc$. \\
+    $\neighborhoodradius$ & The integer neighborhood radius. \\
+    $\bandlimit\neighborhoodradius$ & The number of source points for the FMM (due to periodic tiling).\@ \\
+    $\numarbpts$ & The number of evaluation points (interpolation nodes $\arbpt{\arbptindex}$). \\
+    $\truncnum$ & The truncation number of the kernel approximation.
+  \end{tabular}
+\end{center}
+We also note that in our estimate of the complexity, we assume that
+the source and evaluation points are distributed uniformly. We note
+that assumption of uniformity, while generally useful, can be improved
+upon for the interpolation nodes. In particular, the integer
+neighborhood radius $\neighborhoodradius$ plays a larger role: if we
+ignore the checkpoints, the evaluation points only occur in the range
+$[\tfrac{n}{2n+1}, \tfrac{n+1}{2n+1})$.  If the FMM is implemented to
+take advantage of this, the number of translation operators that must
+be applied can be significantly reduced. The implementation used in
+the current work does not take advantage of this optimization.
+
+Applying the $\SSmat, \SRmat$, and $\RRmat$ translation operators
+takes approximately $O(\truncnum^2)$ operations, as applying these
+operators corresponds to multiplication of a vector in $\C^\truncnum$
+by a matrix in $\C^{\truncnum\times\truncnum}$. With the parameter
+$\fmmdepth$ chosen, a union of four perfect binary trees of height
+$\fmmdepth - 1$ is constructed---this data structure will be referred
+to as a translation hierarchy (see Figure~\ref{fig:fmm} for a
+graphical depiction of the case of $\fmmdepth = 4$). For each
+subinterval at the finest level of subdivision, the FMM involves a
+hierarchical sequence of translations such that the function can be
+efficiently evaluated in this subinterval using an $R$ expansion. We
+will not dwell on the details of this, as they can readily be found
+elsewhere~\cite{fmm-helmholtz, fmm-orig}.
+
+To estimate the cost of the one-dimensional FMM, we start by
+determining the cost of the translation operators. As the translation
+hierarchy consists of four perfect binary trees of height
+$\fmmdepth - 1$, since one $\SSmat$ and one $\RRmat$ translation operator is
+computed for each edge in this tree, and since there are
+$2^{\fmmdepth-1} - 2$ edges in a perfect binary tree of the given
+height, the combined cost of the $\SSmat$ and $\RRmat$ translation operators
+is $8(2^{\fmmdepth-1} - 2)O(\truncnum^2) =
+O(2^\fmmdepth\truncnum^2)$. As for the $\SRmat$ translation operators,
+we note for each node in the translation hierarchy, at most (and in
+most cases) three $\SRmat$ operators are computed (cf.\
+Figure~\ref{fig:fmm}). Since there are $4(2^{\fmmdepth-1}-1)$ nodes in
+the translation hierarchy, the cost of applying the $\SRmat$ operators is
+$12(2^{\fmmdepth-1}-1)O(\truncnum^2) =
+O(2^\fmmdepth\truncnum^2)$. Then, the overall cost of applying the
+translation operators is $O(2^\fmmdepth\truncnum^2)$.
+
+The cost of the rest of the phases of the algorithm is straightforward
+to estimate. The construction of the $S$-factorizations is asymptotic
+in the number of source points and the truncation number, so the
+corresponding cost is
+$O(\bandlimit\truncnum\neighborhoodradius)$. Indirect evaluation at a
+single point is $O(\truncnum)$ (evaluating a polynomial of degree
+$\truncnum$), and the entire indirect evaluation phase takes place at
+$\numarbpts$ points, so the overall cost is
+$O(\numarbpts\truncnum)$. Finally, the direct evaluation cost is
+proportional to the number of points in the 1-cell neighborhood of
+each cell containing a target point times the number of target
+points---since the number of source points that align with target
+points is $\bandlimit$, the overall cost is proportional to
+$2^{-L} \bandlimit \numarbpts$.
+
+\begin{figure}[h]
+  \centering
+  \input{../tikz/fmm.tex}
+  \caption{an illustration of the translation phases of the
+    one-dimensional FMM.}\label{fig:fmm}
+\end{figure}
+
 \begin{figure}[h]
   \centering
   \input{../tikz/optL_plot.tex}

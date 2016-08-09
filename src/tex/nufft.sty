@@ -7,6 +7,7 @@
   booktabs,
   color,
   enumitem,
+  float,
   fullpage,
   graphicx,
   hyperref,
@@ -21,6 +22,8 @@
 
 \theoremstyle{definition}
 \newtheorem{algorithm}{Algorithm}
+\newtheorem{lemma}{Lemma}
+\newtheorem{theorem}{Theorem}
 
 \newcommand{\abs}[1]{\card{#1}}
 \newcommand{\asconv}{\overset{\operatorname{as}}{\longrightarrow}}
@@ -47,6 +50,7 @@
 \newcommand{\ip}[1]{\left\langle#1\right\rangle}
 \newcommand{\m}[1]{\boldsymbol{#1}}
 \newcommand{\nats}{\mathbb{N}}
+\newcommand{\C}{\mathbb{C}}
 \newcommand{\N}{\mathbb{N}}
 \newcommand{\norm}[1]{\left|\left|#1\right|\right|}
 \newcommand{\probarc}[1]{\stackrel{#1}{\longrightarrow}}
@@ -77,6 +81,7 @@
 
 \newcommand{\phinear}{\phi_{\operatorname{near}}}
 \newcommand{\phifar}{\phi_{\operatorname{far}}}
+\newcommand{\Tmat}{\bold{T}}
 \newcommand{\SSmat}{\bold{S}|\bold{S}}
 \newcommand{\SRmat}{\bold{S}|\bold{R}}
 \newcommand{\RRmat}{\bold{R}|\bold{R}}
@@ -104,7 +109,7 @@
 \newcommand{\xstar}{{x}_{*}}
 \newcommand{\phiarg}{y}
 \newcommand{\phiargcp}{{\tilde{y}}}
-\newcommand{\numcps}{L}
+\newcommand{\numcps}{q}
 \newcommand{\cpindex}{l}
 \newcommand{\neighborhoodradius}{n}
 \newcommand{\truncnum}{P}
@@ -126,7 +131,11 @@
 \newcommand{\dcoef}[1]{d_{#1}}
 \newcommand{\fft}{\m{F}}
 \newcommand{\ifft}{\m{F}^{-1}}
-\newcommand{\phifarerror}{{\eps}^{(\truncnum)}}
+\newcommand{\baseerror}{{\eps}^{(\truncnum)}}
+\newcommand{\phifarerror}{\baseerror_{\operatorname{far}}}
+\newcommand{\Serror}{\baseerror_{S}}
+\newcommand{\fmmdepth}{L}
+\newcommand{\cauchy}{\Phi}
 
 \DeclareMathOperator{\tri}{Triangle}
 \DeclareMathOperator{\sqr}{Square}

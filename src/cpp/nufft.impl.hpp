@@ -171,11 +171,17 @@ nufft::compute_P(
 		}
 	}
 	{
-		std::complex<range_t> c0;
+		domain_t const pi {3.141592653589793};
+		std::complex<range_t> c0 {0, 0};
 		for (int_t i {0}; i < N; ++i) {
-			c0 += Vc[i];
+			std::complex<range_t> tmp {0, 0};
+			domain_t const x {twopi*i/domain_t(N)};
+			tmp += std::atanh((x - pi)/(twopi*n));
+			tmp += std::atanh((x - pi)/(twopi*(n + 1)));
+			tmp *= Fas_per[i];
+			c0 += tmp;
 		}
-		C[0] = -c0/range_t(N);
+		C[0] /= -twopi;
 	}
 
 	// This lambda evaluates the phifar polynomial using the

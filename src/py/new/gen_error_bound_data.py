@@ -3,24 +3,10 @@ import numpy as np
 
 from scipy.special import expi as Ei
 
-def A(n, p):
-    num1 = 2*(p + n + 1) - 1
-    denom1 = 2*p*np.power(2*(n + 1) - 1, p + 1)
-    num2 = 2*(p + n + 1) + 1
-    denom2 = 2*p*np.power(2*(n - 1) + 1, p + 1)
-    return num1/denom1 + num2/denom2
-
-def B(n, p):
-    num1 = np.power(2*(n + 1) - 1, -p - 1)
-    denom1 = 2*np.log(2*(n + 1) - 1)
-    num2 = np.power(2*(n + 1) + 1, -p - 1)
-    denom2 = 2*np.log(2*(n + 1) + 1)
-    return num1/denom1 + num2/denom2
-
-def C(n, p):
-    term1 = Ei(-p*np.log(2*(n + 1) - 1))
-    term2 = Ei(-p*np.log(2*(n + 1) + 1))
-    return -0.25*(term1 + term2)
+def error(n, p):
+    tmp = Ei(-p*np.log(2*n + 3)) + Ei(-p*np.log(2*n + 1))
+    tmp /= -2*np.pi
+    return tmp
 
 if __name__ == '__main__':
     parser = argparse.ArgumentParser(
@@ -48,13 +34,20 @@ if __name__ == '__main__':
     with open('data_error_bound.dat', 'w') as f:
         for i, n in enumerate(N):
             for j, p in enumerate(P):
-                errors[i, j] = A(n, p) + B(n, p) + C(n, p)
+                errors[i, j] = error(n, p)
                 f.write('%d %d %g\n' % (n, p, errors[i, j]))
             f.write('\n')
 
-    with open('data_error_bound_thresholds.dat', 'w') as f:
+    with open('data_error_bound_thresholds1.dat', 'w') as f:
         for i, n in enumerate(N):
             for j, p in enumerate(P):
-                if errors[i, j] < 1e-6:
+                if errors[i, j] < 1e-7:
+                    f.write('%d %d %g\n' % (n, p, errors[i, j]))
+                    break
+
+    with open('data_error_bound_thresholds2.dat', 'w') as f:
+        for i, n in enumerate(N):
+            for j, p in enumerate(P):
+                if errors[i, j] < 1e-15:
                     f.write('%d %d %g\n' % (n, p, errors[i, j]))
                     break

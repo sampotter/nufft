@@ -113,33 +113,130 @@ where the error term is given by:
   \phifarerror \defd \sum_{\powerindex=\truncnum}^{\infty} \ccoef{\powerindex} R_\powerindex(\phiarg - \pi).
 \end{align}
 Then, for the method to converge, we require $\phifarerror$ and each
-$\ccoef{\powerindex}$ to converge.
+$\ccoef{\powerindex}$ to converge. The following section establishes
+these necessary conditions.
 
-To show that the coefficients $\ccoef{\powerindex}$ converge, we
-consider the cases $m = 0$ and $m > 0$ separately. For $m = 0$, we
-observe that:
-\begin{align*}
-  \ccoef{0} = \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{2(\pi - \unifpt{\unifptindex})}{{(\unifpt{\unifptindex} - \pi)}^2 - 4\pi^2\persumindex^2} = \frac{1}{2\pi^2} \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \cdot {(\unifpt{\unifptindex} - \pi)} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{1}{\persumindex^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2}.
-\end{align*}
-We can see that this quantity is finite by an application of the
-integral test. Specifically, we have:
-\begin{align*}
-  \int_{\neighborhoodradius+1}^\infty \frac{dt}{t^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2} = \frac{2\pi}{\unifpt{\unifptindex}} \arctanh \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi(\neighborhoodradius+1)}},
-\end{align*}
-when:
-\begin{align*}
-  \parens{\frac{\unifpt{\unifptindex}-\pi}{2\pi}}^2 \leq {(\neighborhoodradius+1)}^2,
-\end{align*}
-which is the case, since $n \in \N$ and
-$0 \leq \unifpt{\unifptindex} < 2\pi$ for
-$k = 0, \hdots, \bandlimit-1$. For $\ccoef{\powerindex}$ where
-$\powerindex > 0$, we can see that the coefficient is finite by again
-applying the integral test and evaluating the corresponding integral.
+\begin{lemma}\label{lemma:phifar-coefs}
+  The coefficients $\ccoef{\powerindex}$ for
+  $\powerindex = 0, \hdots, \truncnum - 1$ are finite.
+\end{lemma}
+
+\begin{proof}
+  To show that the coefficients $\ccoef{\powerindex}$ converge, we
+  consider the cases $m = 0$ and $m > 0$ separately. For $m = 0$, we
+  observe that:
+  \begin{align*}
+    \ccoef{0} = \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{2(\pi - \unifpt{\unifptindex})}{{(\unifpt{\unifptindex} - \pi)}^2 - 4\pi^2\persumindex^2} = \frac{1}{2\pi^2} \dftsum{\unifptindex} {(-1)}^\unifptindex \unifval{\unifptindex{}} \cdot {(\unifpt{\unifptindex} - \pi)} \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{1}{\persumindex^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2}.
+  \end{align*}
+  We can see that this quantity is finite by an application of the
+  integral test. Specifically, for each
+  $\unifptindex = 0, \hdots, \bandlimit$, we have:
+  \begin{align*}
+    \int_{\neighborhoodradius+1}^\infty \frac{dt}{t^2 - \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi}}^2} = \frac{2\pi}{\unifpt{\unifptindex}} \arctanh \parens{\frac{\unifpt{\unifptindex} - \pi}{2\pi(\neighborhoodradius+1)}},
+  \end{align*}
+  when:
+  \begin{align*}
+    \parens{\frac{\unifpt{\unifptindex}-\pi}{2\pi}}^2 \leq {(\neighborhoodradius+1)}^2,
+  \end{align*}
+  which is the case, since $n \in \N$ and
+  $0 \leq \unifpt{\unifptindex} < 2\pi$ for
+  $k = 0, \hdots, \bandlimit-1$. For $\ccoef{\powerindex}$ where
+  $\powerindex > 0$, we can see that the coefficient is finite by again
+  applying the integral test and evaluating the corresponding integral.
+\end{proof}
+
+Next, we deal with the error due to the truncation of $\phifar$, as in
+(\ref{eq:phifar-error}).
+
+\begin{lemma}\label{lemma:phifar-error}
+  The error term for the approximation to $\phifar(y)$ given by
+  $\phifarerror$ is finite and bounded as follows:
+  \begin{align*}
+    |\phifarerror| \leq -\frac{\norm{\boldsymbol{\unifval{}}}_{1}}{2\pi} \parens{\Ei \parens{\truncnum \log(2\neighborhoodradius+3)} + \Ei \parens{\truncnum \log(2\neighborhoodradius+1)}}.
+  \end{align*}
+\end{lemma}
+
+\begin{proof}
+  First, for each $\phiarg$ such that $0\leq{}\phiarg<2\pi{}$, we have
+  that:
+  \begin{align}
+    \label{eq:phifarerror-first-bound}
+    |\phifarerror| \leq \dftsum{\unifptindex{}} \abs{\unifval{\unifptindex}} \sum_{\powerindex=\truncnum}^\infty \sum_{\persumindex\notin\persumdomain} \abs{\frac{(\phiarg - \pi)^\powerindex}{\unifpt{\unifptindex} + 2\pi\persumindex - \pi}}.
+  \end{align}
+  Then, we have that $|\phiarg - \pi| \leq \pi$, and that
+  $|\unifpt{\unifptindex} - 2\pi\persumindex - \pi| \geq \pi
+  |2\persumindex - 1|$. This gives us:
+  \begin{align}
+    \label{eq:phifarerror-second-bound}
+    \abs{\frac{{(\phiarg - \pi)}^\powerindex}{\unifpt{\unifptindex} + 2\pi\persumindex - \pi}} \leq \frac{1}{\pi |2\persumindex - 1|}.
+  \end{align}
+  From (\ref{eq:phifarerror-first-bound}) and
+  (\ref{eq:phifarerror-second-bound}), we have that:
+  \begin{align}
+    \label{eq:phifarerror-third-bound}
+    |\phifarerror| \leq \frac{1}{\pi} \dftsum{\unifptindex} |\unifval{\unifptindex}| \sum_{\persumindex=\neighborhoodradius+1}^\infty \parens{\sum_{\powerindex=\truncnum}^\infty \frac{1}{{(2\persumindex - 1)}^{\powerindex + 1}} + \sum_{\powerindex=\truncnum}^\infty \frac{1}{{(2\persumindex + 1)}^{\powerindex + 1}}}.
+  \end{align}
+  Next, since $\persumindex > \neighborhoodradius \geq 1$, we have
+  that the two inner series in (\ref{eq:phifarerror-third-bound}) are
+  positive and decreasing for each $\powerindex$. Applying the
+  integral test to (\ref{eq:phifarerror-third-bound}) lets us bound:
+  \begin{align}
+    \label{eq:phifarerror-fourth-bound}
+    \sum_{\powerindex=\truncnum}^\infty \frac{1}{{(2\persumindex \pm 1)}^{\powerindex + 1}} \leq \int_\truncnum^\infty \frac{dm}{{(2\persumindex \pm 1)}^{\powerindex + 1}} = \frac{{(2\persumindex\pm 1)}^{-\truncnum-1}}{\log (2 \persumindex\pm 1)}.
+  \end{align}
+
+  Next, we consider the series in $\persumindex$. Again, since the
+  terms of the series are positive and decreasing, we can bound using
+  the integral test as follows:
+  \begin{align}
+    \label{eq:phifarerror-fifth-bound}
+    \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{{(2 \persumindex \pm 1)}^{-\truncnum-1}}{\log(2\persumindex \pm 1)} \leq \int_{\persumindex=\neighborhoodradius+1}^\infty \frac{{(2 \persumindex \pm 1)}^{-\truncnum-1}}{\log(2\persumindex \pm 1)} d\persumindex.
+  \end{align}
+  We make the following changes of variable: first we let
+  $x = 2\persumindex\pm 1$, and then $y = \persumindex\log(x)$. This
+  allows us to write:
+  \begin{align}
+    \label{eq:phifarerror-first-equality}
+    \int_{\persumindex=\neighborhoodradius+1}^\infty \frac{{(2 \persumindex \pm 1)}^{-\truncnum-1}}{\log(2\persumindex \pm 1)} d\persumindex = \int_{2(\neighborhoodradius+1)\mp 1}^\infty \frac{dx}{x^{\truncnum+1}\log(x)} = \frac{1}{2} \int_{\truncnum \log(2(\neighborhoodradius+1)\mp 1)} \frac{dy}{ye^y}.
+  \end{align}
+  The final integral is the negative of the exponential integral
+  function $\Ei$ evaluated at
+  $-\truncnum \log(2(\neighborhoodradius+1)\mp 1)$. Thus, combining
+  (\ref{eq:phifarerror-fifth-bound}) and
+  (\ref{eq:phifarerror-first-equality}), we have:
+  \begin{align}
+    \label{eq:phifarerror-sixth-bound}
+    \sum_{\persumindex=\neighborhoodradius+1}^\infty \frac{{(2 \persumindex \pm 1)}^{-\truncnum-1}}{\log(2\persumindex \pm 1)} \leq -\frac{1}{2} \Ei \parens{-\truncnum \log(2(\neighborhoodradius+1)\mp 1)}.
+  \end{align}
+  Finally, combining (\ref{eq:phifarerror-third-bound}),
+  (\ref{eq:phifarerror-fourth-bound}), and
+  (\ref{eq:phifarerror-sixth-bound}) lets us write:
+  \begin{align}
+    \label{eq:phifarerror-result}
+    |\phifarerror| \leq -\frac{1}{2\pi} \parens{\Ei \parens{-\truncnum \log(2\neighborhoodradius+3)} + \Ei \parens{-\truncnum \log(2\neighborhoodradius+1)}} \dftsum{\unifptindex} |\unifval{\unifptindex}|,
+  \end{align}
+  which completes the proof.
+\end{proof}
+
+\begin{theorem}
+  The necessary conditions for the convergence of the periodic
+  summation are established by Lemmas~\ref{lemma:phifar-coefs}
+  and~\ref{lemma:phifar-error}.
+\end{theorem}
+
+The error bound developed in Lemma~\ref{lemma:phifar-error} provides a
+useful threshold criterion for choosing the neighborhood radius
+$\neighborhoodradius$ and truncation number $\truncnum$ parameters
+(see Figure~\ref{fig:phifar-error}).
 
 \begin{figure}[h]
   \centering
   \input{../tikz/error_bound_plot.tex}
-  \caption{test}\label{fig:errorbound}
+  \caption{the bound for $|\phifarerror|$ from
+    Lemma~\ref{lemma:phifar-error}. The two sets of labeled values
+    indicate points such that the error bound is below $10^{-7}$ and
+    $10^{-15}$. The $\ell_1$ norm in the bound is taken to be
+    unity.}\label{fig:phifar-error}
 \end{figure}
 
 % Local Variables:

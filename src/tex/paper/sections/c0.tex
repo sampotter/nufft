@@ -10,35 +10,44 @@ is necessary. As it happens, approximating $\persumcoef{0}$ from:
   \persumcoef{0} = \sum_{\persumindex\notin\persumdomain}\sum_{\unifptindex=0}^{\bandlimit-1} \frac{{(-1)}^k \unifval{\unifptindex}}{\unifpt{\unifptindex} + 2\pi(\persumindex - 1)}
 \end{align}
 is unrealistic due to slow convergence---the series is similar to the
-alternating harmonic series, for instance. Other methods have been
-suggested~\cite{periodic-sums}.
+alternating harmonic series, for instance. Other methods for more
+general problems have been suggested~\cite{periodic-sums}.
 
-Empirically, the coefficients $\persumcoef{m}$ are small for $m >
-0$. Then, for some small $\eps > 0$, we should have:
-\begin{align}
-  \label{eq:g-approx-for-c0}
-  \unifval{\unifptindex} \approx \tfrac{1}{\bandlimit} \sin(\bandlimit{} \cdot (\unifpt{\unifptindex} + \eps)/2) (\persumcoef{0} + \phinear(\unifpt{\unifptindex} + \eps)).
+In our case, we find that, for each $y\in\R$:
+\begin{align}\label{eq:c0-est}
+  c_0 = \frac{1}{\bandlimit} \sum_{\unifptindex=0}^{\bandlimit-1} \phinear(y - \unifpt{\unifptindex}).
 \end{align}
-This suggests that we can approximate $\persumcoef{0}$ by solving:
-\begin{align}
-  \label{eq:c0-min-prob}
-  \persumcoef{0} \approx \min_c \sum_{\unifptindex=0}^{\bandlimit-1} \parens{\unifval{\unifptindex} - \tfrac{1}{K} \sin(\bandlimit{} \cdot (\unifpt{\unifptindex} + \eps)/2) (\persumcoef{0} + \phinear(\unifpt{\unifptindex} + \eps))}^2.
-\end{align}
-If we let
-$s_\unifptindex = \tfrac{1}{\bandlimit{}} \sin(\bandlimit{} \cdot
-(\unifpt{\unifptindex} + \eps)/2)$ and
-$\phi_\unifptindex = \phinear(\unifpt{\unifptindex} + \eps)$, then the
-analytic solution to (\ref{eq:c0-min-prob}) is:
-\begin{align}
-  \label{eq:c0-minimizer}
-  \persumcoef{0} \approx \frac{\sum_{\unifptindex=0}^{\bandlimit-1} s_\unifptindex(\unifval{\unifptindex} - s_\unifptindex\phi_\unifptindex)}{\sum_{k=0}^{\bandlimit-1} s_\unifptindex^2}.
-\end{align}
-Despite this method's heuristic nature, it was found to compute
-accurate approximations to $\persumcoef{0}$ in essentially constant
-time as compared to the direct method mentioned earlier. However, it
-should be noted that choosing $\eps$ to be too small can be
-problematic.
+Using the FMM, we are able to approximately compute $c_0$ without
+compromising the overall complexity of the algorithm. What's more, by
+merging each $y - \unifpt{\unifptindex}$ into the set of target points
+and using $y - \unifpt{\unifptindex}$ for the algorithm's checkpoints,
+$c_0$ can be estimated without compromising the performance of the
+implementation. An added benefit of this approach is that, since $c_0$
+computed this way does not depend on the set of target points, it can
+be precomputed so that the cost of its computation is amortized over
+repeated invocations.
 
+As a matter of practical importance, we also note that $\phinear$ as
+computed by the FMM is most accurate at the abscissae
+$(2\unifptindex + 1)\pi{}/\bandlimit$, for
+$k = 0, \hdots, \bandlimit - 1$. An implementation of the algorithm
+presented in this paper, then, should select $y = \pi/\bandlimit$ when
+computing $c_0$ in the above fashion.
+
+If the overhead of computing the FMM at $\bandlimit$ points is too
+much, another approach which provides comparable (in our experiments,
+indistinguishable) accuracy is by bounding the series defining $c_0$
+in the same fashion as in the proof of convergence of $c_0$ in the
+proof of the necessary condition for the periodic summation
+method. Specifically, we have that $c_0$ is approximately given by:
+\begin{align}
+  \label{eq:c0-arctanh}
+  c_0 \approx \frac{1}{2\pi} \dftsum{\unifptindex{}} {(-1)}^\unifptindex \unifval{\unifptindex} \cdot \parens{\arctanh\parens{\frac{\unifpt{\unifptindex}-\pi}{2\pi\neighborhoodradius}} + \arctanh\parens{\frac{\unifpt{\unifptindex}-\pi}{2\pi(\neighborhoodradius + 1)}}}.
+\end{align}
+This quantity can be computed in $O(\bandlimit)$ time, and in our
+numerical experiments we found that it gave results as accurate as the
+results of the previous method. Because of this, this is the method
+used in our implementation.
 
 %%% Local Variables:
 %%% mode: latex

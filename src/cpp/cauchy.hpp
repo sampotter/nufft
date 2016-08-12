@@ -20,10 +20,7 @@ namespace nufft {
                            range_t const * weights,
                            vector_t<int_t> const & indices);
                 
-        static range_t R(int_t m, domain_t x);
         static range_t R(int_t p, domain_t x, range_t const * coefs);
-        static range_t S(int_t m, domain_t x);
-        static range_t a(int_t m, domain_t x);
         static domain_t b(int_t m, domain_t x);
 
         static void

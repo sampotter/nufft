@@ -23,13 +23,6 @@ nufft::cauchy<domain_t, range_t, int_t>::phi(
 
 template <class domain_t, class range_t, class int_t>
 range_t
-nufft::cauchy<domain_t, range_t, int_t>::R(int_t m, domain_t x)
-{
-    return std::pow(x, m);
-}
-
-template <class domain_t, class range_t, class int_t>
-range_t
 nufft::cauchy<domain_t, range_t, int_t>::R(
     int_t p,
     domain_t x,
@@ -41,20 +34,6 @@ nufft::cauchy<domain_t, range_t, int_t>::R(
         tmp += coefs[j];
     }
     return tmp;
-}
-
-template <class domain_t, class range_t, class int_t>
-range_t
-nufft::cauchy<domain_t, range_t, int_t>::S(int_t m, domain_t x)
-{
-    return x == 0 ? 0 : std::pow(x, -(m + 1));
-}
-
-template <class domain_t, class range_t, class int_t>
-range_t
-nufft::cauchy<domain_t, range_t, int_t>::a(int_t m, domain_t x)
-{
-    return x == 0 ? 0 : std::pow(-x, -(m + 1));
 }
 
 template <class domain_t, class range_t, class int_t>

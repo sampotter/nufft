@@ -280,7 +280,7 @@ BOOST_AUTO_TEST_CASE (horner_R_works) {
     double actual {nufft::cauchy<>::R(p, x, coefs)};
     double expected {0};
     for (int i {0}; i < p; ++i) {
-        expected += coefs[i]*nufft::cauchy<>::R(i, x);
+        expected += coefs[i]*std::pow(x, i);
     }
     BOOST_CHECK_CLOSE(expected, actual, 1e-10);
 }

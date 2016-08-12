@@ -15,13 +15,15 @@ namespace nufft {
         static inline range_t phi(domain_t y, domain_t x) {
             return 1.0/(y - x);
         }
+
         static range_t phi(domain_t y,
                            domain_t const * sources,
                            range_t const * weights,
                            vector_t<int_t> const & indices);
                 
         static range_t R(int_t p, domain_t x, range_t const * coefs);
-        static domain_t b(int_t m, domain_t x);
+
+        static domain_t b(domain_t m, domain_t x);
 
         static void
         apply_SS_translation(vector_t<range_t> const & input,

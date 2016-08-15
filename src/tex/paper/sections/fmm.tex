@@ -52,11 +52,13 @@ matrix by $\SSmat$. Represented as an infinite matrix, its entries are
 given by:
 \begin{align}
   \label{eq:SSmat}
-  \parens{\SSmat}_{n,m} \defd \frac{{(-1)}^{n-m} n! \delta^{n-m}}{(n-m)!m!},
+  \parens{\SSmat}_{n,m} \defd \begin{cases} \frac{{(-1)}^{n-m} n! \delta^{n-m}}{(n-m)!m!} & \mbox{if } n \geq m, \\
+    0 & \mbox{otherwise,}
+  \end{cases}
 \end{align}
 where $\delta$ is the translation vector between the two expansion
 centers. That is, if the resultant $S$-factorization is to be expanded
-about $\xstar'$, then $\delta = \xstar - \xstar'$. The corresponding
+about $\xstar'$, then $\delta = \xstar' - \xstar$. The corresponding
 $S$-reexpansion is:
 \begin{align}
   \label{eq:SSmat-reexpansion}
@@ -82,18 +84,17 @@ respectively.
 
 \subsection*{Error Analysis}
 
-\begin{lemma}\label{lemma:S-error}
-  With $\xstar\in\R$, and $x, y, r, R \in \R$ such that:
-  \begin{align}
-    \label{eq:S-error-condition}
-    |x - \xstar| < r < R < |y - \xstar|,
-  \end{align}
-  approximating $\cauchy(y, x)$ with a $\truncnum$ term $S$-expansion
-  is bounded by:
-  \begin{align*}
-    |\Serror| < \frac{1}{R-r} \parens{\frac{r}{R}}^\truncnum.
-  \end{align*}
-\end{lemma}
+The FMM breaks the summation into two parts---a term due to direct
+summation and a term due to indirect summation. The direct summation
+incurs only the usual error associated with carrying out computations
+on a computer (e.g.\ floating point error). The indirect summation
+operates by first creating truncated $S$-expansions for each source
+point, and then carrying out a series of translations. Typically,
+there will be a sequence of $\SSmat$ translations, followed by one
+$\SRmat$ translation, and then a sequence of $\RRmat$
+translations. The details of the algorithmic procedure can be found
+elsewhere, e.g.~\cite{fmm-orig}. We are mainly concerned with deriving
+a rough bound for the error due to the indirect summation.
 
 \begin{proof}
   The $\truncnum$ term $S$-expansion of $\cauchy(y, x)$ can be
@@ -118,8 +119,31 @@ respectively.
 \end{proof}
 
 \begin{lemma}\label{lemma:SS-error}
-  \TODO\ $\SSmat$ reexpansion error.
+  Applying an $\SSmat$ translation operator to a $\truncnum$ term
+  approximation of an $S$-factorization of $\cauchy$ incurs no
+  additional error.
 \end{lemma}
+
+\begin{proof}
+  Our truncated $S$-expansion is given by (\ref{eq:S-expansion}),
+  which is expanded about the expansion center $\xstar$. Reexpansion
+  about $\xstar'$ (\TODO\ what is required of $\xstar'$?) is given by:
+  \begin{align}\label{eq:SS-reexpansion}
+    \cauchy(y, x) = \Serror + \sum_{n=0}^{\truncnum-1} \parens{\sum_{\powerindex=0}^{\infty} {(\SSmat)}_{n,\powerindex} b_{\powerindex}(x, \xstar)} S_n(y - \xstar')
+  \end{align}
+  Denoting the error due to $\SS$ translation $\SSerror$, we have:
+  \begin{align}\label{eq:SS-error}
+    \SSerror = \sum_{n=0}^{\truncnum-1} \parens{\sum_{\powerindex=\truncnum}^\infty {(\SSmat)}_{n,\powerindex} b_\powerindex(x, \xstar)} S_n(x, \xstar'),
+  \end{align}
+  so that (\ref{eq:SS-reexpansion}) can be written:
+  \begin{align}
+    \cauchy(y, x) = \Serror + \SSerror + \sum_{n=0}^{\truncnum-1} \parens{\sum_{\powerindex=0}^{\truncnum-1} {(\SSmat)}_{n,\powerindex} b_{\powerindex}(x, \xstar)} S_n(y - \xstar').
+  \end{align}
+  Now, we note that the entries of $\SSmat$ are only nonzero if
+  $n \geq m$. This implies that each entry of $\SSmat$ involved in the
+  double summation defining $\SSerror$ is zero, so that
+  $\SSerror = 0$. This proves the claim.
+\end{proof}
 
 \begin{lemma}\label{lemma:SR-error}
   \TODO\ $\SRmat$ reexpansion error.

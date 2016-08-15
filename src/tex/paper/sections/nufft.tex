@@ -68,7 +68,7 @@ by letting:
 The corresponding formula for recovering $\unifval{\unifptindex}$ from
 $\arbval{\arbptindex}$ is:
 \begin{align}\label{eq:per-inv-interp-cot-kernel}
-  \unifpt{\unifptindex} = \dcoef{\unifptindex} \sum_{\persumindex=-\infty}^\infty\sum_{\arbptindex=0}^{\numarbpts-1}\frac{\ccoef{\arbptindex}}{\arbpt{\arbptindex} - \unifpt{\unifptindex} - 2\pi\persumindex}.
+  \unifval{\unifptindex} = \dcoef{\unifptindex} \sum_{\persumindex=-\infty}^\infty\sum_{\arbptindex=0}^{\numarbpts-1}\frac{\ccoef{\arbptindex} \arbval{\arbptindex}}{\arbpt{\arbptindex} - \unifpt{\unifptindex} - 2\pi\persumindex}.
 \end{align}
 
 If we let $\fft$ denote a linear operator corresponding to the DFT,

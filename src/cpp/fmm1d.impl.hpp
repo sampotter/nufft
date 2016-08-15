@@ -330,11 +330,9 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
     std::unordered_map<int_t, coefs_type> source_coefs;
     source_coefs[max_level] = get_finest_farfield_coefs(
         src_bookmarks, sources, weights, max_level, p);
-    if (max_level > 2) { // TODO: this line is prob unnecessary, remove later
-        for (int_t level {max_level}; level > 2; --level) {
-            source_coefs[level - 1] = get_parent_farfield_coefs(
-                source_coefs[level], level, p);
-        }
+    for (int_t level {max_level}; level > 2; --level) {
+        source_coefs[level - 1] = get_parent_farfield_coefs(
+            source_coefs[level], level, p);
     }
 
     std::unordered_map<int_t, coefs_type> target_coefs;

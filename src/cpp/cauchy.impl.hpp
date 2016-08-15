@@ -72,13 +72,6 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
         ++update_deltas_iter;
     };
 
-    // TODO: we could try using compensated summation for the
-    // accumulation of these coefficients, but it would end up being
-    // pretty complicated and inefficient. It might be necessary to
-    // maintain an array of compensation terms in parallel with the
-    // coefficients themselves, doubling the memory requirements for
-    // this part of the algorithm.
-
     vector_t<domain_t> coefs(p, 0);
     coefs[0] = 1;
 
@@ -98,19 +91,6 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
         for (int_t j {0}; j <= i; ++j) {
             output[i] += coefs[j] * deltas[j] * input[j];
         }
-
-        // TODO: unsure if using compensated summation here helps, but
-        // just in case we need it -- what's commented below works.
-
-        // output[i] = 0;
-        // range_t comp {0};
-        // for (index_t j {0}; j <= i; ++j) {
-        //     range_t next_term {coefs[j] * deltas[j] * input[j]};
-        //     next_term -= comp;
-        //     range_t tmp_sum = output[i] + next_term;
-        //     comp = (tmp_sum - output[i]) - next_term;
-        //     output[i] = tmp_sum;
-        // }
 
         update_deltas();
         update_coefs();

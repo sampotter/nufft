@@ -155,7 +155,6 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     int_t E4_neighbors[3];
     for (int_t i {0}; i < max_key; ++i) {
         auto const center = get_box_center(level, i);
-        // auto const E4_neighbors = get_E4_neighbors(level, i);
         get_E4_neighbors(i, E4_neighbors);
         for (auto const n: E4_neighbors) {
             if (n < 0 || n >= max_key) {

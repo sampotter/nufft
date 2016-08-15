@@ -152,8 +152,9 @@ Next, we deal with the error due to the truncation of $\phifar$, as in
   The error term for the approximation to $\phifar(y)$ given by
   $\phifarerror$ is finite and bounded as follows:
   \begin{align*}
-    |\phifarerror| \leq -\frac{\norm{\boldsymbol{\unifval{}}}_{1}}{2\pi} \parens{\Ei \parens{\truncnum \log(2\neighborhoodradius+3)} + \Ei \parens{\truncnum \log(2\neighborhoodradius+1)}}.
+    |\phifarerror| \leq -\frac{\norm{\boldsymbol{\unifval{}}}_{1}}{2\pi} \parens{\Ei \parens{-\truncnum \log(2\neighborhoodradius+3)} + \Ei \parens{-\truncnum \log(2\neighborhoodradius+1)}},
   \end{align*}
+  where $\Ei$ is the exponential integral.
 \end{lemma}
 
 \begin{proof}

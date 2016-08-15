@@ -58,12 +58,12 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_farfield_coefs(
             continue;
         }
         auto const left = opt_bookmark->first;
-        coefs[index] = get_multipole_coefs(
+        coefs.emplace(index, get_multipole_coefs(
             sources.data() + left,
             weights.data() + left,
             opt_bookmark->second - left + 1,
             get_box_center(max_level, index),
-            p);
+            p));
     }
     return coefs;
 }

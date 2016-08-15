@@ -55,28 +55,35 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
     // deltas into a single array, I could use an inline struct to
     // make things a bit simpler to understand.
     
-    vector_t<domain_t> deltas(p, 0);
+    static vector_t<domain_t> deltas(p);
     deltas[0] = 1;
+    for (int_t i {1}; i < p; ++i) {
+        deltas[i] = 0;
+    }
+
+    static vector_t<domain_t> coefs(p);
+    coefs[0] = 1;
+    for (int_t i {1}; i < p; ++i) {
+        coefs[i] = 0;
+    }
 
     int_t update_deltas_iter {1};
-    auto const update_deltas = [delta, &deltas, &update_deltas_iter, p] () {
+    int_t update_coefs_iter {1};
+    for (int_t i {0}; i < p; ++i) {
+        output[i] = 0;
+        for (int_t j {0}; j <= i; ++j) {
+            output[i] += coefs[j] * deltas[j] * input[j];
+        }
+
         if (update_deltas_iter >= p) {
             return;
         }
-        
         deltas[update_deltas_iter] = 1;
         for (int_t i {update_deltas_iter - 1}; i >= 0; --i) {
             deltas[i] *= -delta;
         }
-        
         ++update_deltas_iter;
-    };
 
-    vector_t<domain_t> coefs(p, 0);
-    coefs[0] = 1;
-
-    int_t update_coefs_iter {1};
-    auto const update_coefs = [&coefs, &update_coefs_iter, p] () {
         if (update_coefs_iter >= p) {
             return;
         }
@@ -84,16 +91,6 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
             coefs[i] += coefs[i - 1];
         }
         ++update_coefs_iter;
-    };
-
-    for (int_t i {0}; i < p; ++i) {
-        output[i] = 0;
-        for (int_t j {0}; j <= i; ++j) {
-            output[i] += coefs[j] * deltas[j] * input[j];
-        }
-
-        update_deltas();
-        update_coefs();
     }
 }
 
@@ -107,34 +104,35 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
 {
     domain_t const delta_recip = 1.0/delta;
     
-    vector_t<domain_t> deltas(p, delta_recip);
-    for (int_t i {1}; i < p; ++i) {
-        deltas[i] *= deltas[i - 1];
+    static vector_t<domain_t> deltas(p);
+    for (int_t i {0}; i < p; ++i) {
+        deltas[i] = delta_recip;
+        if (i > 0) {
+            deltas[i] *= deltas[i - 1];
+        }
     }
 
-    auto const update_deltas = [delta_recip, &deltas] () {
-        for (auto & delta: deltas) {
-            delta *= -delta_recip;
-        }
-    };
-
-    // TODO: looks like coefs doesn't depend on input data, except for
-    // p---can we compute it more (space) efficiently, and without
-    // allocating?
-    vector_t<domain_t> coefs(p, 1);
-
-    auto const update_coefs = [&coefs, p] () {
-        for (int_t i {1}; i < p; ++i) {
-            coefs[i] += coefs[i - 1];
-        }
-    };
+    static vector_t<domain_t> coefs(p);
+    for (int_t i {0}; i < p; ++i) {
+        coefs[i] = 1;
+    }
 
     for (int_t i {0}; i < p; ++i) {
         for (int_t j {0}; j < p; ++j) {
             output[i] += coefs[j] * deltas[j] * input[j];
         }
-		update_deltas();
-		update_coefs();
+
+        for (auto & delta: deltas) {
+            delta *= -delta_recip;
+        }
+
+        // TODO: looks like coefs doesn't depend on input data, except for
+        // p---can we compute it more (space) efficiently, and without
+        // allocating?
+
+        for (int_t i {1}; i < p; ++i) {
+            coefs[i] += coefs[i - 1];
+        }
     }
 }
 
@@ -146,16 +144,12 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_RR_translation(
 	domain_t delta,
 	int_t p)
 {
-	vector_t<domain_t> coefs(p, 1);
+	static vector_t<domain_t> coefs(p);
+    for (int_t i {0}; i < p; ++i) {
+        coefs[i] = 1;
+    }
 
     int_t end {p - 1};
-	auto const update_coefs = [&coefs, &end] () {
-		for (int_t i {1}; i < end; ++i) {
-			coefs[i] += coefs[i - 1];
-		}
-		--end;
-	};
-
 	for (int_t i {0}; i < p; ++i) {
 		output[i] = 0;
 		domain_t this_delta {1};
@@ -165,7 +159,10 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_RR_translation(
 			this_delta *= delta;
 			++k;
 		}
-		update_coefs();
+		for (int_t i {1}; i < end; ++i) {
+			coefs[i] += coefs[i - 1];
+		}
+		--end;
 	}
 }
 

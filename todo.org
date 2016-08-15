@@ -1,5 +1,20 @@
 * Todo
 ** Immediate todo
+   - [ ] Replace one of the waveforms with random combinations of
+     sinusoids
+   - [ ] Build on a Linux machine and see what the output is like
+     (i.e. if we're getting weird push_back slow path stuff)
+   - [ ] Count the number of translations (and initial multipole
+     expansions) that are being done and see if our method /should/
+     beat it (before implementing it...)
+   - [ ] Look at the allocators that AA presented in that C++ talk and
+     see if using e.g. a stack allocator might make it easier to deal
+     with the coefficient dictionaries
+   - [ ] Optimize/templatize bookmarks
+	 - [ ] We're keeping all of the coefficients that we've ever
+       computed in memory---but I think we only need to keep a level
+       at a time, since evaluation only uses the last level?
+   - [ ] Implement and use my adaptive FMM (as a template parameter)
    - [X] Remove crossed out TODO items from paper
    - [X] Remove checkpoint distribution section
    - [X] Remove error analysis section

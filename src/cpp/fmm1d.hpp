@@ -9,6 +9,7 @@
 
 #include "bookmarks.hpp"
 #include "index_manip.hpp"
+#include "source_coefs.hpp"
 #include "traits.hpp"
 
 namespace nufft {
@@ -27,28 +28,31 @@ namespace nufft {
         template <class T> using vector_t = std::vector<T>;
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;
 
-        static vector_t<range_t>
-        get_multipole_coefs(domain_t const * sources,
-                            range_t const * weights,
-                            int_t num_sources,
-                            domain_t x_star,
-                            int_t p);
+        static void
+        compute_multipole_coefs(domain_t const * sources,
+                                range_t const * weights,
+                                int_t num_sources,
+                                domain_t x_star,
+                                int_t p,
+                                range_t * coefs);
 
-        static coefs_type
-        get_finest_farfield_coefs(
+        static void
+        compute_finest_farfield_coefs(
             bookmarks<domain_t, int_t> const & source_bookmarks,
             vector_t<domain_t> const & sources,
             vector_t<range_t> const & weights,
             int_t max_level,
-            int_t p);
-
-        static coefs_type
-        get_parent_farfield_coefs(coefs_type const & coefs,
-                                  int_t level,
-                                  int_t p);
+            int_t p,
+            source_coefs<range_t, int_t> & source_coefs);
 
         static void
-        do_E4_SR_translations(coefs_type const & input_coefs,
+        compute_parent_farfield_coefs(
+            int_t level,
+            int_t p,
+            source_coefs<range_t, int_t> & source_coefs);
+
+        static void
+        do_E4_SR_translations(source_coefs<range_t, int_t> const & source_coefs,
                               coefs_type & output_coefs,
                               int_t level,
                               int_t p);

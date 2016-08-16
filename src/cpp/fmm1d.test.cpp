@@ -51,8 +51,14 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         -0.6855300683488881,
         -0.6047525248078208
     };
-    auto const actual = fmm1d<cauchy<>>::get_multipole_coefs(
-        sources.data(), weights.data(), sources.size(), x_star, p);
+    vector_t<double> actual(p);
+    fmm1d<cauchy<>>::compute_multipole_coefs(
+        sources.data(),
+        weights.data(),
+        sources.size(),
+        x_star,
+        p,
+        &actual[0]);
     
     BOOST_CHECK_EQUAL_COLLECTIONS(
         std::cbegin(actual),
@@ -207,30 +213,38 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
         -4.477479584367964e-27,
     };
 
-    auto const actual_coefs = fmm1d<cauchy<>>::get_finest_farfield_coefs(
-        source_bookmarks, sources, weights, max_level, p);
+    source_coefs<double, int_t> source_coefs(max_level, p);
+
+    fmm1d<cauchy<>>::compute_finest_farfield_coefs(
+        source_bookmarks,
+        sources,
+        weights,
+        max_level,
+        p,
+        source_coefs);
 
     for (auto const & entry: expected_coefs) {
         auto const key = entry.first;
-        BOOST_CHECK(actual_coefs.find(key) != std::cend(actual_coefs));
+        BOOST_CHECK(source_coefs.test(max_level, key));
     }
 
-    for (auto const & entry: actual_coefs) {
-        auto const key = entry.first;
-        BOOST_CHECK(expected_coefs.find(key) != std::cend(expected_coefs));
+    for (int_t i {0}; i < 1 << max_level; ++i) {
+        if (source_coefs.test(max_level, i)) {
+            BOOST_CHECK(expected_coefs.find(i) != std::cend(expected_coefs));
+        }
     }
 
     for (auto const & entry: expected_coefs) {
         auto const & expected_box_coefs = entry.second;
         
         auto const key = entry.first;
-        auto const & actual_box_coefs = actual_coefs.find(key)->second;
+        auto const & actual_box_coefs = source_coefs.get_coefs(max_level, key);
 
         BOOST_CHECK_EQUAL_COLLECTIONS(
             std::cbegin(expected_box_coefs),
             std::cend(expected_box_coefs),
-            std::cbegin(actual_box_coefs),
-            std::cend(actual_box_coefs));
+            actual_box_coefs,
+            actual_box_coefs + p);
     }
 }
 
@@ -239,6 +253,8 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
 
     int_t level = 4;
     int_t p = 5;
+
+    source_coefs<double, int_t> source_coefs(level, p);
 
     fmm1d<cauchy<>>::coefs_type child_coefs;
     child_coefs[1] = {
@@ -354,8 +370,15 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
         5.371148724791965e-7,
     };
 
-    auto const actual_parent_coefs =
-        fmm1d<cauchy<>>::get_parent_farfield_coefs(child_coefs, level, p);
+    for (int_t i {0}; i < 1 << level; ++i) {
+        auto coefs = source_coefs.get_coefs(level, i);
+        for (int_t m {0}; m < p; ++m) {
+            coefs[m] = child_coefs[i][m];
+        }
+        source_coefs.set(level, i);
+    }
+
+    fmm1d<cauchy<>>::compute_parent_farfield_coefs(level, p, source_coefs);
 
     fmm1d<cauchy<>>::coefs_type expected_parent_coefs;
     expected_parent_coefs[6] = {
@@ -415,27 +438,26 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
         -1.1946889829296134e-5,
     };
 
-    for (auto const & entry: actual_parent_coefs) {
-        auto const key = entry.first;
-        BOOST_CHECK(expected_parent_coefs.find(key) !=
-                    std::cend(expected_parent_coefs));
+    for (int_t i {0}; i < 1 << (level - 1); ++i) {
+        if (source_coefs.test(level - 1, i)) {
+            BOOST_CHECK(expected_parent_coefs.find(i) !=
+                        std::cend(expected_parent_coefs));
+        }
     }
 
     for (auto const & entry: expected_parent_coefs) {
         auto const key = entry.first;
-        BOOST_CHECK(actual_parent_coefs.find(key) !=
-                    std::cend(actual_parent_coefs));
+        BOOST_CHECK(source_coefs.test(level - 1, key));
     }
 
-    for (auto const & entry: actual_parent_coefs) {
-        auto const actual_coef_vector = entry.second;
-        auto const key = entry.first;
-        if (expected_parent_coefs.find(key) != std::cend(expected_parent_coefs)) {
+    for (int_t i {0}; i < 1 << (level - 1); ++i) {
+        auto const coefs = source_coefs.get_coefs(level - 1, i);
+        if (expected_parent_coefs.find(i) != std::cend(expected_parent_coefs)) {
             auto const expected_coef_vector =
-                expected_parent_coefs.find(key)->second;
+                expected_parent_coefs.find(i)->second;
             BOOST_CHECK_EQUAL_COLLECTIONS(
-                std::cbegin(actual_coef_vector),
-                std::cend(actual_coef_vector),
+                coefs,
+                coefs + p,
                 std::cbegin(expected_coef_vector),
                 std::cend(expected_coef_vector));
         }
@@ -448,6 +470,8 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
     int_t level = 3;
     int_t p = 5;
     
+    source_coefs<double, int_t> source_coefs(level, p);
+
     fmm1d<cauchy<>>::coefs_type input_coefs;
     input_coefs[6] = {
         0.4134492556906605,
@@ -505,6 +529,13 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
         -0.00038477786374808336,
         -1.1946889829296134e-5,
     };
+    
+    for (int_t i {0}; i < 1 << level; ++i) {
+        auto coefs = source_coefs.get_coefs(level, i);
+        for (int_t m {0}; m < p; ++m) {
+            coefs[m] = input_coefs[i][m];
+        }
+    }
 
     fmm1d<cauchy<>>::coefs_type expected_coefs;
     expected_coefs[6] = {
@@ -565,7 +596,11 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
     };
 
     fmm1d<cauchy<>>::coefs_type actual_coefs;
-    fmm1d<cauchy<>>::do_E4_SR_translations(input_coefs, actual_coefs, level, p);
+    fmm1d<cauchy<>>::do_E4_SR_translations(
+        source_coefs,
+        actual_coefs,
+        level,
+        p);
 
     auto const max_index = std::pow(2, level);
     auto const assert_indices_subset = [max_index] (

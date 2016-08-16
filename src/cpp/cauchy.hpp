@@ -26,13 +26,13 @@ namespace nufft {
         static domain_t b(int_t m, domain_t x);
 
         static void
-        apply_SS_translation(vector_t<range_t> const & input,
+        apply_SS_translation(range_t const * const input,
                              vector_t<range_t> & output,
                              domain_t delta,
                              int_t p);
 
         static void
-        apply_SR_translation(vector_t<range_t> const & input,
+        apply_SR_translation(range_t const * const input,
                              vector_t<range_t> & output,
                              domain_t delta,
                              int_t p);

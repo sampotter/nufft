@@ -45,7 +45,7 @@ nufft::cauchy<domain_t, range_t, int_t>::b(int_t m, domain_t x)
 template <class domain_t, class range_t, class int_t>
 void
 nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
-    vector_t<range_t> const & input,
+    range_t const * const input,
     vector_t<range_t> & output,
     domain_t delta,
     int_t p)
@@ -96,7 +96,7 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SS_translation(
 template <class domain_t, class range_t, class int_t>
 void
 nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
-    vector_t<range_t> const & input,
+    range_t const * const input,
     vector_t<range_t> & output,
     domain_t delta,
     int_t p)

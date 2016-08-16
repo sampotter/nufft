@@ -17,7 +17,7 @@ BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
                           vector_t<double> input,
                           vector_t<double> expected) {
         vector_t<double> actual(p, 0);
-        cauchy<>::apply_SS_translation(input, actual, delta, p);
+        cauchy<>::apply_SS_translation(input.data(), actual, delta, p);
         BOOST_CHECK_EQUAL_COLLECTIONS(
             std::cbegin(expected), std::cend(expected),
             std::cbegin(actual), std::cend(actual));
@@ -192,7 +192,7 @@ BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
     double const delta {0.125};
     int_t const p {10};
     vector_t<double> actual_translation(p, 0);
-    cauchy<>::apply_SR_translation(input, actual_translation, delta, p);
+    cauchy<>::apply_SR_translation(input.data(), actual_translation, delta, p);
 
     BOOST_CHECK_EQUAL_COLLECTIONS(
         std::cbegin(expected_translation),

@@ -1,7 +1,14 @@
 * Todo
 ** Immediate todo
+   - [ ] farfield -> multipole in cpp
+   - [ ] make vectors in compute_parent_farfield_coefs static
+   - [ ] add_coefs -> accumulate_coefs (in compute_parent_farfield_coefs)
+   - [ ] do_* -> compute_*
+   - [ ] make source_coefs a template parameter---think about a "coefs
+     concept"
    - [ ] Replace one of the waveforms with random combinations of
      sinusoids
+   - [ ] Add nufft::source_coefs unit tests
    - [ ] Build on a Linux machine and see what the output is like
      (i.e. if we're getting weird push_back slow path stuff)
    - [ ] Count the number of translations (and initial multipole
@@ -10,6 +17,11 @@
    - [ ] Look at the allocators that AA presented in that C++ talk and
      see if using e.g. a stack allocator might make it easier to deal
      with the coefficient dictionaries
+   - [ ] When we're computing multipole coefficients, we can do
+     further space optimizations by figuring out, after we compute
+     parent coefficients, which of the previous level's coefficients
+     need to be kept for SR translations---for our degenerate NUFFT
+     case, most won't
    - [ ] Optimize/templatize bookmarks
 	 - [ ] We're keeping all of the coefficients that we've ever
        computed in memory---but I think we only need to keep a level

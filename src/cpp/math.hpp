@@ -1,6 +1,7 @@
 #ifndef __NUFFT_MATH_HPP__
 #define __NUFFT_MATH_HPP__
 
+#include <cinttypes>
 #include <complex>
 #include <type_traits>
 
@@ -45,6 +46,39 @@ namespace nufft {
 	constexpr void add(T & lhs, T const & rhs)
 	{
 		lhs += rhs;
+	}
+
+	// TODO: include a version which returns void and directly
+	// computes the result in the first argument (which would then be
+	// passed by reference).
+
+	namespace private_ {
+		template <class T>
+		constexpr T pow(T base, uint32_t expt)
+		{
+			T tmp = expt & 1 ? base : 1;
+			while (expt >>= 1) {
+				base *= base;
+				if (expt & 1) {
+					tmp *= base;
+				}
+			}
+			return tmp;
+		}
+	}
+
+	template <
+		class S,
+		class T,
+		std::enable_if_t<
+			!std::is_integral<S> {} && std::is_integral<T> {}> * = nullptr>
+	constexpr S pow(S base, T expt)
+	{
+		if (expt < 0) {
+			return S(1)/private_::pow(base, -expt);
+		} else {
+			return private_::pow(base, expt);
+		}
 	}
 }
 

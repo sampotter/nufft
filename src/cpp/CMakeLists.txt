@@ -24,6 +24,23 @@ add_executable (nufft.test nufft.test.cpp nufft.hpp nufft.impl.hpp nufft.cpp
   fmm1d.hpp fmm1d.impl.hpp cauchy.hpp cauchy.impl.hpp index_manip.hpp
   index_manip.impl.hpp bookmarks.hpp bookmarks.impl.hpp)
 target_link_libraries (nufft.test ${ARMADILLO_LIBRARIES})
+add_executable (source_coefs.test source_coefs.test.cpp source_coefs.hpp
+  source_coefs.impl.hpp)
+
+set (nufft_tests
+  bookmarks
+  util
+  index_manip
+  cauchy
+  fmm1d
+  math
+  nufft
+  source_coefs)
+foreach (test ${nufft_tests})
+  set_target_properties (${test}.test PROPERTIES COMPILE_FLAGS
+    "-DNUFFT_UNIT_TEST")
+  add_test (${test} ${test}.test)
+endforeach ()
 
 add_executable (fmm1d.perf fmm1d.perf.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
   cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
@@ -42,14 +59,6 @@ add_library (nufft SHARED nufft.hpp nufft.impl.hpp nufft.cpp cauchy.hpp
 target_link_libraries (nufft ${ARMADILLO_LIBRARIES})
 
 enable_testing ()
-
-add_test (bookmarks bookmarks.test)
-add_test (util util.test)
-add_test (index_manip index_manip.test)
-add_test (cauchy cauchy.test)
-add_test (fmm1d fmm1d.test)
-add_test (math math.test)
-add_test (nufft nufft.test)
 
 # Local Variables:
 # indent-tabs-mode: nil

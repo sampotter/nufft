@@ -95,9 +95,12 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_farfield_coefs(
     auto const parent_level {level - 1};
     auto const max_parent_index = max_index / 2;
     
+    vector_t<range_t> workspace(p);
+    vector_t<range_t> parent_box_coefs(p);
     for (int_t parent_index {0}; parent_index < max_parent_index; ++parent_index) {
-        vector_t<range_t> workspace(p, 0); // TODO: move out of loop
-        vector_t<range_t> parent_box_coefs(p, 0);
+        memset(&workspace[0], 0x0, p*sizeof(range_t));
+        memset(&parent_box_coefs[0], 0x0, p*sizeof(range_t));
+
         auto const parent_center =
             get_box_center(parent_level, parent_index);
         

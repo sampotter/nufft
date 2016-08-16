@@ -23,7 +23,7 @@ namespace nufft {
                 
         static range_t R(int_t p, domain_t x, range_t const * coefs);
 
-        static domain_t b(domain_t m, domain_t x);
+        static domain_t b(int_t m, domain_t x);
 
         static void
         apply_SS_translation(vector_t<range_t> const & input,

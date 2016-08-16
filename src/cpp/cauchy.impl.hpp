@@ -2,7 +2,6 @@
 #define __NUFFT_CAUCHY_IMPL_HPP__
 
 #include <cassert>
-#include <cmath>
 
 #include "math.hpp"
 
@@ -38,9 +37,9 @@ nufft::cauchy<domain_t, range_t, int_t>::R(
 
 template <class domain_t, class range_t, class int_t>
 domain_t
-nufft::cauchy<domain_t, range_t, int_t>::b(domain_t m, domain_t x)
+nufft::cauchy<domain_t, range_t, int_t>::b(int_t m, domain_t x)
 {
-    return std::pow(x, m);
+    return pow(x, m);
 }
 
 template <class domain_t, class range_t, class int_t>

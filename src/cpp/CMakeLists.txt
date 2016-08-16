@@ -19,6 +19,7 @@ add_executable (cauchy.test cauchy.test.cpp cauchy.hpp cauchy.impl.hpp)
 add_executable (fmm1d.test fmm1d.test.cpp fmm1d.hpp fmm1d.impl.hpp cauchy.hpp
   cauchy.impl.hpp index_manip.hpp index_manip.impl.hpp bookmarks.hpp
   bookmarks.impl.hpp)
+add_executable (math.test math.test.cpp math.hpp)
 add_executable (nufft.test nufft.test.cpp nufft.hpp nufft.impl.hpp nufft.cpp
   fmm1d.hpp fmm1d.impl.hpp cauchy.hpp cauchy.impl.hpp index_manip.hpp
   index_manip.impl.hpp bookmarks.hpp bookmarks.impl.hpp)
@@ -47,6 +48,7 @@ add_test (util util.test)
 add_test (index_manip index_manip.test)
 add_test (cauchy cauchy.test)
 add_test (fmm1d fmm1d.test)
+add_test (math math.test)
 add_test (nufft nufft.test)
 
 # Local Variables:

@@ -467,7 +467,10 @@ BOOST_AUTO_TEST_CASE (
     }
 }
 
-BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
+BOOST_AUTO_TEST_CASE (
+    do_E4_SR_translations_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     int_t level = 3;
@@ -538,6 +541,7 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
         for (int_t m {0}; m < p; ++m) {
             coefs[m] = input_coefs[i][m];
         }
+        source_coefs.set(level, i);
     }
 
     fmm1d<cauchy<>>::coefs_type expected_coefs;
@@ -623,9 +627,9 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
         auto const index = entry.first;
         auto const & actual = entry.second;
         auto const & expected = expected_coefs.at(index);
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(actual), std::cend(actual),
-            std::cbegin(expected), std::cend(expected));
+        for (std::size_t i {0}; i < actual.size(); ++i) {
+            BOOST_TEST(actual[i] == expected[i]);
+        }
     }
 }
 

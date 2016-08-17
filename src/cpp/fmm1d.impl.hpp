@@ -92,7 +92,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
 
 		auto const parent_center = get_box_center(parent_level, parent_index);
         auto parent_coefs = source_coefs.get_coefs(parent_level, parent_index);
-        auto const add_coefs = [&] (int_t const index) {
+        auto const accumulate_coefs = [&] (int_t const index) {
             if (source_coefs.test(level, index)) {
 				auto const delta = parent_center - get_box_center(level, index);
 				kernel_t::apply_SS_translation(
@@ -108,8 +108,8 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
         };
         
         auto const children = get_children(parent_index);
-        add_coefs(children.first);
-        add_coefs(children.second);
+        accumulate_coefs(children.first);
+        accumulate_coefs(children.second);
     }
 }
 

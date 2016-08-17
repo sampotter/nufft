@@ -86,7 +86,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
     auto const parent_level {level - 1};
     auto const max_parent_index = max_index / 2;
     
-    vector_t<range_t> workspace(p);
+    static vector_t<range_t> workspace(p);
     for (int_t parent_index {0}; parent_index < max_parent_index; ++parent_index) {
         memset(&workspace[0], 0x0, p*sizeof(range_t));
 

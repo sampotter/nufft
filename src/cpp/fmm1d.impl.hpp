@@ -54,14 +54,14 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_finest_farfield_coefs(
     auto const max_index = static_cast<int_t>(std::pow(2, max_level));
     for (int_t index {0}; index < max_index; ++index) {
         auto const bookmark = source_bookmarks(max_level, index);
-        if (!bookmark) {
+        if (bookmark.empty()) {
             continue;
         }
-        auto const left = bookmark->first;
+        auto const left = bookmark.left();
         compute_multipole_coefs(
             sources.data() + left,
             weights.data() + left,
-            bookmark->second - left + 1,
+            bookmark.right() - left + 1,
             get_box_center(max_level, index),
             p,
             source_coefs.get_coefs(max_level, index));
@@ -230,28 +230,30 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
     assert(max < max_index);
 #endif
     for (int_t i {0}; i < max_index; ++i) {
-        auto const opt = target_bookmarks(max_level, i);
-        if (!opt) {
+        auto const bookmark = target_bookmarks(max_level, i);
+        if (bookmark.empty()) {
             continue;
         }
-        auto const left = opt->first;
-        auto const right = opt->second;
 
         // TODO: this can very likely be greatly simplified
         vector_t<int_t> direct_indices;
         for (int_t j {std::max(int_t {0}, i - 1)};
              j < std::min(static_cast<int_t>(max_index), i + 2);
              ++j) {
-            auto const opt = source_bookmarks(max_level, j);
-            if (!opt) {
+            auto const bookmark = source_bookmarks(max_level, j);
+            if (bookmark.empty()) {
                 continue;
             }
-            auto const left = opt->first;
-            auto const right = opt->second;
+            auto const left = bookmark.left();
+            auto const right = bookmark.right();
             for (int_t k {left}; k <= right; ++k) {
                 direct_indices.push_back(k);
             }
         }
+
+        auto const left = bookmark.left();
+        auto const right = bookmark.right();
+
         if (!direct_indices.empty()) {
             for (int_t j {left}; j <= right; ++j) {
                 output[j] += kernel_t::phi(

@@ -22,8 +22,8 @@ BOOST_AUTO_TEST_CASE (empty_bookmarks_are_correct) {
         std::all_of(
             std::cbegin(empty_bookmarks),
             std::cend(empty_bookmarks),
-            [] (boost::optional<bookmarks_t::bookmark_t> const index) {
-                return index == boost::none;
+            [] (bookmarks_t::bookmark_t const bookmark) {
+                return bookmark.empty();
             }));
 }
 
@@ -34,8 +34,7 @@ BOOST_AUTO_TEST_CASE (bookmarks_all_full) {
     for (int_t level {0}; level <= max_level; ++level) {
         auto const level_size = std::pow(2, level);
         for (int_t index {0}; index < level_size; ++index) {
-            auto const opt_bookmark = bookmarks(level, index);
-            BOOST_TEST(bool {opt_bookmark});
+            BOOST_TEST(!bookmarks(level, index).empty());
         }
     }
 }
@@ -47,11 +46,11 @@ BOOST_AUTO_TEST_CASE (bookmarks_edges) {
 
     for (int_t level {0}; level <= max_level; ++level) {
         auto const level_size = std::pow(2, level);
-        BOOST_TEST(bool {bookmarks(level, 0)});
+        BOOST_TEST(!bookmarks(level, 0).empty());
         for (int_t index {1}; index < level_size - 1; ++index) {
-            BOOST_TEST(!bool {bookmarks(level, index)});
+            BOOST_TEST(bookmarks(level, index).empty());
         }
-        BOOST_TEST(bool {bookmarks(level, level_size - 1)});
+        BOOST_TEST(!bookmarks(level, level_size - 1).empty());
     }
 }
 

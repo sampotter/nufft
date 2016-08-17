@@ -9,7 +9,10 @@
 using int_t = int64_t;
 template <class T> using vector_t = std::vector<T>;
 
-BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
+BOOST_AUTO_TEST_CASE (
+    apply_SS_translation_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     auto const test = [] (int_t p,
@@ -18,9 +21,9 @@ BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
                           vector_t<double> expected) {
         vector_t<double> actual(p, 0);
         cauchy<>::apply_SS_translation(input.data(), actual, delta, p);
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(expected), std::cend(expected),
-            std::cbegin(actual), std::cend(actual));
+        for (int_t m {0}; m < p; ++m) {
+            BOOST_TEST(actual[m] == expected[m]);
+        }
     };
 
     // jl: 1
@@ -160,7 +163,10 @@ BOOST_AUTO_TEST_CASE (apply_SS_translation_works) {
          {-1.7721947719892979, -0.037298740246162906, -0.0009506419118722582, -2.0541731288899247e-5, 7.272835526999819e-8});
 }
 
-BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
+BOOST_AUTO_TEST_CASE (
+    apply_SR_translation_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     vector_t<double> const expected_translation = {
@@ -194,14 +200,15 @@ BOOST_AUTO_TEST_CASE (apply_SR_translation_works) {
     vector_t<double> actual_translation(p, 0);
     cauchy<>::apply_SR_translation(input.data(), actual_translation, delta, p);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(
-        std::cbegin(expected_translation),
-        std::cend(expected_translation),
-        std::cbegin(actual_translation),
-        std::cend(actual_translation));
+    for (int_t m {0}; m < p; ++m) {
+        BOOST_TEST(expected_translation[m] == actual_translation[m]);
+    }
 }
 
-BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
+BOOST_AUTO_TEST_CASE (
+    apply_RR_translation_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     {
@@ -236,11 +243,9 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
         vector_t<double> actual_translation(p, 0);
         cauchy<>::apply_RR_translation(input, actual_translation, delta, p);
 
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(expected_translation),
-            std::cend(expected_translation),
-            std::cbegin(actual_translation),
-            std::cend(actual_translation));
+        for (int_t m {0}; m < p; ++m) {
+            BOOST_TEST(expected_translation[m] == actual_translation[m]);
+        }
     }
 
     {
@@ -265,11 +270,9 @@ BOOST_AUTO_TEST_CASE (apply_RR_translation_works) {
         vector_t<double> actual_translation(p, 0);
         cauchy<>::apply_RR_translation(input, actual_translation, delta, p);
 
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(expected_translation),
-            std::cend(expected_translation),
-            std::cbegin(actual_translation),
-            std::cend(actual_translation));
+        for (int_t m {0}; m < p; ++m) {
+            BOOST_TEST(expected_translation[m] == actual_translation[m]);
+        }
     }
 }
 

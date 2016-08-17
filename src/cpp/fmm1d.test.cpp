@@ -12,7 +12,10 @@
 using int_t = int64_t;
 template <class T> using vector_t = std::vector<T>;
 
-BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
+BOOST_AUTO_TEST_CASE (
+    get_multipole_coefs_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
     
     vector_t<double> const sources = {
@@ -59,15 +62,16 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         x_star,
         p,
         &actual[0]);
-    
-    BOOST_CHECK_EQUAL_COLLECTIONS(
-        std::cbegin(actual),
-        std::cend(actual),
-        std::cbegin(expected),
-        std::cend(expected));
+
+    for (int_t m {0}; m < p; ++m) {
+        BOOST_TEST(actual[m] == expected[m]);
+    }
 }
 
-BOOST_AUTO_TEST_CASE (get_finest_multipole_coefs_works) {
+BOOST_AUTO_TEST_CASE (
+    get_finest_multipole_coefs_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     vector_t<double> const sources = {
@@ -240,15 +244,16 @@ BOOST_AUTO_TEST_CASE (get_finest_multipole_coefs_works) {
         auto const key = entry.first;
         auto const & actual_box_coefs = source_coefs.get_coefs(max_level, key);
 
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(expected_box_coefs),
-            std::cend(expected_box_coefs),
-            actual_box_coefs,
-            actual_box_coefs + p);
+        for (int_t m {0}; m < p; ++m) {
+            BOOST_TEST(expected_box_coefs[m] == actual_box_coefs[m]);
+        }
     }
 }
 
-BOOST_AUTO_TEST_CASE (get_parent_multipole_coefs_works) {
+BOOST_AUTO_TEST_CASE (
+    get_parent_multipole_coefs_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     int_t level = 4;
@@ -455,11 +460,9 @@ BOOST_AUTO_TEST_CASE (get_parent_multipole_coefs_works) {
         if (expected_parent_coefs.find(i) != std::cend(expected_parent_coefs)) {
             auto const expected_coef_vector =
                 expected_parent_coefs.find(i)->second;
-            BOOST_CHECK_EQUAL_COLLECTIONS(
-                coefs,
-                coefs + p,
-                std::cbegin(expected_coef_vector),
-                std::cend(expected_coef_vector));
+            for (int_t m {0}; m < p; ++m) {
+                BOOST_TEST(coefs[m] == expected_coef_vector[m]);
+            }
         }
     }
 }
@@ -626,7 +629,10 @@ BOOST_AUTO_TEST_CASE (do_E4_SR_translations_works) {
     }
 }
 
-BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
+BOOST_AUTO_TEST_CASE (
+    do_RR_translations_works,
+    *boost::unit_test::tolerance(1e-15))
+{
     using namespace nufft;
 
     int_t level = 3;
@@ -825,13 +831,13 @@ BOOST_AUTO_TEST_CASE (do_RR_translations_works) {
         auto const index = entry.first;
         auto const & actual = entry.second;
         auto const & expected = expected_coefs.at(index);
-        BOOST_CHECK_EQUAL_COLLECTIONS(
-            std::cbegin(actual), std::cend(actual),
-            std::cbegin(expected), std::cend(expected));
+        for (int_t m {0}; m < p; ++m) {
+            BOOST_TEST(actual[m] == expected[m]);
+        }
     }
 }
 
-BOOST_AUTO_TEST_CASE (evaluate_works) {
+BOOST_AUTO_TEST_CASE (evaluate_works, *boost::unit_test::tolerance(1e-15)) {
     using namespace nufft;
 
     vector_t<double> const X = {
@@ -1369,11 +1375,12 @@ BOOST_AUTO_TEST_CASE (evaluate_works) {
 
     fmm1d<cauchy<>>::evaluate(X_bookmarks, Y_bookmarks, coefs, output, X, Y, U, L, p);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(output), std::cend(output),
-                                  std::cbegin(expected), std::cend(expected));
+    for (int_t m {0}; m < p; ++m) {
+        BOOST_TEST(output[m] == expected[m]);
+    }
 }
 
-BOOST_AUTO_TEST_CASE (fmm_works) {
+BOOST_AUTO_TEST_CASE (fmm_works, *boost::unit_test::tolerance(1e-15)) {
     using namespace nufft;
 
     vector_t<double> const X = {
@@ -1793,8 +1800,9 @@ BOOST_AUTO_TEST_CASE (fmm_works) {
 
     auto const actual = fmm1d<cauchy<>>::fmm(X, Y, U, L, p);
 
-    BOOST_CHECK_EQUAL_COLLECTIONS(std::cbegin(actual), std::cend(actual),
-                                  std::cbegin(expected), std::cend(expected));
+    for (int_t m {0}; m < p; ++m) {
+        BOOST_TEST(actual[m] == expected[m]);
+    }
 }
 
 BOOST_AUTO_TEST_CASE (deeper_depths_dont_crash) {

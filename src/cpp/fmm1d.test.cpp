@@ -52,7 +52,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         -0.6047525248078208
     };
     vector_t<double> actual(p);
-    fmm1d<cauchy<>>::compute_multipole_coefs(
+    fmm1d<cauchy<>>::get_multipole_coefs(
         sources.data(),
         weights.data(),
         sources.size(),
@@ -67,7 +67,7 @@ BOOST_AUTO_TEST_CASE (get_multipole_coefs_works) {
         std::cend(expected));
 }
 
-BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
+BOOST_AUTO_TEST_CASE (get_finest_multipole_coefs_works) {
     using namespace nufft;
 
     vector_t<double> const sources = {
@@ -215,7 +215,7 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
 
     source_coefs<double, int_t> source_coefs(max_level, p);
 
-    fmm1d<cauchy<>>::compute_finest_farfield_coefs(
+    fmm1d<cauchy<>>::get_finest_multipole_coefs(
         source_bookmarks,
         sources,
         weights,
@@ -248,7 +248,7 @@ BOOST_AUTO_TEST_CASE (get_finest_farfield_coefs_works) {
     }
 }
 
-BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
+BOOST_AUTO_TEST_CASE (get_parent_multipole_coefs_works) {
     using namespace nufft;
 
     int_t level = 4;
@@ -378,7 +378,7 @@ BOOST_AUTO_TEST_CASE (get_parent_farfield_coefs_works) {
         source_coefs.set(level, i);
     }
 
-    fmm1d<cauchy<>>::compute_parent_farfield_coefs(level, p, source_coefs);
+    fmm1d<cauchy<>>::get_parent_multipole_coefs(level, p, source_coefs);
 
     fmm1d<cauchy<>>::coefs_type expected_parent_coefs;
     expected_parent_coefs[6] = {

@@ -29,7 +29,7 @@ namespace nufft {
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;
 
         static void
-        compute_multipole_coefs(domain_t const * sources,
+        get_multipole_coefs(domain_t const * sources,
                                 range_t const * weights,
                                 int_t num_sources,
                                 domain_t x_star,
@@ -37,7 +37,7 @@ namespace nufft {
                                 range_t * coefs);
 
         static void
-        compute_finest_farfield_coefs(
+        get_finest_multipole_coefs(
             bookmarks<domain_t, int_t> const & source_bookmarks,
             vector_t<domain_t> const & sources,
             vector_t<range_t> const & weights,
@@ -46,7 +46,7 @@ namespace nufft {
             source_coefs<range_t, int_t> & source_coefs);
 
         static void
-        compute_parent_farfield_coefs(
+        get_parent_multipole_coefs(
             int_t level,
             int_t p,
             source_coefs<range_t, int_t> & source_coefs);

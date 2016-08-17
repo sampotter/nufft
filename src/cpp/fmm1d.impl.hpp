@@ -14,7 +14,7 @@
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_multipole_coefs(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_multipole_coefs(
     domain_t const * sources,
     range_t const * weights,
     int_t num_sources,
@@ -39,7 +39,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_multipole_coefs(
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_finest_farfield_coefs(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_multipole_coefs(
     bookmarks<domain_t, int_t> const & source_bookmarks,
     vector_t<domain_t> const & sources,
     vector_t<range_t> const & weights,
@@ -58,7 +58,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_finest_farfield_coefs(
             continue;
         }
         auto const left = bookmark.left();
-        compute_multipole_coefs(
+        get_multipole_coefs(
             sources.data() + left,
             weights.data() + left,
             bookmark.right() - left + 1,
@@ -71,7 +71,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_finest_farfield_coefs(
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
-nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::compute_parent_farfield_coefs(
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
     int_t level,
     int_t p,
     source_coefs<range_t, int_t> & source_coefs)
@@ -318,7 +318,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
     // }
 
     source_coefs<range_t, int_t> source_coefs(max_level, p);
-    compute_finest_farfield_coefs(
+    get_finest_multipole_coefs(
         src_bookmarks,
         sources,
         weights,
@@ -326,7 +326,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
         p,
         source_coefs);
     for (int_t level {max_level}; level > 2; --level) {
-        compute_parent_farfield_coefs(level, p, source_coefs);
+        get_parent_multipole_coefs(level, p, source_coefs);
     }
 
     std::unordered_map<int_t, coefs_type> target_coefs;

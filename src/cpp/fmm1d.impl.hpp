@@ -229,14 +229,17 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
     assert(0 <= min);
     assert(max < max_index);
 #endif
+
+	vector_t<int_t> direct_indices;
     for (int_t i {0}; i < max_index; ++i) {
+		direct_indices.clear();
+
         auto const bookmark = target_bookmarks(max_level, i);
         if (bookmark.empty()) {
             continue;
         }
 
         // TODO: this can very likely be greatly simplified
-        vector_t<int_t> direct_indices;
         for (int_t j {std::max(int_t {0}, i - 1)};
              j < std::min(static_cast<int_t>(max_index), i + 2);
              ++j) {
@@ -246,6 +249,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
             }
             auto const left = bookmark.left();
             auto const right = bookmark.right();
+			direct_indices.reserve(right - left + 1);
             for (int_t k {left}; k <= right; ++k) {
                 direct_indices.push_back(k);
             }

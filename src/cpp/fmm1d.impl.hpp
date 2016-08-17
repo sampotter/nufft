@@ -313,14 +313,6 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
     bookmarks<domain_t, int_t> const src_bookmarks {sources, max_level};
     bookmarks<domain_t, int_t> const trg_bookmarks {targets, max_level};
 
-    // std::unordered_map<int_t, coefs_type> source_coefs;
-    // source_coefs[max_level] = get_finest_farfield_coefs(
-    //     src_bookmarks, sources, weights, max_level, p);
-    // for (int_t level {max_level}; level > 2; --level) {
-    //     source_coefs[level - 1] = get_parent_farfield_coefs(
-    //         source_coefs[level], level, p);
-    // }
-
     source_coefs<range_t, int_t> source_coefs(max_level, p);
     get_finest_multipole_coefs(
         src_bookmarks,

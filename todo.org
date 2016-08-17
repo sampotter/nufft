@@ -1,8 +1,10 @@
 * Todo
 ** Immediate todo
+   - [ ] lift vector in fmm1d::evaluate
    - [ ] farfield -> multipole in cpp
    - [ ] make vectors in compute_parent_farfield_coefs static
    - [ ] add_coefs -> accumulate_coefs (in compute_parent_farfield_coefs)
+   - [ ] fix tests that are failing due to floating point roundoff
    - [ ] do_* -> compute_*
    - [ ] make source_coefs a template parameter---think about a "coefs
      concept"

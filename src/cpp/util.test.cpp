@@ -24,5 +24,5 @@ BOOST_AUTO_TEST_CASE (linspace_kahan_summation_works) {
 }
 
 // Local Variables:
-// indent-tabs-mode: p
+// indent-tabs-mode: nil
 // End:

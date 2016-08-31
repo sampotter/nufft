@@ -10,7 +10,6 @@
 #include "index_manip.hpp"
 #include "math.hpp"
 #include "source_coefs.hpp"
-#include "util.hpp"
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void

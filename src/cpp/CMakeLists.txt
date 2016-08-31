@@ -3,8 +3,8 @@ cmake_minimum_required (VERSION 3.4)
 
 set (CMAKE_CXX_FLAGS "-Wall -Wextra -std=c++1z")
 set (CMAKE_CXX_FLAGS_DEBUG "-O0 -g -DNUFFT_DEBUG")
-set (CMAKE_CXX_FLAGS_RELEASE "-O3 -flto -ffast-math")
-set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -ffast-math -g")
+set (CMAKE_CXX_FLAGS_RELEASE "-O3 -flto -ffast-math -DNUFFT_RELEASE")
+set (CMAKE_CXX_FLAGS_RELWITHDEBINFO "-O3 -ffast-math -g -DNUFFT_RELEASE")
 
 find_package (Boost)
 find_package (Armadillo REQUIRED)

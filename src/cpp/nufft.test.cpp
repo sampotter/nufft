@@ -4,7 +4,19 @@
 
 #include "nufft.hpp"
 
-BOOST_AUTO_TEST_CASE (basic_test, *boost::unit_test::tolerance(1e-15)) {
+#ifdef NUFFT_DEBUG
+double constexpr basic_test_precision {1e-15};
+#endif
+
+// This drop in precision is because of -ffast-math.
+#ifdef NUFFT_RELEASE
+double constexpr basic_test_precision {1e-12};
+#endif
+
+BOOST_AUTO_TEST_CASE (
+	basic_test,
+	*boost::unit_test::tolerance(basic_test_precision))
+{
 	double values_double[] = {
 		0.00000000,
 		+0.00000000e+00,

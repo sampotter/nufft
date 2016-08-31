@@ -26,6 +26,7 @@ add_executable (nufft.test nufft.test.cpp nufft.hpp nufft.impl.hpp nufft.cpp
 target_link_libraries (nufft.test ${ARMADILLO_LIBRARIES})
 add_executable (source_coefs.test source_coefs.test.cpp source_coefs.hpp
   source_coefs.impl.hpp)
+add_executable (stencils.test stencils.test.cpp stencils.hpp stencils.impl.hpp)
 
 set (nufft_tests
   bookmarks
@@ -35,7 +36,8 @@ set (nufft_tests
   fmm1d
   math
   nufft
-  source_coefs)
+  source_coefs
+  stencils)
 foreach (test ${nufft_tests})
   set_target_properties (${test}.test PROPERTIES COMPILE_FLAGS
     "-DNUFFT_UNIT_TEST")

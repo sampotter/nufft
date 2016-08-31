@@ -115,26 +115,32 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
         }
     }
 
-    static vector_t<domain_t> coefs(p);
-    for (int_t i {0}; i < p; ++i) {
-        coefs[i] = 1;
-    }
+	static_assert(std::is_signed<decltype(p)>::value);
+	static decltype(p) current_p {-1};
+    static vector_t<domain_t> coefs;
+	if (p != current_p) {
+		coefs.resize(p*p);
+		coefs.shrink_to_fit();
+		current_p = p;
+		for (int_t i {0}; i < p; ++i) {
+			coefs[i] = 1;
+		}
+		for (int_t i {1}; i < p; ++i) {
+			for (int_t j {0}; j < p; ++j) {
+				coefs[p*i + j] = coefs[p*(i - 1) + j];
+			}
+			for (int_t j {1}; j < p; ++j) {
+				coefs[p*i + j] += coefs[p*i + j - 1];
+			}
+		}
+	}
 
     for (int_t i {0}; i < p; ++i) {
         for (int_t j {0}; j < p; ++j) {
-            output[i] += coefs[j] * deltas[j] * input[j];
+            output[i] += coefs[p*i + j] * deltas[j] * input[j];
         }
-
         for (auto & delta: deltas) {
             delta *= -delta_recip;
-        }
-
-        // TODO: looks like coefs doesn't depend on input data, except for
-        // p---can we compute it more (space) efficiently, and without
-        // allocating?
-
-        for (int_t i {1}; i < p; ++i) {
-            coefs[i] += coefs[i - 1];
         }
     }
 }

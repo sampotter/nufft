@@ -101,6 +101,10 @@ nufft::cauchy<domain_t, range_t, int_t>::apply_SR_translation(
     domain_t delta,
     int_t p)
 {
+#ifdef NUFFT_DEBUG
+	assert(p > 0);
+#endif
+
     domain_t const delta_recip = 1.0/delta;
     
     static vector_t<domain_t> deltas(p);

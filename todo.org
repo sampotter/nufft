@@ -1,18 +1,30 @@
 * Todo
 ** Immediate todo
-   - [ ] lift vector in fmm1d::evaluate
-   - [ ] farfield -> multipole in cpp
-   - [ ] make vectors in compute_parent_farfield_coefs static
-   - [ ] add_coefs -> accumulate_coefs (in compute_parent_farfield_coefs)
-   - [ ] fix tests that are failing due to floating point roundoff
-   - [ ] do_* -> compute_*
+   - [X] lift vector in fmm1d::evaluate
+   - [X] farfield -> multipole in cpp
+   - [X] make vectors in compute_parent_farfield_coefs static
+   - [X] add_coefs -> accumulate_coefs (in compute_parent_farfield_coefs)
+   - [X] fix tests that are failing due to floating point roundoff
+   - [X] use static bool to attend to TODO at cauchy.impl.hpp:128
+   - [ ] write test for the precomputed SR coefficients
    - [ ] make source_coefs a template parameter---think about a "coefs
      concept"
    - [ ] Replace one of the waveforms with random combinations of
      sinusoids
-   - [ ] Add nufft::source_coefs unit tests
+   - [ ] improve timing method in Python
+   - [ ] fix static vectors:
+	 - [ ] make sure they get recomputed if any parameters they depend
+       on change
+	 - [ ] add tests for this
+	 - [ ] or... we could just factor out the vectors into workspaces
+       so that this doesn't need to happen---either way.
+   - [X] Add nufft::source_coefs unit tests
    - [ ] Build on a Linux machine and see what the output is like
      (i.e. if we're getting weird push_back slow path stuff)
+   - [ ] -ffast-math:
+	 - [ ] Figure out how much of a speedup it provides
+	 - [ ] Figure out how much error it causes
+	 - [ ] Figure out if it's worth it
    - [ ] Count the number of translations (and initial multipole
      expansions) that are being done and see if our method /should/
      beat it (before implementing it...)

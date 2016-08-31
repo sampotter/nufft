@@ -259,11 +259,14 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
 
         if (!direct_indices.empty()) {
             for (int_t j {left}; j <= right; ++j) {
+                auto const begin = &direct_indices[0];
+                auto const end = begin + direct_indices.size();
                 output[j] += kernel_t::phi(
                     targets[j],
                     sources.data(),
                     weights.data(),
-                    direct_indices);
+                    begin,
+                    end);
             }
         }
 

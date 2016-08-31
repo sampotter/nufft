@@ -19,7 +19,8 @@ namespace nufft {
         static range_t phi(domain_t y,
                            domain_t const * sources,
                            range_t const * weights,
-                           vector_t<int_t> const & indices);
+                           int_t const * indices_begin,
+                           int_t const * indices_end);
                 
         static range_t R(int_t p, domain_t x, range_t const * coefs);
 

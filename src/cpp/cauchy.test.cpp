@@ -293,7 +293,9 @@ BOOST_AUTO_TEST_CASE (vectorized_phi_works) {
     double sources[] = {-0.5, -0.2, 0.3, 0.7};
     double weights[] = {0.1, 0.2, 0.3, 0.4};
     vector_t<int_t> indices {0, 1, 2, 3};
-    double actual {nufft::cauchy<>::phi(y, sources, weights, indices)};
+    auto const begin = &indices[0];
+    auto const end = begin + indices.size();
+    double actual {nufft::cauchy<>::phi(y, sources, weights, begin, end)};
     double expected {0};
     for (auto & i: indices) {
         expected += weights[i]*nufft::cauchy<>::phi(y, sources[i]);

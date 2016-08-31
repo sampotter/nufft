@@ -5,8 +5,6 @@
 #include <cmath>
 #include <type_traits>
 
-#include <armadillo>
-
 #include "cauchy.hpp"
 #include "fmm1d.hpp"
 #include "traits.hpp"
@@ -144,32 +142,8 @@ nufft::compute_P(
 	// Compute coefficients C[1], C[2], ..., C[p-1] using R and
 	// Phi. Following that, compute C[0] using the "mean difference"
 	// method.
-	//
-	// TODO: For now, this uses the Armadillo matrix library. In the
-	// future, it should use a bespoke method that takes advantage of
-	// the problem structure.
 
 	std::vector<std::complex<range_t>> C(p, 0);
-	{
-		using namespace arma;
-
-		cx_mat R_mat(num_cps, p - 1);
-		for (int_t j = 0; j < p - 1; ++j) {
-			for (int_t i = 0; i < num_cps; ++i) {
-				R_mat(i, j) = R[i*p + j + 1];
-			}
-		}
-
-		cx_mat Phi_mat(num_cps, 1);
-		for (int_t i = 0; i < num_cps; ++i) {
-			Phi_mat(i) = Phi[i];
-		}
-
-		cx_mat const C_mat = pinv(R_mat)*Phi_mat;
-		for (int_t i = 1; i < p; ++i) {
-			C[i] = C_mat(i - 1);
-		}
-	}
 	{
 		domain_t const pi {3.141592653589793};
 		std::complex<range_t> c0 {0, 0};

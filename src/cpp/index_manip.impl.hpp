@@ -3,7 +3,12 @@
 
 #include <cassert>
 #include <cmath>
-#include <iterator>
+
+template <class int_t>
+nufft::index_pair<int_t>::index_pair(int_t first, int_t second):
+    first {first},
+    second {second}
+{}
 
 template <class domain_t, class range_t, class int_t>
 int_t
@@ -16,7 +21,7 @@ nufft::index_manip<domain_t, range_t, int_t>::get_parent(int_t index)
 }
 
 template <class domain_t, class range_t, class int_t>
-typename nufft::index_manip<domain_t, range_t, int_t>::index_pair_type
+nufft::index_pair<int_t>
 nufft::index_manip<domain_t, range_t, int_t>::get_children(int_t index)
 {
 #if DEBUG

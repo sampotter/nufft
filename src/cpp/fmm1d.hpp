@@ -39,11 +39,11 @@ namespace nufft {
 
         static void
         get_multipole_coefs(domain_t const * sources,
-                                range_t const * weights,
-                                int_t num_sources,
-                                domain_t x_star,
-                                int_t p,
-                                range_t * coefs);
+                            range_t const * weights,
+                            int_t num_sources,
+                            domain_t x_star,
+                            int_t p,
+                            range_t * coefs);
 
         static void
         get_finest_multipole_coefs(

@@ -2,6 +2,7 @@
 #define __NUFFT_FMM1D_IMPL_HPP__
 
 #include <algorithm>
+#include <functional>
 
 #ifdef NUFFT_DEBUG
 #    include <boost/range/adaptor/map.hpp>
@@ -10,6 +11,58 @@
 #include "index_manip.hpp"
 #include "math.hpp"
 #include "source_coefs.hpp"
+
+template <class kernel_t, class domain_t, class range_t, class int_t>
+void
+nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::mark_stencils(
+    bookmarks<domain_t, int_t> const & target_bookmarks,
+    SS_stencil<int_t> & SS_stencil,
+    SR_stencil<int_t> & SR_stencil,
+    RR_stencil<int_t> & RR_stencil,
+    int_t max_level)
+{
+#ifdef NUFFT_DEBUG
+    assert(max_level >= 2);
+#endif
+	using mark_func_t = std::function<void(int_t, int_t)>;
+	mark_func_t const mark_SS_stencil_rec = [&] (int_t level, int_t index) {
+		if (!SS_stencil.test(level, index)) {
+			SS_stencil.set(level, index);
+			if (level < max_level) {
+				auto const children = get_children(index);
+				mark_SS_stencil_rec(level + 1, children.first);
+				mark_SS_stencil_rec(level + 1, children.second);
+			}
+		}
+    };
+	mark_func_t const mark_stencils_rec = [&] (int_t level, int_t index) {
+		if (level > 2) {
+			RR_stencil.set(level, index);
+		}
+        static int_t E4_neighbors[3];
+        get_E4_neighbors(index, E4_neighbors);
+		for (int_t i {0}, n {E4_neighbors[i]}; i < 3; n = E4_neighbors[++i]) {
+            if (0 <= n && n < (1 << level)) {
+                SR_stencil.set(level, index, i);
+				if (level < max_level) {
+					auto const children = get_children(n);
+					mark_SS_stencil_rec(level + 1, children.first);
+					mark_SS_stencil_rec(level + 1, children.second);
+				}
+            }
+        }
+		if (level > 2) {
+			mark_stencils_rec(level - 1, get_parent(index));
+		}
+    };
+    auto const max_index = 1 << max_level;
+    for (int_t index {0}; index < max_index; ++index) {
+        auto const bookmark = target_bookmarks(max_level, index);
+        if (!bookmark.empty()) {
+            mark_stencils_rec(max_level, index);
+        }
+    }
+}
 
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
@@ -314,6 +367,11 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
     
     bookmarks<domain_t, int_t> const src_bookmarks {sources, max_level};
     bookmarks<domain_t, int_t> const trg_bookmarks {targets, max_level};
+
+    SS_stencil<int_t> SS_stencil {max_level};
+    SR_stencil<int_t> SR_stencil {max_level};
+    RR_stencil<int_t> RR_stencil {max_level};
+	mark_stencils(trg_bookmarks, SS_stencil, SR_stencil, RR_stencil, max_level);
 
     source_coefs<range_t, int_t> source_coefs(max_level, p);
     get_finest_multipole_coefs(

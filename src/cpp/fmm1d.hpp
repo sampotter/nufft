@@ -10,6 +10,7 @@
 #include "bookmarks.hpp"
 #include "index_manip.hpp"
 #include "source_coefs.hpp"
+#include "stencils.hpp"
 #include "traits.hpp"
 
 namespace nufft {
@@ -24,9 +25,17 @@ namespace nufft {
         static auto constexpr get_box_center = index_manip_t::get_box_center;
         static auto constexpr get_children = index_manip_t::get_children;
         static auto constexpr get_E4_neighbors = index_manip_t::get_E4_neighbors;
+        static auto constexpr get_parent = index_manip_t::get_parent;
 
         template <class T> using vector_t = std::vector<T>;
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;
+
+        static void
+        mark_stencils(bookmarks<domain_t, int_t> const & target_bookmarks,
+                      SS_stencil<int_t> & SS_stencil,
+                      SR_stencil<int_t> & SR_stencil,
+                      RR_stencil<int_t> & RR_stencil,
+                      int_t max_level);
 
         static void
         get_multipole_coefs(domain_t const * sources,

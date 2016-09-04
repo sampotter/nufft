@@ -1832,6 +1832,489 @@ BOOST_AUTO_TEST_CASE (deeper_depths_dont_crash) {
     }
 }
 
+BOOST_AUTO_TEST_CASE (mark_stencils_works__single_target__L_is_2) {
+    using namespace nufft;
+
+    std::vector<double> targets = {0.5}; // just a single point in the middle
+
+    int L = 2;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(SR_stencil.test(2, 2, 0)); // only this one!
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+}
+
+BOOST_AUTO_TEST_CASE (mark_stencils_works__single_target__L_is_3) {
+    using namespace nufft;
+
+    std::vector<double> targets = {0.5}; // just a single point in the middle
+
+    int L = 3;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    BOOST_CHECK(SS_stencil.test(3, 0)); // only these
+    BOOST_CHECK(SS_stencil.test(3, 1)); // two!
+    BOOST_CHECK(!SS_stencil.test(3, 2));
+    BOOST_CHECK(!SS_stencil.test(3, 3));
+    BOOST_CHECK(!SS_stencil.test(3, 4));
+    BOOST_CHECK(!SS_stencil.test(3, 5));
+    BOOST_CHECK(!SS_stencil.test(3, 6));
+    BOOST_CHECK(!SS_stencil.test(3, 7));
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(SR_stencil.test(2, 2, 0)); // only this one!
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+
+    BOOST_CHECK(!SR_stencil.test(3, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 2));
+    BOOST_CHECK(SR_stencil.test(3, 4, 0)); // only
+    BOOST_CHECK(SR_stencil.test(3, 4, 1)); // these
+    BOOST_CHECK(SR_stencil.test(3, 4, 2)); // three!
+    BOOST_CHECK(!SR_stencil.test(3, 5, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 2));
+
+    BOOST_CHECK(!RR_stencil.test(3, 0));
+    BOOST_CHECK(!RR_stencil.test(3, 1));
+    BOOST_CHECK(!RR_stencil.test(3, 2));
+    BOOST_CHECK(!RR_stencil.test(3, 3));
+    BOOST_CHECK(RR_stencil.test(3, 4)); // only this one!
+    BOOST_CHECK(!RR_stencil.test(3, 5));
+    BOOST_CHECK(!RR_stencil.test(3, 6));
+    BOOST_CHECK(!RR_stencil.test(3, 7));
+}
+
+BOOST_AUTO_TEST_CASE (mark_stencils_works__single_target__L_is_4) {
+    using namespace nufft;
+
+    std::vector<double> targets = {0.5}; // just a single point in the middle
+
+    int L = 4;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    BOOST_CHECK(SS_stencil.test(3, 0)); // only these
+    BOOST_CHECK(SS_stencil.test(3, 1)); // two!
+    BOOST_CHECK(!SS_stencil.test(3, 2));
+    BOOST_CHECK(!SS_stencil.test(3, 3));
+    BOOST_CHECK(!SS_stencil.test(3, 4));
+    BOOST_CHECK(!SS_stencil.test(3, 5));
+    BOOST_CHECK(!SS_stencil.test(3, 6));
+    BOOST_CHECK(!SS_stencil.test(3, 7));
+
+    BOOST_CHECK(SS_stencil.test(4, 0));
+    BOOST_CHECK(SS_stencil.test(4, 1));
+    BOOST_CHECK(SS_stencil.test(4, 2));
+    BOOST_CHECK(SS_stencil.test(4, 3));
+    BOOST_CHECK(SS_stencil.test(4, 4));
+    BOOST_CHECK(SS_stencil.test(4, 5));
+    BOOST_CHECK(!SS_stencil.test(4, 6)); // all
+    BOOST_CHECK(!SS_stencil.test(4, 7)); // of
+    BOOST_CHECK(!SS_stencil.test(4, 8)); // them
+    BOOST_CHECK(!SS_stencil.test(4, 9)); // except
+    BOOST_CHECK(!SS_stencil.test(4, 10)); // for
+    BOOST_CHECK(!SS_stencil.test(4, 11)); // these
+    BOOST_CHECK(SS_stencil.test(4, 12));
+    BOOST_CHECK(SS_stencil.test(4, 13));
+    BOOST_CHECK(SS_stencil.test(4, 14));
+    BOOST_CHECK(SS_stencil.test(4, 15));
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(SR_stencil.test(2, 2, 0)); // only this one!
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+
+    BOOST_CHECK(!SR_stencil.test(3, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 2));
+    BOOST_CHECK(SR_stencil.test(3, 4, 0)); // only
+    BOOST_CHECK(SR_stencil.test(3, 4, 1)); // these
+    BOOST_CHECK(SR_stencil.test(3, 4, 2)); // three!
+    BOOST_CHECK(!SR_stencil.test(3, 5, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 2));
+
+    BOOST_CHECK(!SR_stencil.test(4, 0, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 0, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 2));
+    BOOST_CHECK(SR_stencil.test(4, 8, 0)); // only
+    BOOST_CHECK(SR_stencil.test(4, 8, 1)); // these
+    BOOST_CHECK(SR_stencil.test(4, 8, 2)); // three!
+    BOOST_CHECK(!SR_stencil.test(4, 9, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 9, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 9, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 15, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 15, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 15, 2));
+
+    BOOST_CHECK(!RR_stencil.test(3, 0));
+    BOOST_CHECK(!RR_stencil.test(3, 1));
+    BOOST_CHECK(!RR_stencil.test(3, 2));
+    BOOST_CHECK(!RR_stencil.test(3, 3));
+    BOOST_CHECK(RR_stencil.test(3, 4)); // only this one!
+    BOOST_CHECK(!RR_stencil.test(3, 5));
+    BOOST_CHECK(!RR_stencil.test(3, 6));
+    BOOST_CHECK(!RR_stencil.test(3, 7));
+
+    BOOST_CHECK(!RR_stencil.test(4, 0));
+    BOOST_CHECK(!RR_stencil.test(4, 1));
+    BOOST_CHECK(!RR_stencil.test(4, 2));
+    BOOST_CHECK(!RR_stencil.test(4, 3));
+    BOOST_CHECK(!RR_stencil.test(4, 4));
+    BOOST_CHECK(!RR_stencil.test(4, 5));
+    BOOST_CHECK(!RR_stencil.test(4, 6));
+    BOOST_CHECK(!RR_stencil.test(4, 7));
+    BOOST_CHECK(RR_stencil.test(4, 8)); // only this one!
+    BOOST_CHECK(!RR_stencil.test(4, 9));
+    BOOST_CHECK(!RR_stencil.test(4, 10));
+    BOOST_CHECK(!RR_stencil.test(4, 11));
+    BOOST_CHECK(!RR_stencil.test(4, 12));
+    BOOST_CHECK(!RR_stencil.test(4, 13));
+    BOOST_CHECK(!RR_stencil.test(4, 14));
+    BOOST_CHECK(!RR_stencil.test(4, 15));
+}
+
+BOOST_AUTO_TEST_CASE (mark_stencils_works__two_targets__L_is_4) {
+    using namespace nufft;
+
+    // one point in each of the edge boxes
+    std::vector<double> targets = {0.03125, 0.96875};
+
+    int L = 4;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    // should have to compute all SS translations
+    for (int l = 3; l <= L; ++l) {
+        for (int i = 0; i < (1 << l); ++i) {
+            BOOST_CHECK(SS_stencil.test(l, i));
+        }
+    }
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(SR_stencil.test(2, 0, 1)); // these
+    BOOST_CHECK(SR_stencil.test(2, 0, 2)); // two
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(SR_stencil.test(2, 3, 0)); // and these
+    BOOST_CHECK(SR_stencil.test(2, 3, 1)); // two
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+
+    BOOST_CHECK(!SR_stencil.test(3, 0, 0));
+    BOOST_CHECK(SR_stencil.test(3, 0, 1)); // these
+    BOOST_CHECK(SR_stencil.test(3, 0, 2)); // two
+    BOOST_CHECK(!SR_stencil.test(3, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 3, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 4, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 4, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 4, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 5, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 2));
+    BOOST_CHECK(SR_stencil.test(3, 7, 0)); // and these
+    BOOST_CHECK(SR_stencil.test(3, 7, 1)); // two
+    BOOST_CHECK(!SR_stencil.test(3, 7, 2));
+
+    BOOST_CHECK(!SR_stencil.test(4, 0, 0));
+    BOOST_CHECK(SR_stencil.test(4, 0, 1)); // these
+    BOOST_CHECK(SR_stencil.test(4, 0, 2)); // two
+    BOOST_CHECK(!SR_stencil.test(4, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 1, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 1, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 2, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 3, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 4, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 5, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 6, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 7, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 8, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 8, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 8, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 9, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 9, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 9, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 10, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 11, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 12, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 13, 2));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 0));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 1));
+    BOOST_CHECK(!SR_stencil.test(4, 14, 2));
+    BOOST_CHECK(SR_stencil.test(4, 15, 0)); // and these
+    BOOST_CHECK(SR_stencil.test(4, 15, 1)); // two
+    BOOST_CHECK(!SR_stencil.test(4, 15, 2));
+
+    BOOST_CHECK(RR_stencil.test(3, 0)); // these
+    BOOST_CHECK(!RR_stencil.test(3, 1));
+    BOOST_CHECK(!RR_stencil.test(3, 2));
+    BOOST_CHECK(!RR_stencil.test(3, 3));
+    BOOST_CHECK(!RR_stencil.test(3, 4));
+    BOOST_CHECK(!RR_stencil.test(3, 5));
+    BOOST_CHECK(!RR_stencil.test(3, 6));
+    BOOST_CHECK(RR_stencil.test(3, 7)); // two
+
+    BOOST_CHECK(RR_stencil.test(4, 0)); // these
+    BOOST_CHECK(!RR_stencil.test(4, 1));
+    BOOST_CHECK(!RR_stencil.test(4, 2));
+    BOOST_CHECK(!RR_stencil.test(4, 3));
+    BOOST_CHECK(!RR_stencil.test(4, 4));
+    BOOST_CHECK(!RR_stencil.test(4, 5));
+    BOOST_CHECK(!RR_stencil.test(4, 6));
+    BOOST_CHECK(!RR_stencil.test(4, 7));
+    BOOST_CHECK(!RR_stencil.test(4, 8));
+    BOOST_CHECK(!RR_stencil.test(4, 9));
+    BOOST_CHECK(!RR_stencil.test(4, 10));
+    BOOST_CHECK(!RR_stencil.test(4, 11));
+    BOOST_CHECK(!RR_stencil.test(4, 12));
+    BOOST_CHECK(!RR_stencil.test(4, 13));
+    BOOST_CHECK(!RR_stencil.test(4, 14));
+    BOOST_CHECK(RR_stencil.test(4, 15)); // two
+}
+
+BOOST_AUTO_TEST_CASE (mark_stencils_works__dense_targets__L_is_2) {
+    using namespace nufft;
+
+    std::vector<double> targets = {0.125, 0.375, 0.625, 0.875};
+
+    int L = 2;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(SR_stencil.test(2, 0, 1));
+    BOOST_CHECK(SR_stencil.test(2, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(SR_stencil.test(2, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(SR_stencil.test(2, 3, 0));
+    BOOST_CHECK(SR_stencil.test(2, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+}
+
+BOOST_AUTO_TEST_CASE (mark_stencils_works__dense_targets__L_is_3) {
+    using namespace nufft;
+
+    std::vector<double> targets(8);
+    double target = 0.0625;
+    for (int i = 0; i < 8; ++i) {
+        targets[i] = target;
+        target += 0.125;
+    }
+
+    int L = 3;
+    bookmarks<double, int> target_bookmarks {targets, L};
+    SS_stencil<int> SS_stencil {L};
+    SR_stencil<int> SR_stencil {L};
+    RR_stencil<int> RR_stencil {L};
+
+    fmm1d<cauchy<>, double, double, int>::mark_stencils(
+        target_bookmarks, SS_stencil, SR_stencil, RR_stencil, L);
+
+    for (int i = 0; i < 8; ++i) {
+        BOOST_CHECK(SS_stencil.test(3, i));
+    }
+
+    BOOST_CHECK(!SR_stencil.test(2, 0, 0));
+    BOOST_CHECK(SR_stencil.test(2, 0, 1));
+    BOOST_CHECK(SR_stencil.test(2, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 1, 1));
+    BOOST_CHECK(SR_stencil.test(2, 1, 2));
+    BOOST_CHECK(SR_stencil.test(2, 2, 0));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 2, 2));
+    BOOST_CHECK(SR_stencil.test(2, 3, 0));
+    BOOST_CHECK(SR_stencil.test(2, 3, 1));
+    BOOST_CHECK(!SR_stencil.test(2, 3, 2));
+
+    BOOST_CHECK(!SR_stencil.test(3, 0, 0));
+    BOOST_CHECK(SR_stencil.test(3, 0, 1));
+    BOOST_CHECK(SR_stencil.test(3, 0, 2));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 1, 1));
+    BOOST_CHECK(SR_stencil.test(3, 1, 2));
+    BOOST_CHECK(SR_stencil.test(3, 2, 0));
+    BOOST_CHECK(SR_stencil.test(3, 2, 1));
+    BOOST_CHECK(SR_stencil.test(3, 2, 2));
+    BOOST_CHECK(SR_stencil.test(3, 3, 0));
+    BOOST_CHECK(SR_stencil.test(3, 3, 1));
+    BOOST_CHECK(SR_stencil.test(3, 3, 2));
+    BOOST_CHECK(SR_stencil.test(3, 4, 0));
+    BOOST_CHECK(SR_stencil.test(3, 4, 1));
+    BOOST_CHECK(SR_stencil.test(3, 4, 2));
+    BOOST_CHECK(SR_stencil.test(3, 5, 0));
+    BOOST_CHECK(SR_stencil.test(3, 5, 1));
+    BOOST_CHECK(SR_stencil.test(3, 5, 2));
+    BOOST_CHECK(SR_stencil.test(3, 6, 0));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 6, 2));
+    BOOST_CHECK(SR_stencil.test(3, 7, 0));
+    BOOST_CHECK(SR_stencil.test(3, 7, 1));
+    BOOST_CHECK(!SR_stencil.test(3, 7, 2));
+
+    for (int i = 0; i < 8; ++i) {
+        BOOST_CHECK(RR_stencil.test(3, i));
+    }
+}
+
 // Local Variables:
 // indent-tabs-mode: nil
 // End:

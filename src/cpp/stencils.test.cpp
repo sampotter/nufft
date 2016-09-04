@@ -12,29 +12,20 @@ struct SS_stencil_fixture {
 };
 
 BOOST_FIXTURE_TEST_CASE (SS_set_works, SS_stencil_fixture) {
-	stencil.set(2, 0, 1);
-	stencil.set(2, 1, 1);
 	stencil.set(3, 0, 1);
 	stencil.set(4, 0, 1);
-	BOOST_CHECK(stencil.mask_.test(3));
-	BOOST_CHECK(stencil.mask_.test(4));
 	BOOST_CHECK(stencil.mask_.test(7));
 	BOOST_CHECK(stencil.mask_.test(15));
 }
 
 BOOST_FIXTURE_TEST_CASE (SS_test_works, SS_stencil_fixture) {
-	stencil.mask_.set(3);
-	stencil.mask_.set(4);
 	stencil.mask_.set(7);
 	stencil.mask_.set(15);
-	stencil.test(2, 0);
-	stencil.test(2, 1);
 	stencil.test(3, 0);
 	stencil.test(4, 0);
 }
 
 BOOST_FIXTURE_TEST_CASE (SS_get_level_index_works, SS_stencil_fixture) {
-	BOOST_CHECK_EQUAL(stencil.get_level_index(2), 3);
 	BOOST_CHECK_EQUAL(stencil.get_level_index(3), 7);
 	BOOST_CHECK_EQUAL(stencil.get_level_index(4), 15);
 }
@@ -49,29 +40,20 @@ struct RR_stencil_fixture {
 };
 
 BOOST_FIXTURE_TEST_CASE (RR_set_works, RR_stencil_fixture) {
-	stencil.set(2, 0, 1);
-	stencil.set(2, 1, 1);
 	stencil.set(3, 0, 1);
 	stencil.set(4, 0, 1);
-	BOOST_CHECK(stencil.mask_.test(3));
-	BOOST_CHECK(stencil.mask_.test(4));
 	BOOST_CHECK(stencil.mask_.test(7));
 	BOOST_CHECK(stencil.mask_.test(15));
 }
 
 BOOST_FIXTURE_TEST_CASE (RR_test_works, RR_stencil_fixture) {
-	stencil.mask_.set(3);
-	stencil.mask_.set(4);
 	stencil.mask_.set(7);
 	stencil.mask_.set(15);
-	stencil.test(2, 0);
-	stencil.test(2, 1);
 	stencil.test(3, 0);
 	stencil.test(4, 0);
 }
 
 BOOST_FIXTURE_TEST_CASE (RR_get_level_index_works, RR_stencil_fixture) {
-	BOOST_CHECK_EQUAL(stencil.get_level_index(2), 3);
 	BOOST_CHECK_EQUAL(stencil.get_level_index(3), 7);
 	BOOST_CHECK_EQUAL(stencil.get_level_index(4), 15);
 }

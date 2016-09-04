@@ -14,7 +14,7 @@ void
 nufft::SS_stencil<int_t>::set(int_t level, int_t index, bool value)
 {
 #ifdef NUFFT_DEBUG
-	assert(level >= 2);
+	assert(level > 2);
 	assert(level <= max_level_);
 	assert(index >= 0);
 	assert(index < 1 << level);
@@ -27,7 +27,7 @@ bool
 nufft::SS_stencil<int_t>::test(int_t level, int_t index) const
 {
 #ifdef NUFFT_DEBUG
-	assert(level >= 2);
+	assert(level > 2);
 	assert(level <= max_level_);
 	assert(index >= 0);
 	assert(index < 1 << level);
@@ -41,7 +41,7 @@ int_t
 nufft::SS_stencil<int_t>::get_level_index(int_t level) const
 {
 #ifdef NUFFT_DEBUG
-	assert(level >= 2);
+	assert(level > 2);
 	assert(level <= max_level_);
 #endif
 	return (1 << level) - 1;

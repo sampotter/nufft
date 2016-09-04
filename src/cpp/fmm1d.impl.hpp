@@ -101,9 +101,8 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_finest_multipole_coefs(
 {
 #ifdef NUFFT_DEBUG
     assert(p > 0);
-    assert(std::pow(2, max_level) <= std::numeric_limits<int_t>::max());
 #endif
-    auto const max_index = static_cast<int_t>(std::pow(2, max_level));
+    auto const max_index = 1 << max_level;
     for (int_t index {0}; index < max_index; ++index) {
         auto const bookmark = source_bookmarks(max_level, index);
         if (bookmark.empty()) {
@@ -131,10 +130,9 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
 #ifdef NUFFT_DEBUG
     assert(p > 0);
     assert(level > 0);
-    assert(std::pow(2, level) <= std::numeric_limits<int_t>::max());
 #endif
     
-    auto const max_index = static_cast<int_t>(std::pow(2, level));
+    auto const max_index = 1 << level;
     auto const parent_level {level - 1};
     auto const max_parent_index = max_index / 2;
     
@@ -173,7 +171,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     int_t level,
     int_t p)
 {
-    auto const max_key = std::pow(2, level);
+    auto const max_key = 1 << level;
 #ifdef NUFFT_DEBUG
     auto const validate_coefs = [max_key] (coefs_type const & coefs) {
         for (auto const & entry: coefs) {
@@ -217,7 +215,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
 {
     auto const parent_level = level;
     auto const child_level = level + 1;
-    auto const max_parent_index = std::pow(2, parent_level);
+    auto const max_parent_index = 1 << parent_level;
 #ifdef NUFFT_DEBUG
     auto const verify_keys = [] (coefs_type const & coefs, int_t max_index) {
         auto const keys = coefs | boost::adaptors::map_keys;
@@ -231,7 +229,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
         }
     };
     verify_keys(parent_coefs, max_parent_index);
-    verify_keys(child_coefs, std::pow(2, child_level));
+    verify_keys(child_coefs, 1 << child_level);
 #endif
     vector_t<range_t> workspace(p, 0);
     for (int_t i {0}; i < max_parent_index; ++i) {
@@ -272,7 +270,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::evaluate(
     int_t max_level,
     int_t p)
 {
-    auto const max_index = std::pow(2, max_level);
+    auto const max_index = 1 << max_level;
 #ifdef NUFFT_DEBUG
     assert(std::size(output) == std::size(targets));
     auto const keys = coefs | boost::adaptors::map_keys;

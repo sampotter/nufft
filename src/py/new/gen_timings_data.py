@@ -11,6 +11,11 @@ import util
 
 include_gt = False
 
+timing_ratio = 0.998
+max_K_power = 4
+p = 4
+n = 7
+
 
 # TODO: need to play with this a bit to figure out good parameters
 def get_irt_timing(pts, coefs):
@@ -32,8 +37,6 @@ def find_optimal_L(pts, coefs):
     F = np.fft.ifft(np.fft.fftshift(coefs))
     K = int(F.size/2)
     Y = pts
-    p = 4
-    n = 3
 
     L = 2
     output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
@@ -49,8 +52,6 @@ def get_nufft_cpp_timing(pts, coefs, L):
     F = np.fft.ifft(np.fft.fftshift(coefs))
     K = int(F.size/2)
     Y = pts
-    p = 4
-    n = 3
     output, t = nufft.inufft_cpp(F, K, Y, L, p, n)
     return t
 
@@ -70,7 +71,7 @@ def get_gt_timing(pts, coefs):
 if __name__ == '__main__':
     square = testfunc.SquareTestSeries()
     Ks = np.array([int(K) if K % 2 == 0 else int(K + 1)
-                   for K in map(np.round, np.logspace(1, 3, 20))])
+                   for K in map(np.round, np.logspace(1, 4, 30))])
     num_sizes = len(Ks)
 
     timing_methods = [
@@ -95,14 +96,16 @@ if __name__ == '__main__':
         for j, timing_method in enumerate(timing_methods):
             if timing_method == get_nufft_cpp_timing:
                 L = find_optimal_L(pts, coefs)
-                times = util.time_adaptive(lambda: timing_method(pts, coefs, L))
+                times = util.time_adaptive(lambda: timing_method(pts, coefs, L),
+                                           timing_ratio)
                 print('  method: %s, time: %g (using L = %d, out of %d trials)'
                       % (timing_method_names[j],
                          times[0],
                          L,
                          len(times)))
             else:
-                times = util.time_adaptive(lambda: timing_method(pts, coefs))
+                times = util.time_adaptive(lambda: timing_method(pts, coefs),
+                                           timing_ratio)
                 print('  method: %s, time: %g (out of %d trials)'
                       % (timing_method_names[j],
                          times[0],

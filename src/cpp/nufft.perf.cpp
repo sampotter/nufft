@@ -4,12 +4,12 @@
 #include <complex>
 #include <random>
 
-auto const NUM_VALUES = 7198;
-auto const NUM_NODES = 7198;
+auto const NUM_VALUES = 10000;
+auto const NUM_NODES = 10000;
 auto const NUM_TRIALS = 10;
-auto const FMM_DEPTH = 9;
+auto const FMM_DEPTH = 12;
 auto const TRUNC_NUM = 4;
-auto const NEIGHB_RAD = 3;
+auto const NEIGHB_RAD = 7;
 
 int main() {
 	std::complex<double> values[NUM_VALUES];

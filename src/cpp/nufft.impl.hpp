@@ -26,17 +26,16 @@ nufft::compute_P(
 	// Some preliminaries:
 
 	auto const F = values;
-	// auto const Y = nodes; // TODO: replace this with a scaled vector version
 	auto const J = num_nodes;
-	domain_t const K = num_values/2;
-	int_t const L = fmm_depth;
+	auto const K = 0.5*domain_t(num_values);
+	auto const L = fmm_depth;
 	auto const N = num_values;
 	auto const p = truncation_number;
 	auto const n = neighborhood_radius;
 
-	range_t const twopi {6.283185307179586};
-	int_t const num_cells {2*n + 1};
-	auto const num_cells_recip = 1.0/static_cast<domain_t>(num_cells);
+	auto const twopi = range_t(6.283185307179586);
+	auto const num_cells = 2*n + 1;
+	auto const num_cells_recip = 1.0/domain_t(num_cells);
 	auto const scale_factor = num_cells_recip*(1.0/twopi);
 
 	// Initialize X_per, the periodic extension of X to the periodic

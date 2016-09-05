@@ -125,6 +125,7 @@ void
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
     int_t level,
     int_t p,
+	SS_stencil<int_t> const & SS_stencil,
     source_coefs<range_t, int_t> & source_coefs)
 {
 #ifdef NUFFT_DEBUG
@@ -143,7 +144,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
 		auto const parent_center = get_box_center(parent_level, parent_index);
         auto parent_coefs = source_coefs.get_coefs(parent_level, parent_index);
         auto const accumulate_coefs = [&] (int_t const index) {
-            if (source_coefs.test(level, index)) {
+            if (source_coefs.test(level, index) && SS_stencil.test(level, index)) {
 				auto const delta = parent_center - get_box_center(level, index);
 				kernel_t::apply_SS_translation(
 					source_coefs.get_coefs(level, index),
@@ -166,6 +167,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::get_parent_multipole_coefs(
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
+	SR_stencil<int_t> const & SR_stencil,
     source_coefs<range_t, int_t> const & source_coefs,
     coefs_type & output_coefs,
     int_t level,
@@ -186,11 +188,12 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
     for (int_t i {0}; i < max_key; ++i) {
         auto const center = get_box_center(level, i);
         get_E4_neighbors(i, E4_neighbors);
-        for (auto const n: E4_neighbors) {
-            if (n < 0 || n >= max_key) {
-                continue;
-            }
-			if (!source_coefs.test(level, n)) {
+		for (int_t j {0}; j < 3; ++j) {
+			auto const n = E4_neighbors[j];
+            if (n < 0 ||
+				n >= max_key ||
+				!SR_stencil.test(level, i, j) ||
+				!source_coefs.test(level, n)) {
                 continue;
             }
             if (output_coefs.find(i) == std::cend(output_coefs)) {
@@ -208,6 +211,7 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_E4_SR_translations(
 template <class kernel_t, class domain_t, class range_t, class int_t>
 void
 nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
+	RR_stencil<int_t> const & RR_stencil,
     coefs_type const & parent_coefs,
     coefs_type & child_coefs,
     int_t level,
@@ -252,8 +256,12 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::do_RR_translations(
             }
         };
         auto const children = get_children(i);
-        translate(children.first);
-        translate(children.second);
+		if (RR_stencil.test(child_level, children.first)) {
+			translate(children.first);
+		}
+		if (RR_stencil.test(child_level, children.second)) {
+			translate(children.second);
+		}
     }
 }
 
@@ -380,15 +388,18 @@ nufft::fmm1d<kernel_t, domain_t, range_t, int_t>::fmm(
         p,
         source_coefs);
     for (int_t level {max_level}; level > 2; --level) {
-        get_parent_multipole_coefs(level, p, source_coefs);
+        get_parent_multipole_coefs(level, p, SS_stencil, source_coefs);
     }
 
     std::unordered_map<int_t, coefs_type> target_coefs;
     for (int_t level {2}; level < max_level; ++level) {
-        do_E4_SR_translations(source_coefs, target_coefs[level], level, p);
-        do_RR_translations(target_coefs[level], target_coefs[level + 1], level, p);
+        do_E4_SR_translations(SR_stencil, source_coefs, target_coefs[level],
+							  level, p);
+        do_RR_translations(RR_stencil, target_coefs[level],
+						   target_coefs[level + 1], level, p);
     }
-    do_E4_SR_translations(source_coefs, target_coefs[max_level], max_level, p);
+    do_E4_SR_translations(SR_stencil, source_coefs, target_coefs[max_level],
+						  max_level, p);
 
     vector_t<range_t> output(std::size(targets), 0);
     evaluate(src_bookmarks, trg_bookmarks, target_coefs[max_level],

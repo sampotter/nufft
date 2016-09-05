@@ -31,19 +31,21 @@ namespace nufft {
         using coefs_type = std::unordered_map<int_t, vector_t<range_t>>;
 
         static void
-        mark_stencils(bookmarks<domain_t, int_t> const & target_bookmarks,
-                      SS_stencil<int_t> & SS_stencil,
-                      SR_stencil<int_t> & SR_stencil,
-                      RR_stencil<int_t> & RR_stencil,
-                      int_t max_level);
+        mark_stencils(
+            bookmarks<domain_t, int_t> const & target_bookmarks,
+            SS_stencil<int_t> & SS_stencil,
+            SR_stencil<int_t> & SR_stencil,
+            RR_stencil<int_t> & RR_stencil,
+            int_t max_level);
 
         static void
-        get_multipole_coefs(domain_t const * sources,
-                            range_t const * weights,
-                            int_t num_sources,
-                            domain_t x_star,
-                            int_t p,
-                            range_t * coefs);
+        get_multipole_coefs(
+            domain_t const * sources,
+            range_t const * weights,
+            int_t num_sources,
+            domain_t x_star,
+            int_t p,
+            range_t * coefs);
 
         static void
         get_finest_multipole_coefs(
@@ -58,30 +60,36 @@ namespace nufft {
         get_parent_multipole_coefs(
             int_t level,
             int_t p,
+            SS_stencil<int_t> const & SS_stencil,
             source_coefs<range_t, int_t> & source_coefs);
 
         static void
-        do_E4_SR_translations(source_coefs<range_t, int_t> const & source_coefs,
-                              coefs_type & output_coefs,
-                              int_t level,
-                              int_t p);
+        do_E4_SR_translations(
+            SR_stencil<int_t> const & SR_stencil,
+            source_coefs<range_t, int_t> const & source_coefs,
+            coefs_type & output_coefs,
+            int_t level,
+            int_t p);
 
         static void
-        do_RR_translations(coefs_type const & parent_coefs,
-                           coefs_type & child_coefs,
-                           int_t level,
-                           int_t p);
+        do_RR_translations(
+            RR_stencil<int_t> const & RR_stencil,
+            coefs_type const & parent_coefs,
+            coefs_type & child_coefs,
+            int_t level,
+            int_t p);
 
         static void
-        evaluate(bookmarks<domain_t, int_t> const & source_bookmarks,
-                 bookmarks<domain_t, int_t> const & target_bookmarks,
-                 coefs_type const & coefs,
-                 vector_t<range_t> & output,
-                 vector_t<domain_t> const & sources,
-                 vector_t<domain_t> const & targets,
-                 vector_t<range_t> const & weights,
-                 int_t max_level,
-                 int_t p);
+        evaluate(
+            bookmarks<domain_t, int_t> const & source_bookmarks,
+            bookmarks<domain_t, int_t> const & target_bookmarks,
+            coefs_type const & coefs,
+            vector_t<range_t> & output,
+            vector_t<domain_t> const & sources,
+            vector_t<domain_t> const & targets,
+            vector_t<range_t> const & weights,
+            int_t max_level,
+            int_t p);
 
         static vector_t<range_t>
         fmm(vector_t<domain_t> const & sources,

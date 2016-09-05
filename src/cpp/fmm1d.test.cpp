@@ -383,7 +383,12 @@ BOOST_AUTO_TEST_CASE (
         source_coefs.set(level, i);
     }
 
-    fmm1d<cauchy<>>::get_parent_multipole_coefs(level, p, source_coefs);
+    SS_stencil<int_t> SS_stencil {level};
+    for (int_t i {0}; i < 1 << level; ++i) {
+        SS_stencil.set(level, i);
+    }
+
+    fmm1d<cauchy<>>::get_parent_multipole_coefs(level, p, SS_stencil, source_coefs);
 
     fmm1d<cauchy<>>::coefs_type expected_parent_coefs;
     expected_parent_coefs[6] = {
@@ -602,8 +607,16 @@ BOOST_AUTO_TEST_CASE (
         3732.2818319838607,
     };
 
+    SR_stencil<int_t> SR_stencil {level};
+    for (int_t i {0}; i < 1 << level; ++i) {
+        SR_stencil.set(level, i, 0);
+        SR_stencil.set(level, i, 1);
+        SR_stencil.set(level, i, 2);
+    }
+
     fmm1d<cauchy<>>::coefs_type actual_coefs;
     fmm1d<cauchy<>>::do_E4_SR_translations(
+        SR_stencil,
         source_coefs,
         actual_coefs,
         level,
@@ -814,8 +827,13 @@ BOOST_AUTO_TEST_CASE (
         3732.2818319838607,
     };
 
+    RR_stencil<int_t> RR_stencil {4};
+    for (int_t i {0}; i < 1 << 4; ++i) {
+        RR_stencil.set(4, i);
+    }
+
     fmm1d<cauchy<>>::coefs_type actual_coefs;
-    fmm1d<cauchy<>>::do_RR_translations(input_coefs, actual_coefs, level, p);
+    fmm1d<cauchy<>>::do_RR_translations(RR_stencil, input_coefs, actual_coefs, level, p);
 
     auto const max_index = std::pow(2, level + 1);
     auto const assert_indices_subset = [max_index] (

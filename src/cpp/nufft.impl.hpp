@@ -39,9 +39,7 @@ nufft::compute_P(
 	auto const scale_factor = num_cells_recip*(1.0/twopi);
 
 	// Initialize X_per, the periodic extension of X to the periodic
-	// summation neighborhood (X_per is computed with the correct
-	// scale immediately to prevent floating point
-	// errors---specifically, catastrophic cancellation):
+	// summation neighborhood:
 
 	int_t const X_per_size {num_cells*N};
 	std::vector<domain_t> X_per(X_per_size);
@@ -80,19 +78,6 @@ nufft::compute_P(
 	assert(std::is_sorted(std::cbegin(Y), std::cend(Y)));
 #endif
 
-	// Create array of checkpoints and their periodic offsets inside
-	// the scaled target domain.
-
-	auto const num_cps = N;
-
-	std::vector<domain_t> Yc(2*num_cps);
-	for (int_t i = 0; i < 2*num_cps; ++i) {
-		Yc[i] = num_cells_recip*(n + (i + 0.5)/num_cps);
-	}
-#ifdef NUFFT_DEBUG
-	assert(std::is_sorted(std::cbegin(Y), std::cend(Y)));
-#endif
-
 	// Run the FMM on the nodes and the checkpoints separately. In
 	// the future, we may be able to tune each FMM independently.
 
@@ -105,42 +90,7 @@ nufft::compute_P(
 		V[i] *= scale_factor;
 	}
 
-	auto Vc = nufft::fmm1d<
-		nufft::cauchy<domain_t, std::complex<range_t>, int_t>,
-		domain_t,
-		std::complex<range_t>,
-		int_t>::fmm(X_per, Yc, Fas_per, L, p);
-	for (int_t i {0}; i < 2*num_cps; ++i) {
-		Vc[i] *= scale_factor;
-	}
-
-	// Create Phi vector (full of phinear differences) for least
-	// squares collocation.
-
-	std::vector<std::complex<range_t>> Phi(num_cps);
-	for (int_t i {0}; i < num_cps; ++i) {
-		Phi[i] = Vc[i + num_cps] - Vc[i];
-	}
-
-	// Allocate and populate fitting matrix R for collocation.
-
-	std::vector<std::complex<range_t>> R(num_cps*p);
-	{
-		auto const pi = twopi/2;
-		auto const transform = [&] (domain_t const y) {
-			return twopi*(num_cells*y - n);
-		};
-		for (int_t l {0}; l < num_cps; ++l) {
-			for (int_t m {0}; m < p; ++m) {
-				R[l*p + m] = std::pow(transform(Yc[l + num_cps]) - pi, m);
-				R[l*p + m] -= std::pow(transform(Yc[l]) - pi, m);
-			}
-		}
-	}
-
-	// Compute coefficients C[1], C[2], ..., C[p-1] using R and
-	// Phi. Following that, compute C[0] using the "mean difference"
-	// method.
+	// Estimate zeroth "fitting coefficient".
 
 	std::vector<std::complex<range_t>> C(p, 0);
 	{
@@ -156,6 +106,9 @@ nufft::compute_P(
 		}
 		C[0] /= -twopi;
 	}
+
+	// TODO: compute first through (m - 1)th "fitting coefficients"
+	// approximately.
 
 	// This lambda evaluates the phifar polynomial using the
 	// precomputed coefficients C[m].
